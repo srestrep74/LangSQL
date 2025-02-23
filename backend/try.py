@@ -1,17 +1,14 @@
 from src.modules.text_to_sql.service import LangToSqlService
-
-db_structure = """
-Tables:
-- users (id, name, email, created_at)
-- orders (id, user_id, amount, status, created_at)
-- products (id, name, price, stock)
-
-Relationships:
-- users.id -> orders.user_id (One-to-Many)
-- orders.id -> products.id (Many-to-Many through order_items)
-"""
+from src.modules.queries.service import QueryService
+from src.modules.text_to_sql.utils.LLMClient import LLMClient
+from src.modules.queries.utils.DatabaseManager import DatabaseManager
+from src.adapters.queries.QueryAdapter import QueryAdapter
 
 DB_URL = "postgresql://postgres:rposebas2004@localhost:3306/product_db"
 
-query_service = LangToSqlService(DB_URL)
-query_service.conversation()
+db_manager = DatabaseManager(DB_URL)
+query_service = QueryService(db_manager)
+query_adapter = QueryAdapter(query_service)
+llm_client = LLMClient()
+llm_service = LangToSqlService(query_adapter, llm_client)
+llm_service.conversation()
