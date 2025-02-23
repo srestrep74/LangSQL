@@ -10,7 +10,7 @@ class SyntheticDataModelService:
         self.model = config['SYNTHETIC_DATA_MODEL']
         self.conversation_history = []
 
-    def generate_synthetic_data(self, user_input: str):
+    def generate_synthetic_data(self, user_input: str) -> str:
         self.conversation_history.append({"role": "user", "content": user_input})
 
         payload = {
