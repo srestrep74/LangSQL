@@ -11,6 +11,7 @@ Relationships:
 - orders.id -> products.id (Many-to-Many through order_items)
 """
 
-chat_service = LangToSqlService(db_structure)
+DB_URL = "postgresql://postgres:rposebas2004@localhost:3306/product_db"
 
-chat_service.conversation()
+query_service = LangToSqlService(DB_URL)
+query_service.conversation()
