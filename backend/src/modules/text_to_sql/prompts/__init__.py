@@ -1,0 +1,1 @@
+from .synthetic_data import GENERATE_SYNTHETIC_DATA_PROMPT
