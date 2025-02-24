@@ -2,3 +2,6 @@ dotenv==0.9.9
 python-dotenv==1.0.1
 SQLAlchemy==2.0.38
 psycopg2==2.9.9
+motor==3.7.0
+uvicorn==0.34.0
+email_validator==2.2.0
