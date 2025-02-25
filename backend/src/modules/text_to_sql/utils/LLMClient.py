@@ -1,4 +1,4 @@
-from src.modules.text_to_sql.prompts import AI_INPUT_PROMPT
+from src.modules.text_to_sql.prompts.us import AI_INPUT_PROMPT
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from src.config.constants import Settings

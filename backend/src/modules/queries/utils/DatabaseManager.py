@@ -16,16 +16,24 @@ class DatabaseManager(IDatabaseManager):
     def get_engine(self) -> Engine:
         return self._engine
 
-    def get_db_structure(self) -> str:
+    def get_db_structure(self) -> Dict[str, Any]:
         metadata = MetaData()
         metadata.reflect(bind=self._engine)
 
-        structure = [
-            f"Table: {table.name}, Columns: {', '.join(f'{col.name} ({col.type})' for col in table.columns)}"
-            for table in metadata.tables.values()
-        ]
+        db_structure = {}
 
-        return "\n".join(structure)
+        for table in metadata.sorted_tables:
+            columns = [
+                {"name": col.name, "type": str(col.type), "nullable": col.nullable, "primary_key": col.primary_key}
+                for col in table.columns
+            ]
+            foreign_keys = [
+                {"column": fk.parent.name, "references": fk.column.table.name, "referenced_column": fk.column.name}
+                for fk in table.foreign_keys
+            ]
+            db_structure[table.name] = {"columns": columns, "foreign_keys": foreign_keys}
+
+        return db_structure
 
     def execute_query(self, query: str) -> List[Dict[str, Any]]:
         with self._engine.connect() as connection:
