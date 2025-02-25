@@ -5,8 +5,6 @@ from typing import List, Dict, Any
 
 import httpx
 
-# httpx
-
 
 class QueryAdapter:
     def __init__(self, base_url: str):

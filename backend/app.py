@@ -22,10 +22,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(text_to_sql_router, prefix="/api/text-to-sql", tags=["Text to SQL"])
+app.include_router(text_to_sql_router,
+                   prefix="/api/text-to-sql", tags=["Text to SQL"])
 app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
 app.include_router(alerts_router, prefix="/api/alerts", tags=["Alerts"])
-app.include_router(control_panel_router, prefix="/api/control-panel", tags=["Control Panel"])
+app.include_router(control_panel_router,
+                   prefix="/api/control-panel", tags=["Control Panel"])
 app.include_router(queries_router, prefix="/api/queries", tags=["Queries"])
 app.include_router(reports_router, prefix="/api/reports", tags=["Reports"])
 

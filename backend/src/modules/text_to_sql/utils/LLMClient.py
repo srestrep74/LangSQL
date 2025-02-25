@@ -20,7 +20,8 @@ class LLMClient:
         )
 
     def generate_sql_query(self, db_structure: str, user_input: str) -> str:
-        message = AI_INPUT_PROMPT.format(db_structure=db_structure, user_input=user_input)
+        message = AI_INPUT_PROMPT.format(
+            db_structure=db_structure, user_input=user_input)
         try:
             llm_response = self.llm.invoke([HumanMessage(content=message)])
             return llm_response.content

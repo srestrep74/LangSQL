@@ -11,7 +11,8 @@ class LangToSqlService:
 
     async def process_user_query(self, user_input: str) -> Dict:
         db_structure = await self.query_adapter.get_db_structure()
-        sql_query = self.llm_client.generate_sql_query(db_structure, user_input)
+        sql_query = self.llm_client.generate_sql_query(
+            db_structure, user_input)
         sql_results = await self.query_adapter.execute_query(sql_query)
         # Here must be a call to llm_client.generate_response(sql_results)
         return sql_results
