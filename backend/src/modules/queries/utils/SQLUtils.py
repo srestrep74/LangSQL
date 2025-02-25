@@ -1,5 +1,6 @@
 import re
 
+
 class SQLUtils:
     @staticmethod
     def clean_sql_query(query: str) -> str:
