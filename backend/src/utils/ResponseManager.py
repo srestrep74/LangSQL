@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 from fastapi import status
 
+
 class ResponseManager:
     @staticmethod
     def success_response(data: Optional[Dict[str, Any]] = None, message: str = "Success", status_code: int = status.HTTP_200_OK) -> Dict[str, Any]:
