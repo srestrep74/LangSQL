@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
 from src.config.constants import Settings
-from src.modules.text_to_sql.prompts.us import AI_INPUT_PROMPT
+from src.modules.text_to_sql.prompts.prompt_en import AI_INPUT_PROMPT
 
 
 class LLMClient:
