@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from src.config.dependencies import get_query_service
 from src.modules.queries.service import QueryService
 from src.utils.ResponseManager import ResponseManager
+from src.modules.queries.schemas.ExecutionQueryRequest import ExecutionQueryRequest
 
 import urllib.parse
 
@@ -18,9 +19,9 @@ def get_db_structure(query_service: QueryService = Depends(get_query_service)):
 
 
 @router.post("/execute_query/")
-def execute_query(query: str, query_service: QueryService = Depends(get_query_service)):
+def execute_query(request: ExecutionQueryRequest, query_service: QueryService = Depends(get_query_service)):
     try :
-        query = urllib.parse.unquote(query)
+        query = urllib.parse.unquote(request.query)
         results = query_service.execute_query(query)
         return ResponseManager.success_response(data={"results": results}, message="Success", status_code=status.HTTP_200_OK)
     except Exception as e:
