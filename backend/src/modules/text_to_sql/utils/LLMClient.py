@@ -1,7 +1,8 @@
-from src.modules.text_to_sql.prompts.us import AI_INPUT_PROMPT
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
+
 from src.config.constants import Settings
+from src.modules.text_to_sql.prompts.us import AI_INPUT_PROMPT
 
 
 class LLMClient:
@@ -16,12 +17,13 @@ class LLMClient:
             model_name=self.model_name,
             base_url=self.base_url,
             api_key=self.api_key,
-            temperature=0.7
+            temperature=0.7,
         )
 
     def generate_sql_query(self, db_structure: str, user_input: str) -> str:
         message = AI_INPUT_PROMPT.format(
-            db_structure=db_structure, user_input=user_input)
+            db_structure=db_structure, user_input=user_input
+        )
         try:
             llm_response = self.llm.invoke([HumanMessage(content=message)])
             return llm_response.content

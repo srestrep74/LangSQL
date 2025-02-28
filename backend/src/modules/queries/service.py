@@ -1,5 +1,6 @@
-from sqlalchemy.engine import Engine
 from typing import List, Dict, Any
+
+from sqlalchemy.engine import Engine
 
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
 from src.modules.queries.utils.SQLUtils import SQLUtils

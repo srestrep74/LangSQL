@@ -1,6 +1,7 @@
-from sqlalchemy.engine import Engine
-from sqlalchemy import create_engine, MetaData, text
 from typing import List, Dict, Any
+
+from sqlalchemy import create_engine, MetaData, text
+from sqlalchemy.engine import Engine
 
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
 
@@ -24,11 +25,20 @@ class DatabaseManager(IDatabaseManager):
 
         for table in metadata.sorted_tables:
             columns = [
-                {"name": col.name, "type": str(col.type), "nullable": col.nullable, "primary_key": col.primary_key}
+                {
+                    "name": col.name,
+                    "type": str(col.type),
+                    "nullable": col.nullable,
+                    "primary_key": col.primary_key,
+                }
                 for col in table.columns
             ]
             foreign_keys = [
-                {"column": fk.parent.name, "references": fk.column.table.name, "referenced_column": fk.column.name}
+                {
+                    "column": fk.parent.name,
+                    "references": fk.column.table.name,
+                    "referenced_column": fk.column.name,
+                }
                 for fk in table.foreign_keys
             ]
             db_structure[table.name] = {"columns": columns, "foreign_keys": foreign_keys}
