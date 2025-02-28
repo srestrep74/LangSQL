@@ -10,9 +10,9 @@ class QueryService:
         self.db_manager = db_manager
         self.engine: Engine = self.db_manager.get_engine()
 
-    async def execute_query(self, query: str) -> List[Dict[str, Any]]:
+    def execute_query(self, query: str) -> List[Dict[str, Any]]:
         query = SQLUtils.clean_sql_query(query)
         return self.db_manager.execute_query(query)
 
-    async def get_db_structure(self) -> str:
+    def get_db_structure(self) -> str:
         return self.db_manager.get_db_structure()

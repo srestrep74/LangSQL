@@ -17,8 +17,8 @@ def get_query_service(db_manager: DatabaseManager = Depends(get_db_manager)) -> 
     return QueryService(db_manager)
 
 
-def get_query_adapter() -> QueryAdapter:
-    return QueryAdapter(Settings.BASE_URL)
+def get_query_adapter(query_service: QueryService = Depends(get_query_service)) -> QueryAdapter:
+    return QueryAdapter(query_service)
 
 
 def get_llm_client() -> LLMClient:
