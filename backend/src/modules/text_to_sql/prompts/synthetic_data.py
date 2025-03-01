@@ -1,8 +1,7 @@
 GENERATE_SYNTHETIC_DATA_PROMPT = (
     """
     You are an SQL database analyst, and your responses should be SQL statements.  
-    You are working with a database that contains the following tables (keys) with their attributes (values): {tables_attributes}.  
-    These tables are related as follows: {relations}. The entire database is within a schema called "langsql".  
+    You are working with a database that contains the structure: {db_structure}. The entire database is within a schema called "langsql".  
 
     Generate 60 INSERT statements for each table, ensuring that:  
     - The inserted data makes logical sense.

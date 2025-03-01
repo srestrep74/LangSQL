@@ -2,17 +2,16 @@ import requests
 from typing import Dict
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.text_to_sql.utils.LLMClient import LLMClient
-from .config import load_config
+from src.config.constants import Settings
 from .prompts import GENERATE_SYNTHETIC_DATA_PROMPT
-
-config = load_config()
 
 
 class SyntheticDataModelService:
-    def __init__(self):
-        self.api_key = config['SYNTHETIC_DATA_MODEL_API_KEY']
-        self.base_url = config['SYNTHETIC_DATA_BASE_URL']
-        self.model = config['SYNTHETIC_DATA_MODEL']
+    def __init__(self, query_adapter: QueryAdapter):
+        self.api_key = Settings.SYNTHETIC_DATA_MODEL_API_KEY
+        self.base_url = Settings.SYNTHETIC_DATA_BASE_URL
+        self.model = Settings.SYNTHETIC_DATA_MODEL
+        self.query_adapter = query_adapter
         self.conversation_history = []
 
     def get_model_response(self, user_input: str) -> str:
@@ -39,18 +38,20 @@ class SyntheticDataModelService:
         
         return "Error"
     
-    def generate_synthetic_data(self, table_attributes: dict, relations: list, iteratios: int) -> str:
+    def generate_synthetic_data(self, iterations: int) -> str:
         sql_result = ""
+        db_structure = self.query_adapter.get_db_structure()
+        print(db_structure)
     
         while iterations:
-            message = GENERATE_SYNTHETIC_DATA_PROMPT.format(table_attributes = table_attributes, relations = relations)
+            message = GENERATE_SYNTHETIC_DATA_PROMPT.format(db_structure=db_structure)
             response = self.get_model_response(message)
 
             sql_result += response.replace("```sql", "").replace("```", "").strip()
 
-            print(f"🤖 AI: {response}")
-
             iterations = iterations - 1
+    
+        self.query_adapter.execute_query(sql_result)
 
         return sql_result
 
