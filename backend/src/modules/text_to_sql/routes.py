@@ -30,6 +30,37 @@ def proccess_query(
 def generate_synthetic_data(
     synthetic_data_model_service: SyntheticDataModelService = Depends(get_synthetic_data_model_service)
 ):
+    """
+    This endpoint generates synthetic data and inserts it into the user database.
+
+    Args:
+    
+        synthetic_data_model_service: A service for generating synthetic data. Retrieved via `Depends(get_synthetic_data_model_service)`.
+
+    Returns:
+
+        Successful Response (`200 OK`)
+        ```json
+        {
+            "status": "success",
+            "message": "Success",
+            "data": {
+                "results": [...]
+            }
+        }
+        ```
+
+        Error Response (`400 Bad Request`)
+        ```json
+        {
+            "status": "error",
+            "message": "Error",
+            "details": {
+                "error": "Error description"
+            }
+        }
+        ```
+    """
     try:
         results = synthetic_data_model_service.generate_synthetic_data(iterations=1)
         return ResponseManager.success_response(
