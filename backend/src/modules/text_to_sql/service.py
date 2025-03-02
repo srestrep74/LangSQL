@@ -28,7 +28,7 @@ class SyntheticDataModelService:
             "Content-Type": "application/json"
         }
 
-        response = requests.post(f"{self.base_url}/chat/completions", headers=headers, json=payload)
+        response = requests.post(f"{self.base_url}", headers=headers, json=payload)
 
         if response.status_code == 200:
             message = response.json()["choices"][0]["message"]["content"]
@@ -41,7 +41,6 @@ class SyntheticDataModelService:
     def generate_synthetic_data(self, iterations: int) -> str:
         sql_result = ""
         db_structure = self.query_adapter.get_db_structure()
-        print(db_structure)
     
         while iterations:
             message = GENERATE_SYNTHETIC_DATA_PROMPT.format(db_structure=db_structure)
