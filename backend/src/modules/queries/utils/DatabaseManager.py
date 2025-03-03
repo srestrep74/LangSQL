@@ -41,7 +41,8 @@ class DatabaseManager(IDatabaseManager):
                 }
                 for fk in table.foreign_keys
             ]
-            db_structure[table.name] = {"columns": columns, "foreign_keys": foreign_keys}
+            db_structure[table.name] = {
+                "columns": columns, "foreign_keys": foreign_keys}
 
         return db_structure
 
@@ -51,7 +52,7 @@ class DatabaseManager(IDatabaseManager):
             try:
                 result = connection.execute(text(query))
                 transaction.commit()
-                
+
                 if result.returns_rows:
                     columns = result.keys()
                     return [dict(zip(columns, row)) for row in result.fetchall()]

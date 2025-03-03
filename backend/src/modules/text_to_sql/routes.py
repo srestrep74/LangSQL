@@ -26,15 +26,17 @@ def proccess_query(
             details={"error": str(e)},
         )
 
+
 @router.post("/generate_synthetic_data")
 def generate_synthetic_data(
-    synthetic_data_model_service: SyntheticDataModelService = Depends(get_synthetic_data_model_service)
+    synthetic_data_model_service: SyntheticDataModelService = Depends(
+        get_synthetic_data_model_service)
 ):
     """
     This endpoint generates synthetic data and inserts it into the user database.
 
     Args:
-    
+
         synthetic_data_model_service: A service for generating synthetic data. Retrieved via `Depends(get_synthetic_data_model_service)`.
 
     Returns:
@@ -62,7 +64,8 @@ def generate_synthetic_data(
         ```
     """
     try:
-        results = synthetic_data_model_service.generate_synthetic_data(iterations=1)
+        results = synthetic_data_model_service.generate_synthetic_data(
+            iterations=1)
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",

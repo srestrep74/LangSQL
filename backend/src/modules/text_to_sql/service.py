@@ -3,7 +3,7 @@ from typing import Dict
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.text_to_sql.utils.LLMClient import LLMClient
 from src.config.constants import Settings
-from .prompts import GENERATE_SYNTHETIC_DATA_PROMPT
+from src.modules.text_to_sql.prompts.synthetic_data import GENERATE_SYNTHETIC_DATA_PROMPT
 
 
 class SyntheticDataModelService:
@@ -15,7 +15,8 @@ class SyntheticDataModelService:
         self.conversation_history = []
 
     def get_model_response(self, user_input: str) -> str:
-        self.conversation_history.append({"role": "user", "content": user_input})
+        self.conversation_history.append(
+            {"role": "user", "content": user_input})
 
         payload = {
             "model": self.model,
@@ -28,28 +29,32 @@ class SyntheticDataModelService:
             "Content-Type": "application/json"
         }
 
-        response = requests.post(f"{self.base_url}", headers=headers, json=payload)
+        response = requests.post(
+            f"{self.base_url}", headers=headers, json=payload)
 
         if response.status_code == 200:
             message = response.json()["choices"][0]["message"]["content"]
-            self.conversation_history.append({"role": "assistant", "content": message})
+            self.conversation_history.append(
+                {"role": "assistant", "content": message})
 
             return message
-        
+
         return "Error"
-    
+
     def generate_synthetic_data(self, iterations: int) -> str:
         sql_result = ""
         db_structure = self.query_adapter.get_db_structure()
-    
+
         while iterations:
-            message = GENERATE_SYNTHETIC_DATA_PROMPT.format(db_structure=db_structure)
+            message = GENERATE_SYNTHETIC_DATA_PROMPT.format(
+                db_structure=db_structure)
             response = self.get_model_response(message)
 
-            sql_result += response.replace("```sql", "").replace("```", "").strip()
+            sql_result += response.replace("```sql",
+                                           "").replace("```", "").strip()
 
             iterations = iterations - 1
-    
+
         self.query_adapter.execute_query(sql_result)
 
         return sql_result
@@ -62,7 +67,8 @@ class LangToSqlService:
 
     def process_user_query(self, user_input: str) -> Dict:
         db_structure = self.query_adapter.get_db_structure()
-        sql_query = self.llm_client.generate_sql_query(db_structure, user_input)
+        sql_query = self.llm_client.generate_sql_query(
+            db_structure, user_input)
         sql_results = self.query_adapter.execute_query(sql_query)
         # Here must be a call to llm_client.generate_response(sql_results)
         return sql_results

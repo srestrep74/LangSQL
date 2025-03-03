@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
+
 def get_tables(db: Session, table_schema: str) -> list[str]:
     sql_statement = text(
         """
@@ -9,8 +10,10 @@ def get_tables(db: Session, table_schema: str) -> list[str]:
         WHERE table_schema = :table_schema;
     """)
 
-    result = db.execute(sql_statement, {"table_schema": table_schema}).fetchall()
+    result = db.execute(
+        sql_statement, {"table_schema": table_schema}).fetchall()
     return [row[0] for row in result]
+
 
 def get_attributes(db: Session, table_name: str) -> list[tuple[str, str, str, int | None]]:
     sql_statement = text(
@@ -22,6 +25,7 @@ def get_attributes(db: Session, table_name: str) -> list[tuple[str, str, str, in
 
     result = db.execute(sql_statement, {"table_name": table_name}).fetchall()
     return result
+
 
 def get_relations(db: Session) -> list[tuple[str, str, str, str]]:
     sql_statement = text(
