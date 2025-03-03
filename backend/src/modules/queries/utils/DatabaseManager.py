@@ -41,12 +41,23 @@ class DatabaseManager(IDatabaseManager):
                 }
                 for fk in table.foreign_keys
             ]
-            db_structure[table.name] = {"columns": columns, "foreign_keys": foreign_keys}
+            db_structure[table.name] = {
+                "columns": columns, "foreign_keys": foreign_keys}
 
         return db_structure
 
     def execute_query(self, query: str) -> List[Dict[str, Any]]:
         with self._engine.connect() as connection:
-            result = connection.execute(text(query))
-            columns = result.keys()
-            return [dict(zip(columns, row)) for row in result.fetchall()]
+            transaction = connection.begin()
+            try:
+                result = connection.execute(text(query))
+                transaction.commit()
+
+                if result.returns_rows:
+                    columns = result.keys()
+                    return [dict(zip(columns, row)) for row in result.fetchall()]
+                else:
+                    return [{"message": "Query executed successfully"}]
+            except Exception as e:
+                transaction.rollback()
+                return [{"error": str(e)}]
