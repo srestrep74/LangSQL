@@ -14,7 +14,7 @@ class TestSyntheticDataEndpoint:
 
         response = client.post(
             "/api/text-to-sql/generate_synthetic_data",
-            json={"iterations": 1, "schema_name": "inventory"}  # Se usa `json=` en lugar de `content=`
+            json={"iterations": 1, "schema_name": "inventory"}
         )
 
         assert response.status_code == 200
@@ -24,5 +24,4 @@ class TestSyntheticDataEndpoint:
         assert response_json["message"] == "Success"
         assert "results" in response_json["data"]
 
-        # Se verifica que se llame con `iterations` y `schema_name`
         mock_generate_synthetic_data.assert_called_once_with(iterations=1, schema_name="inventory")
