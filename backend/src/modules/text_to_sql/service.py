@@ -1,43 +1,74 @@
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-from .config import load_config
-from .prompts import AI_INPUT_PROMPT
+import requests
 from typing import Dict
+from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.modules.text_to_sql.utils.LLMClient import LLMClient
+from src.config.constants import Settings
+from src.modules.text_to_sql.prompts.synthetic_data import GENERATE_SYNTHETIC_DATA_PROMPT
 
-config = load_config()
+
+class SyntheticDataModelService:
+    def __init__(self, query_adapter: QueryAdapter):
+        self.api_key = Settings.SYNTHETIC_DATA_MODEL_API_KEY
+        self.base_url = Settings.SYNTHETIC_DATA_BASE_URL
+        self.model = Settings.SYNTHETIC_DATA_MODEL
+        self.query_adapter = query_adapter
+        self.conversation_history = []
+
+    def get_model_response(self, user_input: str) -> str:
+        self.conversation_history.append(
+            {"role": "user", "content": user_input})
+
+        payload = {
+            "model": self.model,
+            "messages": self.conversation_history,
+            "temperature": 0.7
+        }
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(
+            f"{self.base_url}", headers=headers, json=payload)
+
+        if response.status_code == 200:
+            message = response.json()["choices"][0]["message"]["content"]
+            self.conversation_history.append(
+                {"role": "assistant", "content": message})
+
+            return message
+
+        return "Error"
+
+    def generate_synthetic_data(self, iterations: int) -> str:
+        sql_result = ""
+        db_structure = self.query_adapter.get_db_structure()
+
+        while iterations:
+            message = GENERATE_SYNTHETIC_DATA_PROMPT.format(
+                db_structure=db_structure)
+            response = self.get_model_response(message)
+
+            sql_result += response.replace("```sql",
+                                           "").replace("```", "").strip()
+
+            iterations = iterations - 1
+
+        self.query_adapter.execute_query(sql_result)
+
+        return sql_result
+
 
 class LangToSqlService:
-    def __init__(self, db_structure: str):
-        self.api_key = config['TEXTTOSQL_API_KEY']
-        self.base_url = config['TEXTTOSQL_BASE_URL']
-        self.model = config['TEXTTOSQL_MODEL_NAME']
-        self.db_structure = db_structure
-        self.llm = self.connect()
-    
-    def connect(self) -> ChatOpenAI:
-        return ChatOpenAI(
-            model_name = self.model,
-            base_url = self.base_url,
-            api_key = self.api_key,
-            temperature = 0.7
-        )
-    
-    def get_ai_sql(self, user_input: str) -> str:
-        message = AI_INPUT_PROMPT.format(db_structure = self.db_structure, user_input = user_input)
+    def __init__(self, query_adapter: QueryAdapter, llm_client: LLMClient):
+        self.query_adapter = query_adapter
+        self.llm_client = llm_client
 
-        try:
-            llm_response = self.llm.invoke([HumanMessage(content=message)])
-            return llm_response.content
-        except Exception as e:
-            return "Response error"
-    
-    def conversation(self) -> Dict:
-        print("...")
-        
-        while True: 
-            user_input = input("Enter the message: ")
-            if user_input.lower() in ["exit", "quit"]:
-                print("out")
-                break
-            sql_query = self.get_ai_sql(user_input)
-            print(f"Sql generado: {sql_query}\n")
+    def process_user_query(self, user_input: str) -> Dict:
+        db_structure = self.query_adapter.get_db_structure()
+        sql_query = self.llm_client.generate_sql_query(
+            db_structure, user_input)
+        sql_results = self.query_adapter.execute_query(sql_query)
+        # Here must be a call to llm_client.generate_response(sql_results)
+        return sql_results

@@ -1,2 +1,6 @@
-dotenv == 0.9.9
-langchain_openai == 0.3.6
+dotenv==0.9.9
+python-dotenv==1.0.1
+SQLAlchemy==2.0.38
+psycopg2==2.9.9
+pytest==8.3.4
+httpx==0.28.1
