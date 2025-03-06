@@ -48,22 +48,16 @@ class DatabaseManager(IDatabaseManager):
 
     def execute_query(self, query: str) -> List[Dict[str, Any]]:
         with self._engine.connect() as connection:
-            print('iniciando transaccion')
             transaction = connection.begin()
             try:
                 result = connection.execute(text(query))
-                print('ejecutando query')
                 transaction.commit()
 
                 if result.returns_rows:
-                    print('query ejecutada correctamente (zip)')
                     columns = result.keys()
                     return [dict(zip(columns, row)) for row in result.fetchall()]
                 else:
-                    print('query ejecutada correctamente')
                     return [{"message": "Query executed successfully"}]
             except Exception as e:
-                print('error en la query')
                 print(str(e))
                 transaction.rollback()
-                return [{"error": str(e)}]
