@@ -22,7 +22,16 @@ import logo from './assets/logo.png';
               <router-link to="/" class="nav-link text-custom-purple">Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/query" class="nav-link text-custom-purple">Query</router-link>
+              <router-link to="/Query" class="nav-link text-custom-purple">Query</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/Alerts" class="nav-link text-custom-purple">Alerts</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/Reports" class="nav-link text-custom-purple">Reports</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/synthetic_data" class="nav-link text-custom-purple">Synthetic Data</router-link>
             </li>
           </ul>
         </div>
