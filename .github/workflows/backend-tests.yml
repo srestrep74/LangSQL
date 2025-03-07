@@ -46,7 +46,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install gh
-          gh auth status
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Issue on Failure (GH CLI)
         if: steps.test.outcome == 'failure'
