@@ -1,9 +1,13 @@
-import requests
 from typing import Dict
+
+import requests
+
 from src.adapters.queries.QueryAdapter import QueryAdapter
-from src.modules.text_to_sql.utils.LLMClient import LLMClient
 from src.config.constants import Settings
-from src.modules.text_to_sql.prompts.synthetic_data import GENERATE_SYNTHETIC_DATA_PROMPT
+from src.modules.text_to_sql.prompts.synthetic_data import (
+    GENERATE_SYNTHETIC_DATA_PROMPT,
+)
+from src.modules.text_to_sql.utils.LLMClient import LLMClient
 
 
 class SyntheticDataModelService:
