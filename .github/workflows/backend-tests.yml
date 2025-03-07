@@ -44,9 +44,7 @@ jobs:
 
       - name: Install GitHub CLI
         run: |
-          sudo apt update
-          sudo apt install gh
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          sudo apt update && sudo apt install -y gh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
