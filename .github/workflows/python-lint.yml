@@ -1,12 +1,16 @@
 name: Python Linter
 
-on: [push]
+on:
+  pull_request:
+    branches:
+      - develop
 
 permissions:
   contents: write
 
 jobs:
   lint:
+    if: ${{ github.actor != 'github-actions' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,7 +23,7 @@ jobs:
           persist-credentials: true
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.12
 
@@ -40,7 +44,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add .
           git diff --cached --quiet || git commit -m "style: run linter"
-          git push origin HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Lint with flake8
         run: flake8 --config=.flake8 .
