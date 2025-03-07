@@ -39,14 +39,14 @@ jobs:
       - name: Run Python tests
         id: test
         run: pytest src/tests/* | tee test_results.txt
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Install GitHub CLI
         run: |
           sudo apt update && sudo apt install -y gh
 
       - name: Create Issue on Failure (GH CLI)
-        if: steps.test.conclusion == 'failure'
+        if: failure()
         run: |
           gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
