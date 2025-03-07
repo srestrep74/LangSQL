@@ -2,10 +2,9 @@ name: Python Tests
 
 on: 
   push
-  # pull_request:
-  #   branches:
-  #     - develop
-  #     - test/gitflows
+
+permissions:
+  issues: write
 
 jobs:
   tests:
@@ -45,14 +44,12 @@ jobs:
       - name: Install GitHub CLI
         run: |
           sudo apt update && sudo apt install -y gh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Issue on Failure (GH CLI)
-        if: steps.test.outcome == 'failure'
+        if: steps.test.conclusion == 'failure'
         run: |
           gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
-                          --body "$(cat test-results.txt | head -c 6000)" \
+                          --body "$(cat test_results.txt | head -c 6000)" \
                           --label "test-failure"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
