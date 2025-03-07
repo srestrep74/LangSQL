@@ -1,6 +1,6 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from sqlalchemy import create_engine, MetaData, text
+from sqlalchemy import MetaData, create_engine, text
 from sqlalchemy.engine import Engine
 
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager

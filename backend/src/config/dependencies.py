@@ -1,12 +1,12 @@
-from sqlalchemy.engine import Engine
-from src.modules.queries.utils.DatabaseManager import DatabaseManager
-from src.modules.queries.service import QueryService
-from src.adapters.queries.QueryAdapter import QueryAdapter
-from src.modules.text_to_sql.utils.LLMClient import LLMClient
-from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
-from src.config.constants import Settings
-
 from fastapi import Depends
+from sqlalchemy.engine import Engine
+
+from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.config.constants import Settings
+from src.modules.queries.service import QueryService
+from src.modules.queries.utils.DatabaseManager import DatabaseManager
+from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
+from src.modules.text_to_sql.utils.LLMClient import LLMClient
 
 
 def get_db_manager() -> Engine:
