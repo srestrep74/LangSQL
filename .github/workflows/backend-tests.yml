@@ -41,12 +41,12 @@ jobs:
         id: test
         run: pytest src/tests/* | tee test_results.txt
         continue-on-error: true
-
-			- name: Create Issue on Failure (GH CLI)
+        
+      - name: Create Issue on Failure (GH CLI)
         if: failure()
-      	run: |
-        	gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
-                        	--body "$(cat backend/test-results.log | head -c 6000)" \
-                        	--label "test-failure"
-       	env:
-         	GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
+                          --body "$(cat backend/test-results.log | head -c 6000)" \
+                          --label "test-failure"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
