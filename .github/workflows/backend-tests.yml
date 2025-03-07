@@ -39,7 +39,9 @@ jobs:
 
       - name: Run Python tests
         id: test
-        run: pytest src/tests/* | tee test_results.txt
+        run: | 
+          pytest src/tests/* | tee test_results.txt
+          echo "status=$?" >> $GITHUB_ENV
         continue-on-error: true
 
       - name: Install GitHub CLI
@@ -48,7 +50,12 @@ jobs:
 
       - name: Create Issue on Failure (GH CLI)
         run: |
-          gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
+          STATUS="Success"
+          if [ "$status" -ne 0 ]; then
+            STATUS="Failure"
+          fi
+
+          gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
                           --label "test-failure"
         env:
