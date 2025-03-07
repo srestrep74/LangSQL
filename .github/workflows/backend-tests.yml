@@ -57,6 +57,6 @@ jobs:
 
           gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
-                          --label "test-failure"
+                          --label "test-result"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
