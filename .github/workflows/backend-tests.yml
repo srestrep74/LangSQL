@@ -41,12 +41,17 @@ jobs:
         id: test
         run: pytest src/tests/* | tee test_results.txt
         continue-on-error: true
-        
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update
+          sudo apt install gh
+
       - name: Create Issue on Failure (GH CLI)
-        if: failure()
+        if: steps.test.outcome == 'failure'
         run: |
           gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
-                          --body "$(cat backend/test-results.log | head -c 6000)" \
+                          --body "$(cat backend/test-results.err | head -c 6000)" \
                           --label "test-failure"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
