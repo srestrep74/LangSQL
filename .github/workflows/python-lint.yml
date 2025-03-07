@@ -3,7 +3,7 @@ name: Python Linter
 on: [push]
 
 permissions:
-  contents: write  # Grants write access to GitHub Actions
+  contents: write
 
 jobs:
   lint:
