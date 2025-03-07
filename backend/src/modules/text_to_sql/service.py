@@ -64,10 +64,11 @@ class LangToSqlService:
         self.query_adapter = query_adapter
         self.llm_client = llm_client
 
-    def process_user_query(self, user_input: str) -> Dict:
-        db_structure = self.query_adapter.get_db_structure()
+    def process_user_query(self, user_input: str, schema_name: str) -> Dict:
+        db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
         sql_query = self.llm_client.generate_sql_query(
             db_structure, user_input)
-        sql_results = self.query_adapter.execute_query(sql_query)
+        print(sql_query)
+        sql_results = self.query_adapter.execute_query(sql_query, schema_name)
         # Here must be a call to llm_client.generate_response(sql_results)
         return sql_results
