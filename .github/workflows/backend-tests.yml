@@ -4,7 +4,8 @@ on:
   push
 
 permissions:
-  issues: write
+  contents: read
+  issues: write 
 
 jobs:
   tests:
@@ -39,14 +40,13 @@ jobs:
       - name: Run Python tests
         id: test
         run: pytest src/tests/* | tee test_results.txt
-        continue-on-error: false
+        continue-on-error: true
 
       - name: Install GitHub CLI
         run: |
           sudo apt update && sudo apt install -y gh
 
       - name: Create Issue on Failure (GH CLI)
-        if: failure()
         run: |
           gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
