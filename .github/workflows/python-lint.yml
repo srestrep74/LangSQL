@@ -2,6 +2,9 @@ name: Python Linter
 
 on: [push]
 
+permissions:
+  contents: write  # Grants write access to GitHub Actions
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -11,7 +14,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v2
@@ -29,14 +34,12 @@ jobs:
           autopep8 --in-place --recursive --aggressive --exclude venv,__pycache__ .
 
       - name: Commit and push changes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add .
           git diff --cached --quiet || git commit -m "style: run linter"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.ref }}
 
       - name: Lint with flake8
         run: flake8 --config=.flake8 .
