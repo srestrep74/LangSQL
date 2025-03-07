@@ -12,3 +12,4 @@ langchain-openai==0.3.7
 langchain-text-splitters==0.3.6
 openai==1.65.4
 fastapi==0.115.8
+uvicorn==0.34.0
