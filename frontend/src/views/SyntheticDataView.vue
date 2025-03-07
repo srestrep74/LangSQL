@@ -1,45 +1,3 @@
-<template>
-  <div class="synthetic-data-view">
-    <div v-if="showToast" class="toast-message">
-      <p>Data is being generated. You will see the changes reflected in your database in a few minutes.</p>
-    </div>
-
-    <div class="description">
-      <h2 class="text-custom-purple">Synthetic Data Generation</h2>
-      <p>
-        This tool allows you to generate synthetic data based on your database schema. 
-        Enter the number of records you want to generate (in multiples of 40, up to 400) and click the button below.
-      </p>
-    </div>
-
-    <div class="schema-section">
-      <h3 class="text-custom-purple">Database Schema</h3>
-      <div class="schema-display">
-        <pre>{{ databaseSchema }}</pre>
-      </div>
-    </div>
-
-    <div class="input-section">
-      <label for="data-amount" class="text-custom-purple">Number of records to generate:</label>
-      <input 
-        type="number" 
-        id="data-amount" 
-        v-model.number="dataAmount" 
-        min="40" 
-        max="400" 
-        step="40" 
-        class="form-control"
-        @input="validateInput"
-      />
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-    </div>
-
-    <div class="button-section">
-      <button @click="generateData" class="btn btn-custom-purple">Generate Data</button>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -119,6 +77,48 @@ const generateData = () => {
   }
 };
 </script>
+
+<template>
+  <div class="synthetic-data-view">
+    <div v-if="showToast" class="toast-message">
+      <p>Data is being generated. You will see the changes reflected in your database in a few minutes.</p>
+    </div>
+
+    <div class="description">
+      <h2 class="text-custom-purple">Synthetic Data Generation</h2>
+      <p>
+        This tool allows you to generate synthetic data based on your database schema. 
+        Enter the number of records you want to generate (in multiples of 40, up to 400) and click the button below.
+      </p>
+    </div>
+
+    <div class="schema-section">
+      <h3 class="text-custom-purple">Database Schema</h3>
+      <div class="schema-display">
+        <pre>{{ databaseSchema }}</pre>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <label for="data-amount" class="text-custom-purple">Number of records to generate:</label>
+      <input 
+        type="number" 
+        id="data-amount" 
+        v-model.number="dataAmount" 
+        min="40" 
+        max="400" 
+        step="40" 
+        class="form-control"
+        @input="validateInput"
+      />
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+    </div>
+
+    <div class="button-section">
+      <button @click="generateData" class="btn btn-custom-purple">Generate Data</button>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .synthetic-data-view {
