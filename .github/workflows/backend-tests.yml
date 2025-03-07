@@ -1,0 +1,63 @@
+name: Python Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - test/gitflows
+
+permissions:
+  contents: read
+  issues: write 
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create .env file
+        run: |
+          echo "SYNTHETIC_DATA_MODEL_API_KEY=${{ secrets.SYNTHETIC_DATA_MODEL_API_KEY }}" >> .env
+          echo "SYNTHETIC_DATA_BASE_URL=${{ secrets.SYNTHETIC_DATA_BASE_URL }}" >> .env
+          echo "SYNTHETIC_DATA_MODEL=${{ secrets.SYNTHETIC_DATA_MODEL }}" >> .env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+
+      - name: Run Python tests
+        id: test
+        run: | 
+          pytest src/tests/* | tee test_results.txt
+          echo "status=${PIPESTATUS[0]}" >> $GITHUB_ENV
+        continue-on-error: true
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt update && sudo apt install -y gh
+
+      - name: Create Issue on Failure (GH CLI)
+        run: |
+          if [ "$status" -ne 0 ]; then
+            STATUS="Failure"
+            gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
+                          --body "$(cat test_results.txt | head -c 6000)" \
+                          --label "test-failure"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
