@@ -17,8 +17,8 @@ class DatabaseManager(IDatabaseManager):
     def get_engine(self) -> Engine:
         return self._engine
 
-    def get_db_structure(self) -> Dict[str, Any]:
-        metadata = MetaData()
+    def get_db_structure(self, schema_name: str) -> Dict[str, Any]:
+        metadata = MetaData(schema=schema_name)
         metadata.reflect(bind=self._engine)
 
         db_structure = {}
@@ -59,5 +59,5 @@ class DatabaseManager(IDatabaseManager):
                 else:
                     return [{"message": "Query executed successfully"}]
             except Exception as e:
+                print(str(e))
                 transaction.rollback()
-                return [{"error": str(e)}]

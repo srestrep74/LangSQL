@@ -7,6 +7,7 @@ from src.config.dependencies import (
 from src.modules.text_to_sql.schemas.ProcessQueryRequest import ProcessQueryRequest
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
+from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
 
 router = APIRouter()
 
@@ -31,9 +32,9 @@ def proccess_query(
 
 
 @router.post("/generate_synthetic_data")
-def generate_synthetic_data(
-    synthetic_data_model_service: SyntheticDataModelService = Depends(
-        get_synthetic_data_model_service)
+async def generate_synthetic_data(
+    request: GenerateSyntheticDataRequest,
+    synthetic_data_model_service: SyntheticDataModelService = Depends(get_synthetic_data_model_service)
 ):
     """
     This endpoint generates synthetic data and inserts it into the user database.
@@ -67,13 +68,16 @@ def generate_synthetic_data(
         ```
     """
     try:
-        results = synthetic_data_model_service.generate_synthetic_data(
-            iterations=1)
+        schema_name = request.schema_name
+        iterations = request.iterations
+        results = synthetic_data_model_service.generate_synthetic_data(iterations=iterations, schema_name=schema_name)
+
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",
             status_code=status.HTTP_200_OK,
         )
+    
     except Exception as e:
         return ResponseManager.error_response(
             message="Error",
