@@ -50,13 +50,11 @@ jobs:
 
       - name: Create Issue on Failure (GH CLI)
         run: |
-          STATUS="Success"
           if [ "$status" -ne 0 ]; then
             STATUS="Failure"
-          fi
-
-          gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
+            gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
                           --label "test-result"
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
