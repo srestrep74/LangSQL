@@ -1,6 +1,6 @@
 import urllib.parse
 
-from fastapi import APIRouter, Depends, status
+from fastapi import Depends, status, APIRouter
 
 from src.config.dependencies import get_query_service
 from src.modules.queries.schemas.ExecutionQueryRequest import ExecutionQueryRequest
