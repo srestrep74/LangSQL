@@ -53,9 +53,9 @@ class SyntheticDataModelService:
             message = GENERATE_SYNTHETIC_DATA_PROMPT.format(
                 db_structure=db_structure, schema_name=schema_name)
             response = self.get_model_response(message)
-            
+
             sql_result = response.replace("```sql", "").replace("```", "").replace("[", "").replace("]", "").strip()
-            
+
             self.query_adapter.execute_query(sql_result)
 
             iterations = iterations - 1
