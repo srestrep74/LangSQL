@@ -1,7 +1,10 @@
 name: Python Tests
 
-on: 
-  push
+on: [push]
+  #pull_request:
+    #branches:
+      #- develop
+      #- test/gitflows
 
 permissions:
   contents: read
@@ -54,7 +57,7 @@ jobs:
             STATUS="Failure"
             gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
-                          --label "test-result"
+                          --label "test-failure"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
