@@ -43,9 +43,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git fetch origin ${{ github.head_ref }}  # Fetch latest changes
+          git checkout ${{ github.head_ref }}      # Switch to the correct branch
+          git pull --rebase origin ${{ github.head_ref }} || echo "No remote changes to rebase"
           git add .
-          git diff --cached --quiet || git commit -m "style: run linter"
-          git push origin HEAD:${{ github.head_ref }}
+          git diff --cached --quiet || (git commit -m "style: run linter" && git push origin HEAD:${{ github.head_ref }})
+        
 
       - name: Lint with flake8
         run: flake8 --config=.flake8 .
