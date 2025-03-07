@@ -1,0 +1,54 @@
+name: Python Linter
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - test/gitflows
+
+permissions:
+  contents: write
+
+jobs:
+  lint:
+    if: ${{ github.actor != 'github-actions' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install autopep8 autoflake flake8 isort
+
+      - name: Auto-format with autopep8
+        run: |
+          autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive --exclude venv,__pycache__ .
+          autopep8 --in-place --recursive --aggressive --exclude venv,__pycache__ .
+          isort --profile black .
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git fetch origin ${{ github.head_ref }}  # Fetch latest changes
+          git checkout ${{ github.head_ref }}      # Switch to the correct branch
+          git pull --rebase origin ${{ github.head_ref }} || echo "No remote changes to rebase"
+          git add .
+          git diff --cached --quiet || (git commit -m "style: run linter" && git push origin HEAD:${{ github.head_ref }})
+        
+
+      - name: Lint with flake8
+        run: flake8 --config=.flake8 .
