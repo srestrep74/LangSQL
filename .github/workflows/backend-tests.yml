@@ -46,12 +46,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install gh
+          gh auth status
 
       - name: Create Issue on Failure (GH CLI)
         if: steps.test.outcome == 'failure'
         run: |
           gh issue create --title "Test Failure in $GITHUB_REF_NAME" \
-                          --body "$(cat backend/test-results.err | head -c 6000)" \
+                          --body "$(cat test-results.txt | head -c 6000)" \
                           --label "test-failure"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
