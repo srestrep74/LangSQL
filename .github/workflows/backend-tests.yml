@@ -41,7 +41,7 @@ jobs:
         id: test
         run: | 
           pytest src/tests/* | tee test_results.txt
-          echo "status=$?" >> $GITHUB_ENV
+          echo "status=${PIPESTATUS[0]}" >> $GITHUB_ENV
         continue-on-error: true
 
       - name: Install GitHub CLI
