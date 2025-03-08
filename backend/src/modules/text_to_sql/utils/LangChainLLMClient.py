@@ -12,13 +12,14 @@ class LangChainLLMClient(ILLMClient):
         self.base_url = Settings.TEXTTOSQL_BASE_URL
         self.model_name = Settings.TEXTTOSQL_MODEL_NAME
         self.llm = self._connect()
+        self.MODEL_TEMPERATURE = 0.7
 
     def _connect(self) -> ChatOpenAI:
         return ChatOpenAI(
             model_name=self.model_name,
             base_url=self.base_url,
             api_key=self.api_key,
-            temperature=0.7,
+            temperature=self.MODEL_TEMPERATURE
         )
 
     def get_model_response(self, db_structure: str, user_input: str) -> str:

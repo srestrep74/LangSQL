@@ -1,4 +1,3 @@
-import requests
 from typing import Dict
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
@@ -14,15 +13,17 @@ class SyntheticDataModelService:
     def generate_synthetic_data(self, iterations: int, schema_name: str) -> str:
         db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
         user_input = GENERATE_SYNTHETIC_DATA_PROMPT.format(
-                db_structure=db_structure, schema_name=schema_name)
-        sql_result = ""
+            db_structure=db_structure, schema_name=schema_name)
+        last_query = ""
 
-        while iterations:
-            sql_result = self.llm_client.get_model_response(db_structure, user_input)
-            sql_result = SQLUtils.clean_sql_query(sql_result)
-            self.query_adapter.execute_query(sql_result, schema_name)
-            iterations = iterations - 1
-        return sql_result
+        for _ in range(iterations):
+            try:
+                last_query = self.llm_client.get_model_response(db_structure, user_input)
+                last_query = SQLUtils.clean_sql_query(last_query)
+                self.query_adapter.execute_query(last_query, schema_name)
+            except Exception as e:
+                return {"error": str(e)}
+        return last_query
 
 
 class LangToSqlService:
@@ -31,9 +32,12 @@ class LangToSqlService:
         self.llm_client = llm_client
 
     def process_user_query(self, user_input: str, schema_name: str) -> Dict:
-        db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
-        sql_query = self.llm_client.get_model_response(
-            db_structure, user_input)
-        sql_results = self.query_adapter.execute_query(sql_query, schema_name)
-        # Here must be a call to llm_client.generate_response(sql_results)
-        return sql_results
+        try:
+            db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
+            sql_query = self.llm_client.get_model_response(
+                db_structure, user_input)
+            sql_results = self.query_adapter.execute_query(sql_query, schema_name)
+            # Here must be a call to llm_client.generate_response(sql_results)
+            return sql_results
+        except Exception as e:
+            return {"error": str(e)}

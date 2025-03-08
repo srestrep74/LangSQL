@@ -74,7 +74,7 @@ async def generate_synthetic_data(
             message="Success",
             status_code=status.HTTP_200_OK,
         )
-    
+
     except Exception as e:
         return ResponseManager.error_response(
             message="Error",

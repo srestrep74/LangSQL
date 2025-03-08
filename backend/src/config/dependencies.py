@@ -27,8 +27,10 @@ def get_query_adapter(query_service: QueryService = Depends(get_query_service)) 
 def get_langchain_llm_client() -> ILLMClient:
     return LangChainLLMClient()
 
+
 def get_apiclient_llm_client() -> ILLMClient:
     return APIClientLLMClient()
+
 
 def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client)) -> LangToSqlService:
     return LangToSqlService(query_adapter, llm_client)

@@ -13,7 +13,7 @@ class QueryService:
 
     def get_db_structure(self, schema_name: str) -> str:
         return self.db_manager.get_db_structure(schema_name)
-    
+
     def execute_query(self, query: str, schema_name: str) -> List[Dict[str, Any]]:
         query = SQLUtils.clean_sql_query(query)
         return self.db_manager.execute_query(query, schema_name)
