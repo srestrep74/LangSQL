@@ -1,11 +1,11 @@
 from typing import Dict
 
-import requests
-
 from src.adapters.queries.QueryAdapter import QueryAdapter
-from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.queries.utils.SQLUtils import SQLUtils
-from src.modules.text_to_sql.prompts.synthetic_data import GENERATE_SYNTHETIC_DATA_PROMPT
+from src.modules.text_to_sql.prompts.synthetic_data import (
+    GENERATE_SYNTHETIC_DATA_PROMPT,
+)
+from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
 
 class SyntheticDataModelService:
