@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/proccess_query")
-def proccess_query(
+async def proccess_query(
     request: ProcessQueryRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
     try:
