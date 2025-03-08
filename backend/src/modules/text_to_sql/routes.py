@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, status
 
-from src.config.dependencies import get_lang_to_sql_service, get_synthetic_data_model_service
+from src.config.dependencies import (
+    get_lang_to_sql_service,
+    get_synthetic_data_model_service,
+)
+from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
 from src.modules.text_to_sql.schemas.ProcessQueryRequest import ProcessQueryRequest
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
-from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
 
 router = APIRouter()
 

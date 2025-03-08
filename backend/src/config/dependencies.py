@@ -1,4 +1,9 @@
+from fastapi import Depends
 from sqlalchemy.engine import Engine
+
+from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.config.constants import Settings
+from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManager import DatabaseManager
 from src.modules.queries.service import QueryService
 from src.adapters.queries.QueryAdapter import QueryAdapter
