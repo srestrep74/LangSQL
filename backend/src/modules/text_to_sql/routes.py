@@ -13,11 +13,11 @@ router = APIRouter()
 
 
 @router.post("/proccess_query")
-def proccess_query(
+async def proccess_query(
     request: ProcessQueryRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
     try:
-        results = lang_to_sql_service.process_user_query(request.user_input)
+        results = lang_to_sql_service.process_user_query(request.user_input, request.schema_name)
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",

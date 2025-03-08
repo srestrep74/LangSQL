@@ -3,13 +3,15 @@ from langchain_openai import ChatOpenAI
 
 from src.config.constants import Settings
 from src.modules.text_to_sql.prompts.prompt_en import AI_INPUT_PROMPT
+from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
 
-class LLMClient:
+class LangChainLLMClient(ILLMClient):
     def __init__(self):
         self.api_key = Settings.TEXTTOSQL_API_KEY
         self.base_url = Settings.TEXTTOSQL_BASE_URL
         self.model_name = Settings.TEXTTOSQL_MODEL_NAME
+        self.MODEL_TEMPERATURE = 0.7
         self.llm = self._connect()
 
     def _connect(self) -> ChatOpenAI:
@@ -17,10 +19,10 @@ class LLMClient:
             model_name=self.model_name,
             base_url=self.base_url,
             api_key=self.api_key,
-            temperature=0.7,
+            temperature=self.MODEL_TEMPERATURE
         )
 
-    def generate_sql_query(self, db_structure: str, user_input: str) -> str:
+    def get_model_response(self, db_structure: str, user_input: str) -> str:
         message = AI_INPUT_PROMPT.format(
             db_structure=db_structure, user_input=user_input
         )

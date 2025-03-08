@@ -46,10 +46,11 @@ class DatabaseManager(IDatabaseManager):
 
         return db_structure
 
-    def execute_query(self, query: str) -> List[Dict[str, Any]]:
+    def execute_query(self, query: str, schema_name: str) -> List[Dict[str, Any]]:
         with self._engine.connect() as connection:
             transaction = connection.begin()
             try:
+                connection.execute(text(f"SET search_path TO {schema_name}"))
                 result = connection.execute(text(query))
                 transaction.commit()
 
