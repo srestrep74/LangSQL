@@ -69,6 +69,8 @@ class LangToSqlService:
         db_structure = self.query_adapter.get_db_structure()
         sql_query = self.llm_client.generate_sql_query(
             db_structure, user_input)
+        print(sql_query)
         sql_results = self.query_adapter.execute_query(sql_query)
-        # Here must be a call to llm_client.generate_response(sql_results)
-        return sql_results
+        human_response = self.llm_client.generate_human_response(sql_results, user_input)
+        print(human_response)
+        return human_response

@@ -18,7 +18,7 @@ class DatabaseManager(IDatabaseManager):
         return self._engine
 
     def get_db_structure(self) -> Dict[str, Any]:
-        metadata = MetaData()
+        metadata = MetaData(schema="inventory")
         metadata.reflect(bind=self._engine)
 
         db_structure = {}

@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
 from src.config.constants import Settings
-from src.modules.text_to_sql.prompts.prompt_en import AI_INPUT_PROMPT
+from src.modules.text_to_sql.prompts.prompt_en import AI_INPUT_PROMPT, HUMAN_RESPONSE_PROMPT
 
 
 class LLMClient:
@@ -22,10 +22,20 @@ class LLMClient:
 
     def generate_sql_query(self, db_structure: str, user_input: str) -> str:
         message = AI_INPUT_PROMPT.format(
-            db_structure=db_structure, user_input=user_input
+            db_structure=db_structure, user_input=user_input, schema = "inventory"
         )
         try:
             llm_response = self.llm.invoke([HumanMessage(content=message)])
             return llm_response.content
+        except Exception as e:
+            return e
+    
+    def generate_human_response(self, llm_response: str, human_question: str) -> str:
+        message = HUMAN_RESPONSE_PROMPT.format(
+            human_question = human_question
+        )
+        try:
+            human_response = self.llm.invoke([HumanMessage(content=message)])
+            return human_response
         except Exception as e:
             return e
