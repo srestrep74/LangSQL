@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import SyntheticDataService from '../services/SyntheticDataService';
 
 const router = useRouter();
 /**
@@ -63,17 +64,37 @@ const validateInput = () => {
   }
 };
 
-const generateData = () => {
-  if (dataAmount.value >= 40 && dataAmount.value <= 400 && dataAmount.value % 40 === 0) {
-    showToast.value = true;
-    setTimeout(() => {
-      showToast.value = false;
-    }, 50000);
-    setTimeout(() => {
-      router.push('/');
-    }, 1000);
-  } else {
-    alert('Please enter a valid number of records (multiples of 40, up to 400).');
+const generateData = async () => {
+  validateInput();
+  if (errorMessage.value) return;
+
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 7000);
+
+  const data = {
+    schema_name: "inventory",
+    iterations: dataAmount.value / 40
+  };
+
+  try {
+    const response = await SyntheticDataService.postSyntheticData(data);
+    
+    if (response.status === "success") {
+      alert("Data generation request successful! You can now check your database.");
+      setTimeout(() => {
+        showToast.value = false;
+        router.push('/');
+      }, 2000);
+    } else {
+      throw new Error(response.message);
+    }
+  } catch (error) {
+    console.error("Failed to generate data:", error);
+    alert("An error occurred while generating data. Please try again.");
+    showToast.value = false;
   }
 };
 </script>
@@ -81,7 +102,7 @@ const generateData = () => {
 <template>
   <div class="synthetic-data-view">
     <div v-if="showToast" class="toast-message">
-      <p>Data is being generated. You will see the changes reflected in your database in a few minutes.</p>
+      <p>Data is being generated. You will be notified when the process is complete.</p>
     </div>
 
     <div class="description">
