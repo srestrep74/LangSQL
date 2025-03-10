@@ -1,8 +1,11 @@
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
+from backend.src.modules.text_to_sql.prompts.prompt import (
+    AI_INPUT_PROMPT,
+    HUMAN_RESPONSE_PROMPT,
+)
 from src.config.constants import Settings
-from backend.src.modules.text_to_sql.prompts.prompt import AI_INPUT_PROMPT, HUMAN_RESPONSE_PROMPT
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
 
