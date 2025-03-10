@@ -1,5 +1,5 @@
-from typing import Dict
 import json
+from typing import Dict
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.utils.SQLUtils import SQLUtils
