@@ -1,9 +1,9 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
+
 from app import app
-import json
-from pathlib import Path
 from src.modules.text_to_sql.service import SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
