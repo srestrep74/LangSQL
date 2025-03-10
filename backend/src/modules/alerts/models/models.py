@@ -10,5 +10,5 @@ class AlertInput(BaseModel):
 
 class AlertDB(AlertInput):
     sql_query: str
-    id: Optional[str] = Field(alias="_id")
+    id: Optional[str] = Field(default=None, alias="_id")
     creation_date: datetime = Field(default_factory=datetime.utcnow)

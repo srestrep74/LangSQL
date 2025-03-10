@@ -11,7 +11,7 @@ class AlertService:
         self.alert_repository = alert_repository
 
     async def create_alert(self, alert_data: AlertInput) -> AlertDB:
-        sql_query = self.text_to_sql_adapter.process_user_query(alert_data.prompt, 'inventory')
+        sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, 'inventory')
         print(sql_query)
         
         alert_db = AlertDB(**alert_data.dict(), sql_query=sql_query)
