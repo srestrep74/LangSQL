@@ -1,6 +1,6 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from sqlalchemy import create_engine, MetaData, text
+from sqlalchemy import MetaData, create_engine, text
 from sqlalchemy.engine import Engine
 
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
@@ -17,8 +17,8 @@ class DatabaseManager(IDatabaseManager):
     def get_engine(self) -> Engine:
         return self._engine
 
-    def get_db_structure(self) -> Dict[str, Any]:
-        metadata = MetaData(schema="inventory")
+    def get_db_structure(self, schema_name: str) -> Dict[str, Any]:
+        metadata = MetaData(schema=schema_name)
         metadata.reflect(bind=self._engine)
 
         db_structure = {}
@@ -46,10 +46,11 @@ class DatabaseManager(IDatabaseManager):
 
         return db_structure
 
-    def execute_query(self, query: str) -> List[Dict[str, Any]]:
+    def execute_query(self, query: str, schema_name: str) -> List[Dict[str, Any]]:
         with self._engine.connect() as connection:
             transaction = connection.begin()
             try:
+                connection.execute(text(f"SET search_path TO {schema_name}"))
                 result = connection.execute(text(query))
                 transaction.commit()
 
@@ -59,5 +60,5 @@ class DatabaseManager(IDatabaseManager):
                 else:
                     return [{"message": "Query executed successfully"}]
             except Exception as e:
+                print(str(e))
                 transaction.rollback()
-                return [{"error": str(e)}]

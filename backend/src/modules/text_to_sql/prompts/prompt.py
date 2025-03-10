@@ -9,7 +9,7 @@ AI_INPUT_PROMPT = (
     {user_input}
 
     The entire database is within a schema called:
-    {schema}
+    {schema_name}
 
     Generate the corresponding SQL query:
     """
@@ -17,7 +17,7 @@ AI_INPUT_PROMPT = (
 
 HUMAN_RESPONSE_PROMPT = (
     """
-    You are a professional writer of answers, now I need you to write the header of an answer for this question:{human_question}.  
+    You are a professional writer of answers, now I need you to write the header of an answer for this question:{human_question}.
     Ensure the header is easy to understand, well-structured, and flows naturally for the reader without unnecessary introductions or disclaimers.
     Give me just one header, and give it directly, no introductions for the answer.
     """
