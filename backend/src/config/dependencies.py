@@ -9,6 +9,7 @@ from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModel
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
+from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 
 
 def get_db_manager() -> Engine:
@@ -37,3 +38,7 @@ def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adap
 
 def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_apiclient_llm_client)) -> SyntheticDataModelService:
     return SyntheticDataModelService(query_adapter, llm_client)
+
+
+def get_text_to_sql_adapter(lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)):
+    return TextToSQLAdapter(lang_to_sql_service)
