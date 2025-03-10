@@ -4,17 +4,27 @@ import TextToSqlService from '@/services/TextToSqlService';
 
 const userQuery = ref('');
 const chatMessages = ref<Array<{ type: string; content: string }>>([]);
+const isLoading = ref(false);
 
 const sendQuery = async () => {
   if (!userQuery.value.trim()) return;
 
   chatMessages.value.push({ type: 'user', content: userQuery.value });
 
+  const loadingMessage = { type: 'bot', content: '<span class="loading-dots">Processing Query</span>' };
+  chatMessages.value.push(loadingMessage);
+  isLoading.value = true;
+
   try {
     const response = await TextToSqlService.proccessQuery(userQuery.value);
 
     if (!response || !response.header) {
       throw new Error('Invalid response from backend');
+    }
+
+    const index = chatMessages.value.indexOf(loadingMessage);
+    if (index !== -1) {
+      chatMessages.value.splice(index, 1);
     }
 
     const formattedHeader = response.header
@@ -52,7 +62,13 @@ const sendQuery = async () => {
       }
     }
   } catch (error) {
+    const index = chatMessages.value.indexOf(loadingMessage);
+    if (index !== -1) {
+      chatMessages.value.splice(index, 1);
+    }
     chatMessages.value.push({ type: 'bot', content: 'Error processing your query. Please try again.' });
+  } finally {
+    isLoading.value = false;
   }
 
   userQuery.value = '';
@@ -150,5 +166,38 @@ const sendQuery = async () => {
 
 .chat-container::-webkit-scrollbar-thumb:hover {
   background: #5a055e;
+}
+
+.loading-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.loading-dots::after {
+  content: '...';
+  display: inline-block;
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
 }
 </style>
