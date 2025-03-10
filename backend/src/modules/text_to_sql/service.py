@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
@@ -44,7 +45,7 @@ class LangToSqlService:
             human_response = self.llm_client.get_human_response(user_input)
             response = {
                 "header": human_response,
-                "sql_results": str(sql_results)
+                "sql_results": json.dumps(sql_results)
             }
             return response
         except Exception as e:
