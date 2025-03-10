@@ -10,6 +10,7 @@ class Settings:
     TEXTTOSQL_API_KEY: str = os.getenv('TEXTTOSQL_API_KEY')
     TEXTTOSQL_BASE_URL: str = os.getenv('TEXTTOSQL_BASE_URL')
     TEXTTOSQL_MODEL_NAME: str = os.getenv('TEXTTOSQL_MODEL_NAME')
+    TEXTTOSQL_TEMPERATURE: str = os.getenv('TEXTTOSQL_TEMPERATURE')
     BASE_URL: str = os.getenv('BASE_URL')
     SYNTHETIC_DATA_MODEL_API_KEY: str = os.getenv(
         'SYNTHETIC_DATA_MODEL_API_KEY')

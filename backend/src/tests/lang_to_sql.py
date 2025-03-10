@@ -47,3 +47,21 @@ class TestSyntheticData:
 
         assert isinstance(response, str)
         assert "INSERT INTO" in response
+
+
+class TestLangToSql:
+    def test_lang_to_sql_endpoint(self):
+        response = client.post(
+            "/api/text-to-sql/process_query",
+            json={"user_input": "How many records are in the warehouse located in Japan", "schema_name": "inventory"}
+        )
+
+        assert response.status_code == 200
+
+        response_json = response.json()
+        assert response_json["status"] == "success"
+        assert response_json["message"] == "Success"
+        assert "results" in response_json["data"]
+        assert isinstance(response_json["data"]["results"], dict)
+        assert "header" in response_json["data"]["results"]
+        assert "sql_results" in response_json["data"]["results"]
