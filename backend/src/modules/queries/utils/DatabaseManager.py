@@ -56,10 +56,8 @@ class DatabaseManager(IDatabaseManager):
 
                 if result.returns_rows:
                     columns = result.keys()
-                    print('Insertado1')
                     return [dict(zip(columns, row)) for row in result.fetchall()]
                 else:
-                    print('Insertado2')
                     return [{"message": "Query executed successfully"}]
             except Exception as e:
                 print(str(e))

@@ -76,7 +76,7 @@ const generateData = async () => {
 
   const data = {
     schema_name: "inventory",
-    iterations: dataAmount.value / 40
+    iterations: dataAmount.value
   };
 
   try {
