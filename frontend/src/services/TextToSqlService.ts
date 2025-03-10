@@ -1,11 +1,12 @@
+import type { ApiResponse, QueryResults } from '@/interfaces/ApiResponse';
 import axios from 'axios';
 
 const API_URL: string = import.meta.env.VITE_API_URL as string;
 
 class TextToSqlService {
-    async proccessQuery(query: string): Promise<any> {
+    async proccessQuery(query: string): Promise<QueryResults> {
         try {
-            const response = await axios.post(`${API_URL}/text-to-sql/proccess_query`, { 
+            const response = await axios.post<ApiResponse>(`${API_URL}/text-to-sql/proccess_query`, { 
                 user_input: query,
                 schema_name: 'inventory'
             });
