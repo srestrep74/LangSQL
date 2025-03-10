@@ -1,7 +1,7 @@
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
-from backend.src.modules.text_to_sql.prompts.prompt import (
+from src.modules.text_to_sql.prompts.prompt import (
     AI_INPUT_PROMPT,
     HUMAN_RESPONSE_PROMPT,
 )
