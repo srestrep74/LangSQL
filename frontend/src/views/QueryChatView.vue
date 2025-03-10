@@ -82,9 +82,10 @@ const sendQuery = async () => {
         <div v-html="message.content"></div>
       </div>
     </div>
-    <div class="input-group w-100 position-relative" style="max-width: 800px; margin-top: 20px;">
-      <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="form-control rounded-pill ps-4 pe-5" placeholder="Type your message..." style="border: 2px solid #7b0779; height: 50px;">
-      <button @click="sendQuery" class="btn btn-custom-purple position-absolute end-0 me-2 top-50 translate-middle-y px-4 rounded-pill">Send</button>
+
+    <div class="input-group-container">
+      <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="chat-input" placeholder="Type your message..." />
+      <button @click="sendQuery" class="btn-custom-send">Send</button>
     </div>
   </main>
 </template>
@@ -168,6 +169,64 @@ const sendQuery = async () => {
   background: #5a055e;
 }
 
+.input-group-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  height: 50px;
+  padding: 0 16px;
+  border: 2px solid #7b0779;
+  border-radius: 25px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.chat-input:focus {
+  border-color: #a01fa0;
+  outline: none;
+}
+
+.btn-custom-send {
+  background: linear-gradient(135deg, #7b0779, #a01fa0);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s;
+}
+
+.btn-custom-send:hover {
+  background: linear-gradient(135deg, #a01fa0, #7b0779);
+  transform: scale(1.05);
+}
+
+.btn-custom-send:active {
+  transform: scale(0.95);
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+
+.loading-dots::after {
+  content: '...';
+  display: inline-block;
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+/* Modal de carga */
 .loading-modal {
   position: fixed;
   top: 0;
@@ -187,17 +246,6 @@ const sendQuery = async () => {
   border-radius: 10px;
   font-size: 1.2rem;
   font-weight: bold;
-}
-
-.loading-dots::after {
-  content: '...';
-  display: inline-block;
-  animation: dots 1.5s steps(3, end) infinite;
-}
-
-@keyframes dots {
-  0% { content: '.'; }
-  33% { content: '..'; }
-  66% { content: '...'; }
+  text-align: center;
 }
 </style>
