@@ -10,5 +10,7 @@ GENERATE_SYNTHETIC_DATA_PROMPT = (
     - Names (varchar values) do not exceed 15 characters.
     - Do not duplicate data (specially unique values and primary keys).
     - Be careful of the foreign key constraints, and primary keys.
+    - Avoid special carachters in the data.
+    - Use simple and clear data.
     """
 )
