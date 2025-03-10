@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
@@ -14,6 +15,7 @@ class SyntheticDataModelService:
         self.llm_client = llm_client
 
     def generate_synthetic_data(self, iterations: int, schema_name: str) -> str:
+        iterations = iterations // 40
         db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
         user_input = GENERATE_SYNTHETIC_DATA_PROMPT.format(
             db_structure=db_structure, schema_name=schema_name)
@@ -43,7 +45,7 @@ class LangToSqlService:
             human_response = self.llm_client.get_human_response(user_input)
             response = {
                 "header": human_response,
-                "sql_results": str(sql_results)
+                "sql_results": json.dumps(sql_results)
             }
             return response
         except Exception as e:
