@@ -16,6 +16,36 @@ router = APIRouter()
 async def proccess_query(
     request: ProcessQueryRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
+    """
+    This endpoint processes a user query and converts it into an SQL statement.
+
+    Args:
+        request (ProcessQueryRequest): The user input containing the query and schema name.
+        lang_to_sql_service (LangToSqlService): A service for processing user queries into SQL. Retrieved via `Depends(get_lang_to_sql_service)`.
+
+    Returns:
+        Successful Response (`200 OK`)
+        ```json
+        {
+            "status": "success",
+            "message": "Success",
+            "data": {
+                "results": "SQL Query String"
+            }
+        }
+        ```
+
+        Error Response (`400 Bad Request`)
+        ```json
+        {
+            "status": "error",
+            "message": "Error",
+            "details": {
+                "error": "Error description"
+            }
+        }
+        ```
+    """
     try:
         results = lang_to_sql_service.process_user_query(request.user_input, request.schema_name)
         return ResponseManager.success_response(
