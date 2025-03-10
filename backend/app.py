@@ -1,13 +1,13 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 
-from src.modules.text_to_sql.routes import router as text_to_sql_router
-from src.modules.auth.routes import router as auth_router
 from src.modules.alerts.routes import router as alerts_router
+from src.modules.auth.routes import router as auth_router
 from src.modules.control_panel.routes import router as control_panel_router
 from src.modules.queries.routes import router as queries_router
 from src.modules.reports.routes import router as reports_router
+from src.modules.text_to_sql.routes import router as text_to_sql_router
 
 app = FastAPI(
     title="LangSQL",
