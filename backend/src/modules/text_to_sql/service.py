@@ -39,10 +39,8 @@ class LangToSqlService:
             db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
             sql_query = self.llm_client.get_model_response(
                 db_structure, user_input, schema_name)
-            print(sql_query)
             sql_results = self.query_adapter.execute_query(sql_query, schema_name)
             human_response = self.llm_client.get_human_response(user_input)
-            print(sql_results)
             response = {
                 "header": human_response,
                 "sql_results": str(sql_results)
