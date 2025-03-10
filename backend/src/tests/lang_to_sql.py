@@ -50,15 +50,9 @@ class TestSyntheticData:
 
 
 class TestLangToSql:
-    @patch("src.modules.text_to_sql.service.LangToSqlService.process_user_query")
-    def test_lang_to_sql_endpoint(self, mock_lang_to_sql):
-        mock_lang_to_sql.return_value = {
-            "header": "Some header text",
-            "sql_results": "[{'some_key': 'some_value'}]"
-        }
-
+    def test_lang_to_sql_endpoint(self):
         response = client.post(
-            "/api/text-to-sql/proccess_query",
+            "/api/text-to-sql/process_query",
             json={"user_input": "How many records are in the warehouse located in Japan", "schema_name": "inventory"}
         )
 
@@ -71,5 +65,3 @@ class TestLangToSql:
         assert isinstance(response_json["data"]["results"], dict)
         assert "header" in response_json["data"]["results"]
         assert "sql_results" in response_json["data"]["results"]
-
-        mock_lang_to_sql.assert_called_once_with("How many records are in the warehouse located in Japan", "inventory")
