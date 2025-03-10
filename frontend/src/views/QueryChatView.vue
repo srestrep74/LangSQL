@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TextToSqlService from '@/services/TextToSqlService';
+import type { QueryResults } from '@/interfaces/ApiResponse';
 
 const userQuery = ref('');
 const chatMessages = ref<Array<{ type: string; content: string }>>([]);
@@ -16,7 +17,7 @@ const sendQuery = async () => {
   isLoading.value = true;
 
   try {
-    const response = await TextToSqlService.proccessQuery(userQuery.value);
+    const response: QueryResults = await TextToSqlService.proccessQuery(userQuery.value);
 
     if (!response || !response.header) {
       throw new Error('Invalid response from backend');
@@ -41,7 +42,7 @@ const sendQuery = async () => {
         const columns = Object.keys(sqlResults[0]);
 
         const tableHeaders = columns.map(column => `<th>${column}</th>`).join('');
-        const tableRows = sqlResults.map((row: Record<string, any>) => `<tr>${columns.map(column => `<td>${row[column]}</td>`).join('')}</tr>`).join('');
+        const tableRows = sqlResults.map((row: Record<string, string|number|null>) => `<tr>${columns.map(column => `<td>${row[column]}</td>`).join('')}</tr>`).join('');
 
         const tableHTML = `
           <div class="sql-table-container">
@@ -58,10 +59,12 @@ const sendQuery = async () => {
 
         chatMessages.value.push({ type: 'bot', content: `SQL Results:<br>${tableHTML}` });
       } catch (error) {
+        console.error(error);
         chatMessages.value.push({ type: 'bot', content: 'Error displaying SQL results.' });
       }
     }
   } catch (error) {
+    console.error(error);
     const index = chatMessages.value.indexOf(loadingMessage);
     if (index !== -1) {
       chatMessages.value.splice(index, 1);
