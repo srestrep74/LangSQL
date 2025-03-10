@@ -2,7 +2,7 @@ from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
 from src.config.constants import Settings
-from src.modules.text_to_sql.prompts.prompt import (
+from src.modules.text_to_sql.prompts.lang_to_sql import (
     AI_INPUT_PROMPT,
     HUMAN_RESPONSE_PROMPT,
 )
@@ -14,7 +14,7 @@ class LangChainLLMClient(ILLMClient):
         self.api_key = Settings.TEXTTOSQL_API_KEY
         self.base_url = Settings.TEXTTOSQL_BASE_URL
         self.model_name = Settings.TEXTTOSQL_MODEL_NAME
-        self.MODEL_TEMPERATURE = 0.7
+        self.MODEL_TEMPERATURE = Settings.TEXTTOSQL_TEMPERATURE
         self.llm = self._connect()
 
     def _connect(self) -> ChatOpenAI:
