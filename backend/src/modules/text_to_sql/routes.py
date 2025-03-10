@@ -46,7 +46,6 @@ async def proccess_query(
         }
         ```
     """
-    print('request', request)
     try:
         results = lang_to_sql_service.process_user_query(request.user_input, request.schema_name)
         return ResponseManager.success_response(
