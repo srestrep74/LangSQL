@@ -6,7 +6,10 @@ from src.modules.text_to_sql.prompts.prompt import (
     HUMAN_RESPONSE_PROMPT,
 )
 from src.config.constants import Settings
-from src.modules.text_to_sql.prompts.prompt import AI_INPUT_PROMPT, HUMAN_RESPONSE_PROMPT
+from src.modules.text_to_sql.prompts.prompt import (
+    AI_INPUT_PROMPT,
+    HUMAN_RESPONSE_PROMPT,
+)
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
 
