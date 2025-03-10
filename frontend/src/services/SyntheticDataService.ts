@@ -6,7 +6,7 @@ class SyntheticDataService {
 
   async postSyntheticData(formData: any): Promise<any> {
     try {
-      const response = await axios.post(API_URL + 'text-to-sql/generate_synthetic_data', formData, {
+      const response = await axios.post(`${API_URL}/text-to-sql/generate_synthetic_data`, formData, {
         headers: {
           'Content-Type': 'application/json'
         }
