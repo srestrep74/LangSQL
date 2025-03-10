@@ -33,6 +33,9 @@ jobs:
 
       - name: Create .env file
         run: |
+          echo "TEXTTOSQL_API_KEY=${{ secrets.TEXTTOSQL_API_KEY }}" >> .env
+          echo "TEXTTOSQL_BASE_URL=${{ secrets.TEXTTOSQL_BASE_URL }}" >> .env
+          echo "TEXTTOSQL_MODEL_NAME=${{ secrets.TEXTTOSQL_MODEL_NAME }}" >> .env
           echo "SYNTHETIC_DATA_MODEL_API_KEY=${{ secrets.SYNTHETIC_DATA_MODEL_API_KEY }}" >> .env
           echo "SYNTHETIC_DATA_BASE_URL=${{ secrets.SYNTHETIC_DATA_BASE_URL }}" >> .env
           echo "SYNTHETIC_DATA_MODEL=${{ secrets.SYNTHETIC_DATA_MODEL }}" >> .env
