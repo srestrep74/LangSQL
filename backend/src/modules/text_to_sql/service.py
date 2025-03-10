@@ -39,9 +39,13 @@ class LangToSqlService:
         try:
             db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
             sql_query = self.llm_client.get_model_response(
-                db_structure, user_input)
+                db_structure, user_input, schema_name)
             sql_results = self.query_adapter.execute_query(sql_query, schema_name)
-            # Here must be a call to llm_client.generate_response(sql_results)
-            return sql_results
+            human_response = self.llm_client.get_human_response(user_input)
+            response = {
+                "header": human_response,
+                "sql_results": str(sql_results)
+            }
+            return response
         except Exception as e:
             return {"error": str(e)}
