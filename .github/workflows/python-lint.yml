@@ -47,7 +47,6 @@ jobs:
           autopep8 --in-place --recursive --aggressive --exclude venv,__pycache__ .
           isort --profile black .
 
-            - name: Commit and push changes
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions"
