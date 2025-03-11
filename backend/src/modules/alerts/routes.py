@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, status
 
-from src.utils.ResponseManager import ResponseManager
-
 from src.modules.alerts.models.models import AlertInput
 from src.modules.alerts.service import AlertService
+from src.utils.ResponseManager import ResponseManager
 
 router = APIRouter()
 
