@@ -11,9 +11,7 @@ permissions:
 
 jobs:
   lint:
-    if: > 
-      github.event.workflow_run.conclusion == 'success' && 
-      contains(fromJson('["develop", "test/gitflows"]'), github.event.workflow_run.head_branch)
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     defaults:
       run:
