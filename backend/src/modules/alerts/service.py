@@ -3,8 +3,8 @@ from fastapi import Depends
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 from src.config.dependencies import get_text_to_sql_adapter
 
-from .models import AlertDB, AlertInput
-from .repositories import AlertRepository
+from src.modules.alerts.models.models import AlertDB, AlertInput
+from src.modules.alerts.repositories.repository import AlertRepository
 
 
 class AlertService:

@@ -1,5 +1,5 @@
-from ..database import database
-from ..models import AlertDB, AlertInput
+from src.modules.alerts.database import database
+from src.modules.alerts.models.models import AlertDB, AlertInput
 
 
 class AlertRepository:
