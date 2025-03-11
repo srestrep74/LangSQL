@@ -6,3 +6,6 @@ DB_NAME = Settings.DB_NAME
 
 client = AsyncIOMotorClient(MONGO_URI)
 database = client[DB_NAME]
+
+def get_database() -> AsyncIOMotorClient:
+    return client[DB_NAME]
