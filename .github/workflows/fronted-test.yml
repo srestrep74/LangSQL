@@ -6,14 +6,13 @@ on:
     branches:
       - "develop"
       - "test/gitflows"
+    paths:
+      - "frontend/**"
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,12 +24,15 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd frontend
           npm install
 
       - name: Run Build
         run: |
+          cd frontend
           npm run build
 
       - name: Run Cypress
         run: |
+          cd frontend
           npm run test:e2e
