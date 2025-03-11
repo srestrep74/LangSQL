@@ -1,10 +1,11 @@
 name: Python Tests
 
-on: [push]
-  #pull_request:
-    #branches:
-      #- develop
-      #- test/gitflows
+on:
+  push:
+  pull_request:
+    branches:
+      - develop
+      - test/gitflows
 
 permissions:
   contents: read

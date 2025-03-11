@@ -1,18 +1,21 @@
 name: Python Linter
 
-on:
-  workflow_run:
-    workflows: ["Python Tests"]
-    types:
-      - completed
-    conclusions:
-      - success
+on: [push]
+  #pull_request:
+    #branches:
+      #- develop
+      #- test/gitflows
 
 permissions:
   contents: write
 
 jobs:
+  tests:
+    uses: ./.github/workflows/backend-tests.yml
+    
   lint:
+    needs: tests
+    if: ${{ github.actor != 'github-actions' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,11 +47,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git fetch origin ${{ github.event.workflow_run.head_branch }}  
-          git checkout ${{ github.event.workflow_run.head_branch }}      
-          git pull --rebase origin ${{ github.event.workflow_run.head_branch }} || echo "No remote changes to rebase"
+          git fetch origin ${{ github.head_ref }}  # Fetch latest changes
+          git checkout ${{ github.head_ref }}      # Switch to the correct branch
+          git pull --rebase origin ${{ github.head_ref }} || echo "No remote changes to rebase"
           git add .
-          git diff --cached --quiet || (git commit -m "style: run linter" && git push origin HEAD:${{ github.event.workflow_run.head_branch }})
+          git diff --cached --quiet || (git commit -m "style: run linter" && git push origin HEAD:${{ github.head_ref }})
+        
 
       - name: Lint with flake8
         run: flake8 --config=.flake8 .
