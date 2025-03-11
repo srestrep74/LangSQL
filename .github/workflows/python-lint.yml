@@ -13,6 +13,7 @@ permissions:
 jobs:
   tests:
     uses: ./.github/workflows/backend-tests.yml
+    secrets: inherit
     
   lint:
     needs: tests
