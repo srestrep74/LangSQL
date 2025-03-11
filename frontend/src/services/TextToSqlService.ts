@@ -6,7 +6,7 @@ const API_URL: string = import.meta.env.VITE_API_URL as string;
 class TextToSqlService {
     async proccessQuery(query: string): Promise<QueryResults> {
         try {
-            const response = await axios.post<ApiResponse>(`${API_URL}/text-to-sql/proccess_query`, { 
+            const response = await axios.post<ApiResponse>(`${API_URL}/text-to-sql/process_query`, { 
                 user_input: query,
                 schema_name: 'inventory'
             });
