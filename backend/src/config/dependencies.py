@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy.engine import Engine
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 from src.config.constants import Settings
 from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManager import DatabaseManager
@@ -37,3 +38,7 @@ def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adap
 
 def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_apiclient_llm_client)) -> SyntheticDataModelService:
     return SyntheticDataModelService(query_adapter, llm_client)
+
+
+def get_text_to_sql_adapter(lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)):
+    return TextToSQLAdapter(lang_to_sql_service)
