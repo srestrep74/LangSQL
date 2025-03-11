@@ -1,7 +1,6 @@
 name: Python Tests
 
 on: [push]
-on: [workflow_run]
   #pull_request:
     #branches:
       #- develop

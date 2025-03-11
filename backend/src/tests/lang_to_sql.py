@@ -20,7 +20,7 @@ class TestSyntheticData:
 
         response = client.post(
             "/api/text-to-sql/generate_synthetic_data",
-            content={"iterations": 1, "schema_name": "inventory"}
+            json={"iterations": 1, "schema_name": "inventory"}
         )
 
         assert response.status_code == 200
