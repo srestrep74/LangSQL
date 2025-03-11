@@ -1,8 +1,10 @@
 from fastapi import Depends
-from .repositories import AlertRepository
-from .models import AlertInput, AlertDB
+
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 from src.config.dependencies import get_text_to_sql_adapter
+
+from .models import AlertDB, AlertInput
+from .repositories import AlertRepository
 
 
 class AlertService:
