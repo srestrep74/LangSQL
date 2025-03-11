@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, status
-from .models import AlertInput, AlertDB
-from .service import AlertService
+
 from src.utils.ResponseManager import ResponseManager
 
+from .models import AlertInput
+from .service import AlertService
+
 router = APIRouter()
+
 
 @router.post("/create")
 async def create_alert(alert_data: AlertInput, alert_service: AlertService = Depends()):

@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy.engine import Engine
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 from src.config.constants import Settings
 from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManager import DatabaseManager
@@ -9,7 +10,6 @@ from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModel
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
-from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 
 
 def get_db_manager() -> Engine:
