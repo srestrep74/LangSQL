@@ -37,7 +37,7 @@ async def create_alert(alert_data: AlertInput, alert_service: AlertService = Dep
         alert = await alert_service.create_alert(alert_data)
         return ResponseManager.success_response(
             data=alert,
-            message="succes",
+            message="success",
             status_code=status.HTTP_200_OK,
         )
     except Exception as e:

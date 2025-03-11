@@ -25,7 +25,6 @@ const submitForm = async () => {
     await AlertService.postCreateAlert(formData);
     isLoading.value = false;
     alert('Alert created successfully!');
-    router.push('/');
   } catch (error) {
     isLoading.value = false;
     alert('Failed to create alert. Please try again.');
