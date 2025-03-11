@@ -5,13 +5,14 @@ on:
     workflows: ["Python Tests"]
     types:
       - completed
+    conclusions:
+      - success
 
 permissions:
   contents: write
 
 jobs:
   lint:
-    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     defaults:
       run:
