@@ -11,12 +11,19 @@ permissions:
   issues: write
 
 jobs:
-  tests:
+  backend-tests:
     uses: ./.github/workflows/backend-tests.yml
+    secrets: inherit
+
+  frontend-tests:
+    uses: ./.github/workflows/frontend-tests.yml
     secrets: inherit
     
   lint:
-    needs: tests
+    needs: 
+      - backend-tests 
+      - frontend-tests
+
     if: ${{ github.actor != 'github-actions' }}
     runs-on: ubuntu-latest
     defaults:

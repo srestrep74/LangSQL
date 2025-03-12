@@ -8,7 +8,7 @@ permissions:
   issues: write 
 
 jobs:
-  tests:
+  backend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
