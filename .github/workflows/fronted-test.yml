@@ -34,8 +34,9 @@ jobs:
       - name: Run Server
         run: npm run dev &
 
-      - name: Wait for Server
-        run: npx wait-on http://localhost:5173
+      - name: Wait for server to be ready
+        run: |
+          timeout 30s bash -c 'until curl -s http://localhost:5173 >/dev/null; do sleep 2; done' || exit 1
 
       - name: Run Cypress
         run: npx cypress run
