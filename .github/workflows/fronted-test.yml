@@ -29,6 +29,9 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Set environment variables
+        run: echo "VITE_API_URL=http://localhost:8000/api" >> $GITHUB_ENV  
+
       - name: Install dependencies
         run: npm install
 
