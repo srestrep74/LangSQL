@@ -27,8 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Build
-        run: npm run build
+      - name: Run Server
+        run: npm run dev
 
       - name: Run Cypress
-        run: npm run test:e2e
+        run: npx cypress run
