@@ -34,5 +34,8 @@ jobs:
       - name: Run Server
         run: npm run dev &
 
+      - name: Wait for Server
+        run: npx wait-on http://localhost:5173
+
       - name: Run Cypress
         run: npx cypress run
