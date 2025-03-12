@@ -8,13 +8,7 @@ permissions:
   issues: write
 
 jobs:
-  backend-tests:
-    uses: ./.github/workflows/backend-tests.yml
-    secrets: inherit
-
   frontend-tests:
-    needs: 
-      - backend-tests 
     runs-on: ubuntu-latest
     defaults:
       run:

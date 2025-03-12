@@ -5,21 +5,29 @@ on:
     branches:
       - develop
       - test/gitflows
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
 
 permissions:
   contents: write
   issues: write
 
 jobs:
+  backend-tests:
+    if: ${{ github.event.pull_request && github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'backend/') }}
+    uses: ./.github/workflows/backend-tests.yml
+    secrets: inherit
+
   frontend-tests:
+    if: ${{ github.event.pull_request && github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files, 'frontend/') }}
     uses: ./.github/workflows/frontend-tests.yml
     secrets: inherit
     
   lint:
     needs: 
+      - backend-tests
       - frontend-tests
-
-    if: ${{ github.actor != 'github-actions' }}
     runs-on: ubuntu-latest
     defaults:
       run:
