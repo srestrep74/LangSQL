@@ -1,11 +1,9 @@
-from unittest.mock import MagicMock, patch
-
-import pytest
-from fastapi.testclient import TestClient
-
 from app import app
 from src.modules.text_to_sql.service import SyntheticDataModelService
+from unittest.mock import MagicMock, patch
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
+import pytest
+from fastapi.testclient import TestClient
 from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 
 client = TestClient(app)
