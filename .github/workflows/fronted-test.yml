@@ -39,4 +39,24 @@ jobs:
           timeout 30s bash -c 'until curl -s http://localhost:5173 >/dev/null; do sleep 2; done' || exit 1
 
       - name: Run Cypress
-        run: npx cypress run
+        run: |
+          npx cypress run | tee test_results.txt
+          echo "status=${PIPESTATUS[0]}" >> $GITHUB_ENV
+
+      - name: Install GitHub CLI
+        if: always()
+        run: |
+          sudo apt update && sudo apt install -y gh
+  
+      - name: Create Issue on Failure (GH CLI)
+        if: env.status != 0
+        run: |
+          gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
+                          --body "$(cat test_results.txt | head -c 6000)" \
+                          --label "test-failure"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Fail job if tests failed
+        if: env.status != '0'
+        run: exit 1

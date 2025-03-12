@@ -57,7 +57,7 @@ describe('Chat Interface E2E Tests', () => {
 
     it('should correctly display multiple messages in sequence', () => {
         cy.get('.chat-input').type('First query').type('{enter}');
-        cy.wait('@queryRequest');
+        cy.wait('@querRequest');
         cy.get('.chat-input').type('Second query').type('{enter}');
         cy.wait('@queryRequest');
         cy.get('.user-message').eq(0).should('contain', 'First query');
