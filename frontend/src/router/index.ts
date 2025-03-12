@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import SyntheticDataView from '../views/SyntheticDataView.vue'
 import HomeView from '../views/HomeView.vue'
-import ExampleView from '@/views/ExampleView.vue'
+import QueryChatView from '../views/QueryChatView.vue'
+import CreateAlertView from '../views/CreateAlerView.vue'
+import ConfigurationView from '@/views/ConfigurationView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,13 +14,25 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/synthetic_data',
+      name: 'synthetic_data',
+      component: SyntheticDataView,
     },
+    {
+      path: '/query',
+      name: 'query',
+      component: QueryChatView,
+    },
+    {
+      path: '/alerts',
+      name: 'alert',
+      component: CreateAlertView,
+    },
+    {
+      path: '/configuration',
+      name: 'configuration',
+      component: ConfigurationView,
+    }
   ],
 })
 
