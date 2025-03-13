@@ -2,7 +2,7 @@ describe('Chat Interface E2E Tests', () => {
     beforeEach(() => {
         cy.visit('/query');
         
-        cy.intercept('POST', '**/api/text-to-sql/proccess_query', (req) => {
+        cy.intercept('POST', '**/api/text-to-sql/process_query', (req) => {
             if (req.body?.query?.toLowerCase().includes('error')) {
                 req.reply({
                     statusCode: 500,
