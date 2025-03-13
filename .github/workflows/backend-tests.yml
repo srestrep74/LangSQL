@@ -1,17 +1,14 @@
 name: Python Tests
 
 on:
-  pull_request:
-    branches:
-      - develop
-      - test/gitflows
+  workflow_call:
 
 permissions:
   contents: read
   issues: write 
 
 jobs:
-  tests:
+  backend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,19 +45,21 @@ jobs:
         run: | 
           pytest src/tests/* | tee test_results.txt
           echo "status=${PIPESTATUS[0]}" >> $GITHUB_ENV
-        continue-on-error: true
 
       - name: Install GitHub CLI
+        if: always()
         run: |
           sudo apt update && sudo apt install -y gh
 
       - name: Create Issue on Failure (GH CLI)
+        if: env.status != 0
         run: |
-          if [ "$status" -ne 0 ]; then
-            STATUS="Failure"
             gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
                           --label "test-failure"
-          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail job if tests failed
+        if: env.status != '0'
+        run: exit 1
