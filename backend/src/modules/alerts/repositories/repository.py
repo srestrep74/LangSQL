@@ -1,4 +1,4 @@
-from src.modules.alerts.database import database
+from src.config.database import database
 from src.modules.alerts.models.models import AlertDB, AlertInput
 
 
