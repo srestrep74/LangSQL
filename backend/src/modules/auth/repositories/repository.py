@@ -1,7 +1,9 @@
-from bson import ObjectId
 from typing import Optional
+
+from bson import ObjectId
+
 from src.config.database import database
-from src.modules.auth.models.models import UserPatch, UserCreate, User
+from src.modules.auth.models.models import User, UserCreate, UserPatch
 
 
 class UserRepository:
@@ -28,16 +30,16 @@ class UserRepository:
     async def update_user(self, user_id: str, user_data: UserPatch) -> Optional[User]:
         # Filter out None values to only update provided fields
         update_data = {k: v for k, v in user_data.model_dump().items() if v is not None}
-        
+
         if not update_data:
             return await self.get_by_id(user_id)
-        
+
         try:
             result = await self.collection.update_one(
                 {"_id": ObjectId(user_id)},
                 {"$set": update_data}
             )
-            
+
             if result.matched_count:
                 return await self.get_by_id(user_id)
             return None

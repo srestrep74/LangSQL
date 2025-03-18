@@ -1,15 +1,14 @@
-from fastapi import APIRouter, HTTPException, Depends, Path, Query, Body, status
-from typing import List, Optional, Dict, Any
-from bson import ObjectId
-from pydantic import Json
+from typing import Any, Dict
 
-from src.utils.ResponseErrorModel import ResponseError
-from src.modules.auth.models.models import UserCreate, UserPatch, User
+from fastapi import APIRouter, Body, status
+
+from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.service import UserService
+from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
 
 router = APIRouter()
-service = UserService() 
+service = UserService()
 
 
 @router.post("/create",
@@ -338,5 +337,3 @@ async def set_main_credential(user_id: str, credential_index: int):
         return ResponseManager.success_response(result)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
