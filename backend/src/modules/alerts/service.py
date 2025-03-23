@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
 from src.config.dependencies import get_text_to_sql_adapter
-from src.modules.alerts.models.models import AlertDB, AlertInput
+from src.modules.alerts.models.models import Alert, AlertCreate
 from src.modules.alerts.repositories.repository import AlertRepository
 
 
@@ -11,7 +11,8 @@ class AlertService:
         self.text_to_sql_adapter = text_to_sql_adapter
         self.alert_repository = alert_repository
 
-    async def create_alert(self, alert_data: AlertInput) -> AlertDB:
+    async def create_alert(self, alert_data: AlertCreate) -> Alert:
         sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
-        alert_db = AlertDB(**alert_data.dict(), user="Alert User", sql_query=sql_query)
-        return await self.alert_repository.create_alert(alert_db)
+        alert_data_dict = alert_data.dict(exclude={"sql_query"})
+        alert_create = AlertCreate(**alert_data_dict, user="Alert User", sql_query=sql_query)
+        return await self.alert_repository.create_alert(alert_create)
