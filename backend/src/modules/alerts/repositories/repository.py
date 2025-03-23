@@ -1,5 +1,5 @@
 from src.config.database import database
-from src.modules.alerts.models.models import AlertCreate, Alert
+from src.modules.alerts.models.models import Alert, AlertCreate
 
 
 class AlertRepository:

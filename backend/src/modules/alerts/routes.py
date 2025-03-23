@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from src.modules.alerts.models.models import AlertCreate, Alert
+from src.modules.alerts.models.models import Alert, AlertCreate
 from src.modules.alerts.service import AlertService
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
