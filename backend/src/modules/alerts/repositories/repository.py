@@ -19,8 +19,6 @@ class AlertRepository:
         
         if not update_data:
             return await self.get_by_id(alert_id)
-        
-        print('ID', alert_id)
 
         try:
             result = await self.collection.update_one({"_id": ObjectId(alert_id)}, {"$set": update_data})
@@ -41,3 +39,10 @@ class AlertRepository:
             return None
         except Exception as e:
             return None
+        
+    async def delete_alert(self, alert_id: str) -> bool:
+        try:
+            result = await self.collection.delete_one({"_id": ObjectId(alert_id)})
+            return result.deleted_count > 0
+        except Exception:
+            return False
