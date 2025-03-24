@@ -2,11 +2,11 @@ import axios from 'axios';
 
 const API_URL: string = import.meta.env.VITE_API_URL as string;
 
-class SyntheticDataService {
+class AlertService {
 
-  async postSyntheticData(formData: any): Promise<any> {
+  async postCreateAlert(formData: any): Promise<any> {
     try {
-      const response = await axios.post(`${API_URL}/text-to-sql/generate_synthetic_data`, formData, {
+      const response = await axios.post(`${API_URL}/alerts/create`, formData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -19,4 +19,4 @@ class SyntheticDataService {
   }
 }
 
-export default new SyntheticDataService();
+export default new AlertService();

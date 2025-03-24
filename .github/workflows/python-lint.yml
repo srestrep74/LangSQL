@@ -8,10 +8,21 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
+  backend-tests:
+    uses: ./.github/workflows/backend-tests.yml
+    secrets: inherit
+
+  frontend-tests:
+    uses: ./.github/workflows/frontend-tests.yml
+    secrets: inherit
+    
   lint:
-    if: ${{ github.actor != 'github-actions' }}
+    needs: 
+      - backend-tests
+      - frontend-tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,6 +32,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
           persist-credentials: true
 
       - name: Set up Python 3.12
@@ -43,12 +56,26 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git fetch origin ${{ github.head_ref }}  # Fetch latest changes
-          git checkout ${{ github.head_ref }}      # Switch to the correct branch
-          git pull --rebase origin ${{ github.head_ref }} || echo "No remote changes to rebase"
+
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          
+          # Ensure correct branch checkout
+          git fetch origin "$BRANCH_NAME"
+          git checkout "$BRANCH_NAME"
+
+          # Stash any local changes before pulling
+          git stash
+          git pull --rebase origin "$BRANCH_NAME" || echo "No remote changes to rebase"
+          git stash pop || echo "No stashed changes to apply"
+
+          # Stage and commit changes if there are any
           git add .
-          git diff --cached --quiet || (git commit -m "style: run linter" && git push origin HEAD:${{ github.head_ref }})
-        
+          if ! git diff --cached --quiet; then
+            git commit -m "style: run linter"
+            git push origin "$BRANCH_NAME"
+          else
+            echo "No changes to commit."
+          fi
 
       - name: Lint with flake8
         run: flake8 --config=.flake8 .

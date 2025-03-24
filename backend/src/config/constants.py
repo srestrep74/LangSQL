@@ -16,3 +16,5 @@ class Settings:
         'SYNTHETIC_DATA_MODEL_API_KEY')
     SYNTHETIC_DATA_BASE_URL: str = os.getenv('SYNTHETIC_DATA_BASE_URL')
     SYNTHETIC_DATA_MODEL: str = os.getenv('SYNTHETIC_DATA_MODEL')
+    MONGO_URI: str = os.getenv('MONGO_URI')
+    DB_NAME: str = os.getenv('DB_NAME')
