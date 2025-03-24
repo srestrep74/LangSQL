@@ -1,5 +1,7 @@
 from src.config.database import database
-from src.modules.alerts.models.models import AlertCreate, Alert
+from src.modules.alerts.models.models import AlertCreate, Alert, AlertPatch
+from typing import Optional
+from bson import ObjectId
 
 
 class AlertRepository:
@@ -11,3 +13,31 @@ class AlertRepository:
         result = await self.collection.insert_one(alert_dict)
         alert_dict["id"] = str(result.inserted_id)
         return Alert(**alert_dict)
+    
+    async def update_alert(self, alert_id: str, alert_data: AlertPatch) -> Optional[Alert]:
+        update_data = {k: v for k, v in alert_data.dict().items() if v is not None}
+        
+        if not update_data:
+            return await self.get_by_id(alert_id)
+        
+        print('ID', alert_id)
+
+        try:
+            result = await self.collection.update_one({"_id": ObjectId(alert_id)}, {"$set": update_data})
+            if result.matched_count:
+                return await self.get_by_id(alert_id)
+            return None
+        except Exception as e:
+            return None
+
+    async def get_by_id(self, alert_id: str) -> Optional[Alert]:
+        try:
+            alert = await self.collection.find_one({"_id": ObjectId(alert_id)})
+            if alert:
+                alert["id"] = str(alert["_id"])
+                del alert["_id"]
+                return Alert(**alert)
+            
+            return None
+        except Exception as e:
+            return None

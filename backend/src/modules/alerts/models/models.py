@@ -27,3 +27,15 @@ class Alert(AlertCreate):
     making it clear when an alert is new (without an ID) versus when it's an existing alert (with an ID).
     """
     id: str
+
+
+class AlertPatch(BaseModel):
+    """
+    Data model for partially updating an existing alert.
+
+    This model is used when an existing alert is being updated with partial data. By providing only the fields
+    that need updating, the model ensures that unnecessary changes are not made to the alert in the database.
+    """
+    notification_emails: Optional[List[EmailStr]] = None
+    prompt: Optional[str] = None
+    expiration_date: Optional[datetime] = None
