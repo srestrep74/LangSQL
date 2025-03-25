@@ -16,5 +16,6 @@ class TestAlerts:
 
         response_json = response.json()
         assert response_json["status"] == "success"
-        assert response_json["message"] == "success"
+        assert response_json["message"] == "Success"
+        assert "id" in response_json["data"]
         assert "sql_query" in response_json["data"]
