@@ -14,7 +14,7 @@ class AlertService:
 
     async def create_alert(self, alert_data: AlertCreate) -> Alert:
         sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
-        alert_data_dict = alert_data.dict(exclude={"sql_query"})
+        alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
         alert_create = AlertCreate(**alert_data_dict, user="Alert User", sql_query=sql_query)
         return await self.alert_repository.create_alert(alert_create)
     
