@@ -1,11 +1,13 @@
 import { reactive, watch } from 'vue';
 import type { User, UserResponse } from '@/interfaces/User';
 import type { AuthResponse } from '@/interfaces/Auth';
+import  UserService  from '@/services/UserService';
 import { dbCredentialsStore } from './dbCredentialsStore';
 
 const state = reactive({
   user: JSON.parse(sessionStorage.getItem('user') || 'null') as UserResponse | null,
   access_token: sessionStorage.getItem('access_token') || '',
+  refresh_token: sessionStorage.getItem('refresh_token') || '',
 });
 
 watch(
@@ -36,6 +38,14 @@ export const userStore = {
     return state.user;
   },
 
+  get access_token(): string {
+    return state.access_token;
+  },
+
+  get refresh_token(): string {
+    return state.refresh_token;
+  },
+
   get isAuthenticated(): boolean {
     return !!state.access_token;
   },
@@ -44,8 +54,27 @@ export const userStore = {
     state.user = user;
   },
 
-  setToken(token: string): void {
-    state.access_token = token;
+  setTokens(access_token: string, refresh_token: string): void {
+    state.access_token = access_token;
+    state.refresh_token = refresh_token;
+  },
+
+  setToken(access_token: string): void {
+    state.access_token = access_token;
+  },
+
+  async refreshToken(): Promise<boolean> {
+    try {
+      const response = await UserService.refreshToken(state.refresh_token);
+      if(response.data?.access_token) {
+        this.setToken(response.data.access_token);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      return false;
+    }
   },
 
   handleAuthResponse(response: AuthResponse): void {
@@ -58,8 +87,8 @@ export const userStore = {
       }
     }
 
-    if (response.data?.access_token) {
-      this.setToken(response.data.access_token);
+    if (response.data?.access_token && response.data?.refresh_token) {
+      this.setTokens(response.data.access_token, response.data.refresh_token);
     }
   },
 

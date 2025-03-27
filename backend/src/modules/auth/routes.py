@@ -6,6 +6,8 @@ from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.service import UserService
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
+from src.modules.auth.utils.util import refresh_access_token
+from fastapi import HTTPException
 
 router = APIRouter()
 service = UserService()
@@ -125,6 +127,25 @@ async def login(email: str = Body(...), password: str = Body(...)):
     if not user:
         return ResponseManager.error_response("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
     return ResponseManager.success_response(user)
+
+@router.post("/refresh",
+             tags=["Auth"],
+             responses={
+                 200: {"description": "Token refreshed successfully"},
+                 401: {"model": ResponseError, "description": "Invalid refresh token"},
+                 500: {"model": ResponseError, "description": "Internal server error."},
+             })
+async def refresh_token(refresh_token: str = Body(...)):
+    try:
+        new_access_token = refresh_access_token(refresh_token)
+        return ResponseManager.success_response({
+            "access_token": new_access_token,
+            "token_type": "bearer"
+        })
+    except HTTPException as e:
+        return ResponseManager.error_response(e.detail, status_code=e.status_code)
+    except Exception as e:
+        return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Query management endpoints

@@ -5,7 +5,7 @@ from bson import ObjectId
 from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.repositories.repository import UserRepository
 
-from src.modules.auth.utils.util import hash_password, verify_password, create_access_token
+from src.modules.auth.utils.util import hash_password, verify_password, create_tokens
 from src.config.constants import Settings
 from datetime import timedelta
 
@@ -34,11 +34,10 @@ class UserService:
         user = await self.repository.collection.find_one({"email": email})
 
         if user and verify_password(password, user["password"]):
-            access_token = create_access_token(
+            access_token, refresh_token = create_tokens(
                 data={
                     "sub": user["email"]
-                },
-                expires_delta=timedelta(minutes=Settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+                }
             )
 
             user["id"] = str(user["_id"])
@@ -47,6 +46,7 @@ class UserService:
 
             return {
                 "access_token": access_token,
+                "refresh_token": refresh_token,
                 "token_type": "bearer",
                 "user": user
             }

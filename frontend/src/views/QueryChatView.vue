@@ -17,7 +17,7 @@ const sendQuery = async () => {
   isLoading.value = true;
 
   try {
-    const response: QueryResults = await TextToSqlService.proccessQuery(userQuery.value);
+    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value);
 
     if (!response || !response.header) {
       throw new Error('Invalid response from backend');
