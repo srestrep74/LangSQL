@@ -2,7 +2,6 @@
 import { RouterLink, RouterView } from 'vue-router';
 import logo from './assets/logo.png';
 import { userStore } from '@/store/userStore';
-import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();

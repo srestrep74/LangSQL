@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
-import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 import type { UserCreate } from '@/interfaces/User';
 import type { DBCredentials, DatabaseType } from '@/interfaces/DBCredentials';
 
