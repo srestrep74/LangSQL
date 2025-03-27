@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from src.modules.alerts.models.models import AlertCreate, Alert, AlertPatch
+from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.service import AlertService
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
@@ -25,7 +25,7 @@ async def create_alert(alert_data: AlertCreate, alert_service: AlertService = De
         return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 @router.patch("/{alert_id}", tags=["alerts"], responses={200: {"model": Alert, "description": "Alert updated successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
 async def update_alert(alert_id: str, alert_data: AlertPatch, alert_service: AlertService = Depends()):
@@ -47,7 +47,8 @@ async def update_alert(alert_id: str, alert_data: AlertPatch, alert_service: Ale
         return ResponseManager.error_response("Alert not found", status_code=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+
 @router.delete("/{alert_id}", tags=["alerts"], responses={200: {"model": Alert, "description": "Alert deleted successfully"}, 404: {"model": ResponseError, "description": "Alert not found"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
 async def delete_alert(alert_id: str, alert_service: AlertService = Depends()):
     """
