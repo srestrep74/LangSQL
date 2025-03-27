@@ -1,9 +1,10 @@
 import { reactive, watch } from 'vue';
-import type { User } from '@/interfaces/User';
+import type { User, UserResponse } from '@/interfaces/User';
 import type { AuthResponse } from '@/interfaces/Auth';
+import { dbCredentialsStore } from './dbCredentialsStore';
 
 const state = reactive({
-  user: JSON.parse(sessionStorage.getItem('user') || 'null') as User | null,
+  user: JSON.parse(sessionStorage.getItem('user') || 'null') as UserResponse | null,
   access_token: sessionStorage.getItem('access_token') || '',
 });
 
@@ -39,7 +40,7 @@ export const userStore = {
     return !!state.access_token;
   },
 
-  setUser(user: User): void {
+  setUser(user: UserResponse): void {
     state.user = user;
   },
 
@@ -48,14 +49,22 @@ export const userStore = {
   },
 
   handleAuthResponse(response: AuthResponse): void {
+
+    if (response.data?.user) {
+      this.setUser(response.data.user);
+
+      if (response.data.user.main_credentials) {
+        dbCredentialsStore.setCredentials(response.data.user.main_credentials);
+      }
+    }
+
     if (response.data?.access_token) {
       this.setToken(response.data.access_token);
     }
   },
 
   clear(): void {
-    state.user = null;
-    state.access_token = '';
+    sessionStorage.clear();
   },
 
   logout(): void {

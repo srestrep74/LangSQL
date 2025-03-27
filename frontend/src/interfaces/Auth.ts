@@ -1,3 +1,5 @@
+import type { UserResponse } from "./User";
+
 export interface AuthUser {
     name: string;
     email: string;
@@ -14,5 +16,6 @@ export interface AuthResponse {
     data: {
       access_token: string;
       token_type: string;
+      user: UserResponse;
     };
-  }
+}

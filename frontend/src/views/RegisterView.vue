@@ -7,7 +7,7 @@ import type { UserCreate } from '@/interfaces/User';
 import type { DBCredentials, DatabaseType } from '@/interfaces/DBCredentials';
 
 const router = useRouter();
-const currentStep = ref(1); // 1 for user info, 2 for DB config
+const currentStep = ref(1);
 
 const initialCredentials: DBCredentials = {
   dbType: 'mysql',
@@ -54,8 +54,6 @@ const register = async () => {
     userData.value.credentials = [mainCredentials];
     
     const response = await UserService.register(userData.value);
-    
-    dbCredentialsStore.setCredentials(mainCredentials);
     
     await router.push('/login');
   } catch (error: unknown) {

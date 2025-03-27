@@ -5,10 +5,18 @@ export interface User {
     email: string;
   }
   
-  export interface UserCreate extends User {
+export interface UserCreate extends User {
     password: string;
     main_credentials: DBCredentials;
     credentials: DBCredentials[];
     queries?: string[];
     alerts?: string[];
-  }
+}
+
+export interface UserResponse extends User{
+  id: string;
+  main_credentials: DBCredentials;
+  credentials: DBCredentials[];
+  queries?: string[];
+  alerts?: string[];
+}

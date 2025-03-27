@@ -21,7 +21,7 @@ const login = async () => {
 
     const response = await UserService.login(credentials.value);
 
-    userStore.setToken(response.data.access_token);
+    userStore.handleAuthResponse(response);
     
     await router.push('/');
   } catch (error: unknown) {
