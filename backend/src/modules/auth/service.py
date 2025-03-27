@@ -16,8 +16,6 @@ class UserService:
 
     async def create_user(self, user_data: UserCreate) -> User:
         hashed_password = hash_password(user_data.password)
-        print("Original password:", user_data.password)
-        print("Hashed password:", hashed_password)
         user_data.password = hashed_password
         return await self.repository.create_user(user_data)
 
