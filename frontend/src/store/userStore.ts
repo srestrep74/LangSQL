@@ -56,5 +56,9 @@ export const userStore = {
   clear(): void {
     state.user = null;
     state.access_token = '';
-  }
+  },
+
+  logout(): void {
+    this.clear();
+  },
 };
