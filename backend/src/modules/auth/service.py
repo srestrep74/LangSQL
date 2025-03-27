@@ -9,6 +9,7 @@ from src.modules.auth.utils.util import hash_password, verify_password, create_a
 from src.config.constants import Settings
 from datetime import timedelta
 
+
 class UserService:
     def __init__(self):
         self.repository = UserRepository()
@@ -34,14 +35,20 @@ class UserService:
 
         if user and verify_password(password, user["password"]):
             access_token = create_access_token(
-                data = {
+                data={
                     "sub": user["email"]
                 },
                 expires_delta=timedelta(minutes=Settings.ACCESS_TOKEN_EXPIRE_MINUTES)
             )
+
+            user["id"] = str(user["_id"])
+            user.pop("_id", None)
+            user.pop("password", None)
+
             return {
                 "access_token": access_token,
-                "token_type": "bearer"
+                "token_type": "bearer",
+                "user": user
             }
         return None
 
