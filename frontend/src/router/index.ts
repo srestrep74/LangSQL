@@ -4,6 +4,8 @@ import HomeView from '../views/HomeView.vue'
 import QueryChatView from '../views/QueryChatView.vue'
 import CreateAlertView from '../views/CreateAlerView.vue'
 import ConfigurationView from '@/views/ConfigurationView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,16 @@ const router = createRouter({
       path: '/configuration',
       name: 'configuration',
       component: ConfigurationView,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterView
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView
     }
   ],
 })
