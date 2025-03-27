@@ -68,6 +68,9 @@ export const userStore = {
   },
 
   logout(): void {
+    dbCredentialsStore.clear();
+    state.user = null;
+    state.access_token = '';
     this.clear();
   },
 };

@@ -7,12 +7,6 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const userInitials = computed(() => {
-  if (!userStore.user?.name) return '';
-  const names = userStore.user.name.split(' ');
-  return names.map(name => name[0]).join('').toUpperCase();
-});
-
 const logout = () => {
   userStore.logout();
   router.push('/');
@@ -62,11 +56,12 @@ const logout = () => {
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" 
                    data-bs-toggle="dropdown" aria-expanded="false">
                   <div class="user-avatar me-2">
-                    <span class="initials">{{ userInitials }}</span>
+                    <i class="bi bi-person-circle"></i>
                   </div>
-                  <span class="user-name">{{ userStore.user?.name }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li><router-link to="/profile" class="dropdown-item">Profile</router-link></li>
+                  <li><hr class="dropdown-divider"></li>
                   <li><button class="dropdown-item" @click="logout">Logout</button></li>
                 </ul>
               </li>
@@ -152,16 +147,14 @@ const logout = () => {
 
 /* User avatar styles */
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: #7b0779;
-  color: white;
+  color: #7b0779;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.9rem;
+}
+
+bi-person-circle {  
+  color: #7b0779 !important;
 }
 
 .user-name {
