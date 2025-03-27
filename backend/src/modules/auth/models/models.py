@@ -33,8 +33,8 @@ class UserCreate(BaseModel):
     password: str
     main_credentials: Dict[str, Any]
     credentials: List[Dict[str, Any]]
-    queries: Optional[List[str]]
-    alerts: Optional[List[str]]
+    queries: Optional[List[str]] = None
+    alerts: Optional[List[str]] = None
 
 
 class User(UserCreate):

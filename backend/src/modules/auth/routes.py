@@ -114,30 +114,17 @@ async def delete_user(user_id: str):
 
 
 @router.post("/login",
-             tags=["User"],
+             tags=["Auth"],
              responses={
                  200: {"model": User, "description": "Login successful"},
                  401: {"model": ResponseError, "description": "Invalid credentials"},
                  500: {"model": ResponseError, "description": "Internal server error."},
              })
 async def login(email: str = Body(...), password: str = Body(...)):
-    """
-    Authenticates a user.
-
-    Args:
-        email: User's email
-        password: User's password
-
-    Returns:
-        User: The user object if authentication is successful
-    """
-    try:
-        result = await service.login(email, password)
-        if not result:
-            return ResponseManager.error_response("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
-        return ResponseManager.success_response(result)
-    except Exception as e:
-        return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    user = await service.login(email, password)
+    if not user:
+        return ResponseManager.error_response("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
+    return ResponseManager.success_response(user)
 
 
 # Query management endpoints

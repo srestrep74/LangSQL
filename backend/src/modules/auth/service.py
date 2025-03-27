@@ -5,12 +5,19 @@ from bson import ObjectId
 from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.repositories.repository import UserRepository
 
+from src.modules.auth.utils.util import hash_password, verify_password, create_access_token
+from src.config.constants import Settings
+from datetime import timedelta
 
 class UserService:
     def __init__(self):
         self.repository = UserRepository()
 
     async def create_user(self, user_data: UserCreate) -> User:
+        hashed_password = hash_password(user_data.password)
+        print("Original password:", user_data.password)
+        print("Hashed password:", hashed_password)
+        user_data.password = hashed_password
         return await self.repository.create_user(user_data)
 
     async def get_user(self, user_id: str) -> User:
@@ -23,26 +30,20 @@ class UserService:
         return await self.repository.delete_user(user_id)
 
     async def login(self, email: str, password: str) -> Optional[User]:
-        """
-        Authenticate a user by email and password.
+        user = await self.repository.collection.find_one({"email": email})
 
-        Args:
-            email: User's email
-            password: User's password
-
-        Returns:
-            User if authentication is successful, None otherwise
-        """
-        try:
-            user = await self.repository.collection.find_one({"email": email})
-
-            if user and user.get("password") == password:
-                user["id"] = str(user["_id"])
-                del user["_id"]
-                return User(**user)
-            return None
-        except Exception:
-            return None
+        if user and verify_password(password, user["password"]):
+            access_token = create_access_token(
+                data = {
+                    "sub": user["email"]
+                },
+                expires_delta=timedelta(minutes=Settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            )
+            return {
+                "access_token": access_token,
+                "token_type": "bearer"
+            }
+        return None
 
     # Methods for queries list
     async def add_query(self, user_id: str, query_id: str) -> Optional[User]:
