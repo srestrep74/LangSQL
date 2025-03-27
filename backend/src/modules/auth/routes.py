@@ -128,6 +128,7 @@ async def login(email: str = Body(...), password: str = Body(...)):
         return ResponseManager.error_response("Invalid credentials", status_code=status.HTTP_401_UNAUTHORIZED)
     return ResponseManager.success_response(user)
 
+
 @router.post("/refresh",
              tags=["Auth"],
              responses={

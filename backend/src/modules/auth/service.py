@@ -6,8 +6,6 @@ from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.repositories.repository import UserRepository
 
 from src.modules.auth.utils.util import hash_password, verify_password, create_tokens
-from src.config.constants import Settings
-from datetime import timedelta
 
 
 class UserService:
