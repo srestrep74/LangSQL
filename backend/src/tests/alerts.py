@@ -9,7 +9,7 @@ class TestAlerts:
     def test_create_alerts(self):
         response = client.post(
             "/api/alerts/create",
-            json={"notification_emails": ["test@example.com"], "prompt": "The most expensive product", "expiration_date": "2025-12-31T12:00:00"},
+            json={"notification_emails": ["test@example.com"], "prompt": "The most expensive product", "expiration_date": "2025-12-11T12:00:00"},
         )
 
         assert response.status_code == 200
