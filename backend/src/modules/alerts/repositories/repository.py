@@ -41,6 +41,17 @@ class AlertRepository:
             return None
         except Exception:
             return None
+        
+    async def get_all_alerts(self) -> list[Alert]:
+        try:
+            alerts = []
+            async for alert in self.collection.find():
+                alert["id"] = str(alert["_id"])
+                del alert["_id"]
+                alerts.append(Alert(**alert))
+            return alerts
+        except Exception:
+            return []
 
     async def delete_alert(self, alert_id: str) -> bool:
         try:
