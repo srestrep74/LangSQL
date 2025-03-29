@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router';
 import logo from './assets/logo.png';
+import { userStore } from '@/store/userStore';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const logout = () => {
+  userStore.logout();
+  router.push('/');
+};
 </script>
 
 <template>
@@ -17,25 +26,55 @@ import logo from './assets/logo.png';
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-center">
+            <!-- Always show Home -->
             <li class="nav-item">
               <router-link to="/" class="nav-link text-custom-purple">Home</router-link>
             </li>
-            <li class="nav-item">
-              <router-link to="/query" class="nav-link text-custom-purple">Query</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/alerts" class="nav-link text-custom-purple">Alerts</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/reports" class="nav-link text-custom-purple">Reports</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/synthetic_data" class="nav-link text-custom-purple">Synthetic Data</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/configuration" class="nav-link text-custom-purple">Configuration</router-link>
-            </li>
+            
+            <!-- Show these only when authenticated -->
+            <template v-if="userStore.isAuthenticated">
+              <li class="nav-item">
+                <router-link to="/query" class="nav-link text-custom-purple">Query</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/alerts" class="nav-link text-custom-purple">Alerts</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/reports" class="nav-link text-custom-purple">Reports</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/synthetic_data" class="nav-link text-custom-purple">Synthetic Data</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/configuration" class="nav-link text-custom-purple">Configuration</router-link>
+              </li>
+              
+              <!-- User Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" 
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="user-avatar me-2">
+                    <i class="bi bi-person-circle"></i>
+                  </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li><router-link to="/profile" class="dropdown-item">Profile</router-link></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="dropdown-item" @click="logout">Logout</button></li>
+                </ul>
+              </li>
+            </template>
+            
+            <!-- Show these only when NOT authenticated -->
+            <template v-else>
+              <li class="nav-item">
+                <router-link to="/login" class="nav-link text-custom-purple">Login</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/register" class="nav-link text-custom-purple">Register</router-link>
+              </li>
+            </template>
           </ul>
         </div>
       </div>
@@ -103,5 +142,32 @@ import logo from './assets/logo.png';
 
 .footer-content {
   font-family: 'Poppins', sans-serif;
+}
+
+/* User avatar styles */
+.user-avatar {
+  color: #7b0779;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+bi-person-circle {  
+  color: #7b0779 !important;
+}
+
+.user-name {
+  font-weight: 500;
+  color: #7b0779;
+}
+
+.dropdown-item {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f0e6ef;
+  color: #7b0779;
 }
 </style>
