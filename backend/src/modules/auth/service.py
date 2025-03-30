@@ -5,12 +5,16 @@ from bson import ObjectId
 from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.repositories.repository import UserRepository
 
+from src.modules.auth.utils.util import hash_password, verify_password, create_tokens
+
 
 class UserService:
     def __init__(self):
         self.repository = UserRepository()
 
     async def create_user(self, user_data: UserCreate) -> User:
+        hashed_password = hash_password(user_data.password)
+        user_data.password = hashed_password
         return await self.repository.create_user(user_data)
 
     async def get_user(self, user_id: str) -> User:
@@ -23,26 +27,26 @@ class UserService:
         return await self.repository.delete_user(user_id)
 
     async def login(self, email: str, password: str) -> Optional[User]:
-        """
-        Authenticate a user by email and password.
+        user = await self.repository.collection.find_one({"email": email})
 
-        Args:
-            email: User's email
-            password: User's password
+        if user and verify_password(password, user["password"]):
+            access_token, refresh_token = create_tokens(
+                data={
+                    "sub": user["email"]
+                }
+            )
 
-        Returns:
-            User if authentication is successful, None otherwise
-        """
-        try:
-            user = await self.repository.collection.find_one({"email": email})
+            user["id"] = str(user["_id"])
+            user.pop("_id", None)
+            user.pop("password", None)
 
-            if user and user.get("password") == password:
-                user["id"] = str(user["_id"])
-                del user["_id"]
-                return User(**user)
-            return None
-        except Exception:
-            return None
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "token_type": "bearer",
+                "user": user
+            }
+        return None
 
     # Methods for queries list
     async def add_query(self, user_id: str, query_id: str) -> Optional[User]:
