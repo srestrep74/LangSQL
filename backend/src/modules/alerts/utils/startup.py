@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from src.modules.alerts.utils.util import CronJob
+from src.modules.alerts.utils.cron_job import CronJob
 from src.modules.alerts.repositories.repository import AlertRepository
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.service import QueryService
@@ -19,8 +19,6 @@ async def lifespan(app: FastAPI):
     app.state.cron_job = cron_job  
     cron_job.scheduler.start()
 
-    print("Scheduler started")
     yield  
 
     cron_job.scheduler.shutdown()
-    print("Scheduler shut down")
