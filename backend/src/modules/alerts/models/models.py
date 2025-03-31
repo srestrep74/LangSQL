@@ -13,6 +13,7 @@ class AlertCreate(BaseModel):
     """
     notification_emails: List[EmailStr]
     prompt: str
+    sent: bool = False
     expiration_date: datetime
     sql_query: Optional[str] = None
     creation_date: datetime = datetime.utcnow()
