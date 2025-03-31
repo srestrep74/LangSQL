@@ -1,14 +1,29 @@
 import api, { isAxiosError } from '@/services/ApiBase';
 import type { ApiResponse, QueryResults } from '@/interfaces/ApiResponse';
 import type { ApiErrorResponse } from '@/interfaces/ApiErrorResponse';
+import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 
 
 class TextToSqlService {
   async processQuery(query: string): Promise<QueryResults> {
     try {
-      const response = await api.post<ApiResponse>('/text-to-sql/process_query', { 
+
+      const credentials = dbCredentialsStore.credentials;
+      if (!credentials) {
+        throw new Error('No database credentials found');
+      }
+
+      const response = await api.post<ApiResponse>('/text-to-sql/process_query', {
         user_input: query,
-        schema_name: 'inventory'
+        connection : {
+          db_type: credentials.dbType,
+          username: credentials.user,
+          password: credentials.password,
+          host: credentials.host,
+          port: credentials.port,
+          database_name: credentials.db_name,
+          schema_name: credentials.schema_name
+        }
       });
 
       if (!response.data?.data?.results) {
@@ -19,11 +34,11 @@ class TextToSqlService {
     } catch (error: unknown) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data as ApiErrorResponse;
-        
-        const errorMessage = errorData?.message 
-          || error.message 
+
+        const errorMessage = errorData?.message
+          || error.message
           || 'Error processing query';
-        
+
         console.error('API Error:', {
           status: error.response?.status,
           message: errorMessage,

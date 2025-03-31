@@ -7,4 +7,5 @@ export interface DBCredentials {
   user: string;
   password: string;
   db_name: string;
+  schema_name?: string;
 }

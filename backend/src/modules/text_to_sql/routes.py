@@ -1,20 +1,21 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Body
 
 from src.config.dependencies import (
     get_lang_to_sql_service,
     get_synthetic_data_model_service,
 )
-from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
-from src.modules.text_to_sql.schemas.ProcessQueryRequest import ProcessQueryRequest
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 router = APIRouter()
 
 
 @router.post("/process_query")
 async def proccess_query(
-    request: ProcessQueryRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
+    connection: DatabaseConnection,
+    user_input: str = Body(..., embed=True),
+    lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
     """
     This endpoint processes a user query and converts it into an SQL statement.
@@ -46,8 +47,9 @@ async def proccess_query(
         }
         ```
     """
+
     try:
-        results = lang_to_sql_service.process_user_query(request.user_input, request.schema_name)
+        results = lang_to_sql_service.process_user_query(user_input, connection)
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",
@@ -63,7 +65,8 @@ async def proccess_query(
 
 @router.post("/generate_synthetic_data")
 async def generate_synthetic_data(
-    request: GenerateSyntheticDataRequest,
+    connection: DatabaseConnection,
+    iterations: int = Body(..., embed=True),
     synthetic_data_model_service: SyntheticDataModelService = Depends(get_synthetic_data_model_service)
 ):
     """
@@ -98,9 +101,7 @@ async def generate_synthetic_data(
         ```
     """
     try:
-        schema_name = request.schema_name
-        iterations = request.iterations
-        results = synthetic_data_model_service.generate_synthetic_data(iterations=iterations, schema_name=schema_name)
+        results = synthetic_data_model_service.generate_synthetic_data(iterations, connection)
 
         return ResponseManager.success_response(
             data={"results": results},
