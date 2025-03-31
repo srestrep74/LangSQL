@@ -51,9 +51,9 @@ const register = async () => {
 
     const mainCredentials = { ...userData.value.main_credentials };
     userData.value.credentials = [mainCredentials];
-    
+
     const response = await UserService.register(userData.value);
-    
+
     await router.push('/login');
   } catch (error: unknown) {
     errorMessage.value = error instanceof Error ? error.message : 'An error occurred';
@@ -70,12 +70,12 @@ const register = async () => {
       <div class="login-container animate-fade-in my-5">
         <h1 class="display-4 fw-bold mb-4 text-white">Create Your LangSQL Account</h1>
         <p class="lead mb-5 animate-slide-up text-white">Start querying your database with natural language</p>
-        
+
         <div class="login-card p-5 rounded my-4">
           <div v-if="errorMessage" class="alert alert-danger mb-4 animate-shake">
             {{ errorMessage }}
           </div>
-          
+
           <form @submit.prevent="register" class="login-form">
             <!-- Step 1: User Information -->
             <div v-if="currentStep === 1" class="step-content">
@@ -91,7 +91,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="email" class="form-label text-white d-block text-start mb-2">Email</label>
                   <input
@@ -103,7 +103,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="password" class="form-label text-white d-block text-start mb-2">Password</label>
                   <input
@@ -117,22 +117,22 @@ const register = async () => {
                   >
                 </div>
               </div>
-              
+
               <div class="text-center mt-5">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-lg hero-btn animate-pulse"
                   @click="nextStep"
                 >
                   Next
                 </button>
               </div>
-              
+
               <div class="text-center mt-4">
                 <router-link to="/login" class="text-link">Already have an account? <span class="fw-bold">Login here</span></router-link>
               </div>
             </div>
-            
+
             <!-- Step 2: Database Configuration -->
             <div v-if="currentStep === 2" class="step-content">
               <div class="row g-4">
@@ -144,16 +144,16 @@ const register = async () => {
                     id="dbType"
                     required
                   >
-                    <option 
-                      v-for="dbType in dbTypes" 
-                      :key="dbType" 
+                    <option
+                      v-for="dbType in dbTypes"
+                      :key="dbType"
                       :value="dbType"
                     >
                       {{ dbType.toUpperCase() }}
                     </option>
                   </select>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="host" class="form-label text-white d-block text-start mb-2">Host</label>
                   <input
@@ -165,7 +165,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-md-3">
                   <label for="port" class="form-label text-white d-block text-start mb-2">Port</label>
                   <input
@@ -177,7 +177,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-md-4">
                   <label for="dbUser" class="form-label text-white d-block text-start mb-2">DB User</label>
                   <input
@@ -189,7 +189,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-md-5">
                   <label for="dbPassword" class="form-label text-white d-block text-start mb-2">DB Password</label>
                   <input
@@ -201,7 +201,7 @@ const register = async () => {
                     required
                   >
                 </div>
-                
+
                 <div class="col-12">
                   <label for="dbName" class="form-label text-white d-block text-start mb-2">Database Name</label>
                   <input
@@ -214,17 +214,28 @@ const register = async () => {
                   >
                 </div>
               </div>
-              
+
+              <div class="col-12" v-if="userData.main_credentials.dbType === 'postgresql'">
+                <label for="schemaName" class="form-label text-white d-block text-start mb-2">Schema Name</label>
+                <input
+                  v-model="userData.main_credentials.schema_name"
+                  type="text"
+                  class="form-control-lg"
+                  id="schemaName"
+                  placeholder="Schema name (optional)"
+                >
+              </div>
+
               <div class="d-flex justify-content-between mt-5">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="btn btn-outline-light"
                   @click="prevStep"
                 >
                   Back
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   class="btn btn-lg hero-btn animate-pulse"
                   :disabled="loading"
                 >
@@ -398,24 +409,24 @@ select.form-control-lg {
   .hero {
     padding: 3rem 1.5rem;
   }
-  
+
   .login-container {
     padding: 0 1.5rem;
   }
-  
+
   .login-card {
     padding: 2rem 1.5rem;
     margin: 1.5rem 0;
   }
-  
+
   h1 {
     font-size: 2.2rem;
   }
-  
+
   .hero-btn {
     max-width: 100%;
   }
-  
+
   .row.g-4 > [class^="col-"] {
     width: 100%;
     max-width: 100%;
