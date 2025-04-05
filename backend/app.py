@@ -13,8 +13,18 @@ from src.modules.alerts.utils.startup import lifespan
 app = FastAPI(
     title="LangSQL",
     version="0.1.0",
-    lifespan=lifespan
+    #lifespan=lifespan
 )
+
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi import Request
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print("Validation error:", exc.errors())
+    return JSONResponse(status_code=422, content={"detail": exc.errors()})
+
 
 app.add_middleware(
     CORSMiddleware,

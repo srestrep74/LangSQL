@@ -34,7 +34,7 @@ watch(
 );
 
 export const userStore = {
-  get user(): User | null {
+  get user(): UserResponse | null {
     return state.user;
   },
 

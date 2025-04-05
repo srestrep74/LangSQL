@@ -17,6 +17,7 @@ class AlertCreate(BaseModel):
     expiration_date: datetime
     sql_query: Optional[str] = None
     creation_date: datetime = datetime.utcnow()
+    user: str
 
 
 class Alert(AlertCreate):
