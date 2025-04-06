@@ -42,7 +42,6 @@ async def update_alert(alert_id: str, alert_data: AlertPatch):
         Alert: The updated alert.
     """
     try:
-        print(f"Updating alert with ID: {alert_id}. With data: {alert_data}")
         result = await alert_service.update_alert(alert_id, alert_data)
         if result:
             return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
@@ -104,23 +103,8 @@ async def get_all_alerts(user_id: str):
     """
     try:
         alert_service = AlertService()
-        result = await alert_service.get_all_alerts(user_id)
+        result = await alert_service.get_alerts(user_id)
         return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-
-@router.get("/check", tags=["alerts"], responses={200: {"description": "Alert check completed successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
-async def check_alert():
-    """
-    Checks all alerts and sends notifications if conditions are met.
-
-    Returns:
-        dict: Confirmation message
-    """
-    print("Checking alerts...")
-    try:
-        result = await alert_service.check_alert()
-        return ResponseManager.success_response({"message": "Alert check completed successfully"}, status_code=status.HTTP_200_OK)
-    except Exception as e:
-        return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

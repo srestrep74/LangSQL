@@ -129,12 +129,16 @@ class AlertService {
       if (!dbCredentials) {
         throw new Error('No database credentials found');
       }
-  
+      
+      const emails = typeof formData.notification_emails === 'string'
+      ? formData.notification_emails.split(',').map((e: string) => e.trim())
+      : formData.notification_emails;
+    
       const dataToSend = {
-        notification_emails: formData.notification_emails,
+        notification_emails: emails,
         prompt: formData.prompt,
         expiration_date: formData.expiration_date
-      };
+      };    
 
       console.log('Data to send:', dataToSend);
   

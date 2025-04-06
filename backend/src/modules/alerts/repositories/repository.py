@@ -42,19 +42,20 @@ class AlertRepository:
         except Exception:
             return None
         
-    async def get_all_alerts(self, user_id: str) -> list[Alert]:
+    async def get_alerts(self, user_id: Optional[str] = None) -> list[Alert]:
         try:
             alerts = []
-            async for alert in self.collection.find():
-                if alert["user"] != user_id:
-                    continue
-                
+
+            query = {"user": user_id} if user_id else {}
+
+            async for alert in self.collection.find(query):
                 alert["id"] = str(alert["_id"])
                 del alert["_id"]
                 alerts.append(Alert(**alert))
+
             return alerts
         except Exception as e:
-            print(f"Exception in get_all_alerts: {e}")
+            print(f"Exception in get_alerts: {e}")
             return []
 
     async def delete_alert(self, alert_id: str) -> bool:

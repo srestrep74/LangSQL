@@ -15,7 +15,7 @@ class AlertService:
     def __init__(self,  query_adapter: QueryAdapter = Depends(get_query_adapter), text_to_sql_adapter: TextToSQLAdapter = Depends(get_text_to_sql_adapter), alert_repository: AlertRepository = Depends(), email_sender: EmailSender = Depends()):
         self.text_to_sql_adapter = text_to_sql_adapter
         self.alert_repository = AlertRepository()
-        self.email_sender = email_sender
+        self.email_sender = EmailSender()
         self.query_adapter = query_adapter
 
     async def create_alert(self, alert_data: AlertCreate) -> Alert:
@@ -50,17 +50,25 @@ class AlertService:
     async def get_alert(self, alert_id: str) -> Optional[Alert]:
         return await self.alert_repository.get_by_id(alert_id)
     
-    async def get_all_alerts(self, user_id: str) -> list[Alert]:
-        result = await self.alert_repository.get_all_alerts(user_id)
+    async def get_alerts(self, user_id: str) -> list[Alert]:
+        result = await self.alert_repository.get_alerts(user_id)
         return result
     
-    async def check_alert(self):
+    async def check_alerts(self):
         try:
-            print("Checking alerts...")
-            alerts = await self.get_all_alerts()
+            alerts = await self.alert_repository.get_alerts()
             for alert in alerts:
-                query_result = self.query_adapter.execute_query(alert.sql_query, "inventory") # Assuming "inventory" is the schema name, this should be replace
-                if query_result:
-                    await self.email_sender.send_email(alert.notification_emails, alert.prompt)
+                try:
+                    user = alert.user
+                    query_result = self.query_adapter.execute_query(alert.sql_query, "inventory")
+
+                    if query_result:
+                        await self.email_sender.send_email(alert.notification_emails, alert.prompt)
+                        print(f"Notification sent to: {alert.notification_emails}")
+                    else:
+                        print(f"No emails to notify for alert: {alert.id}")
+
+                except Exception as alert_error:
+                    print(f"Failed to process alert {alert.id}: {alert_error}")
         except Exception as e:
             print(f"Error in check_alert: {e}")

@@ -1,6 +1,7 @@
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from src.modules.alerts.service import AlertService
 
 class CronJob:
     def __init__(self):
@@ -12,11 +13,9 @@ class CronJob:
         """Calls the alert check endpoint"""
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get("http://127.0.0.1:8000/api/alerts/check")
-                if response.status_code == 200:
-                    print("Alert check triggered successfully")
-                else:
-                    print(f"Alert check failed with status {response.status_code}: {response.text}")
+                print("Calling alert check...")
+                alert_service = AlertService()
+                await alert_service.check_alerts()
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
 
