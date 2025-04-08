@@ -17,7 +17,7 @@ class AlertRepository:
         return Alert(**alert_dict)
 
     async def update_alert(self, alert_id: str, alert_data: AlertPatch) -> Optional[Alert]:
-        update_data = {k: v for k, v in alert_data.dict().items() if v is not None}
+        update_data = {k: v for k, v in alert_data.model_dump().items() if v is not None}
 
         if not update_data:
             return await self.get_by_id(alert_id)

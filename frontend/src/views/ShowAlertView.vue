@@ -74,9 +74,6 @@ onMounted(() => {
             <span v-else class="text-muted">No query provided.</span>
           </dd>
 
-          <dt class="col-sm-4">User</dt>
-          <dd class="col-sm-8">{{ alert.user }}</dd>
-
           <dt class="col-sm-4">Notification Emails</dt>
           <dd class="col-sm-8">
             <ul class="mb-0">

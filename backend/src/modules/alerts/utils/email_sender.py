@@ -13,7 +13,6 @@ class EmailSender:
         self.from_email = self.username
 
     async def send_email(self, recipients: list, alert_condition: str):
-        print("Sending email...")
         for recipient in recipients:
             msg = MIMEMultipart()
             msg["From"] = self.from_email

@@ -13,7 +13,7 @@ from src.modules.alerts.utils.startup import lifespan
 app = FastAPI(
     title="LangSQL",
     version="0.1.0",
-    #lifespan=lifespan
+    lifespan=lifespan
 )
 
 from fastapi.exceptions import RequestValidationError
