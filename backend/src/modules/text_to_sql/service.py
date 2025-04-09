@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, Optional
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.utils.SQLUtils import SQLUtils
@@ -36,7 +36,7 @@ class LangToSqlService:
         self.query_adapter = query_adapter
         self.llm_client = llm_client
 
-    def process_user_query(self, user_input: str, schema_name: str) -> Dict:
+    def chat(self, user_input: str, schema_name: str, user_id: str, chat_id: Optional[str]) -> Dict:
         try:
             db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
             sql_query = self.llm_client.get_model_response(
@@ -60,3 +60,4 @@ class LangToSqlService:
             return sql_query
         except Exception as e:
             return {"error": str(e)}
+        
