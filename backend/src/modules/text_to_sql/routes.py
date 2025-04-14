@@ -5,16 +5,16 @@ from src.config.dependencies import (
     get_synthetic_data_model_service,
 )
 from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
-from src.modules.text_to_sql.schemas.ProcessQueryRequest import ProcessQueryRequest
+from src.modules.text_to_sql.schemas.ChatRequest import ChatRequest
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
 
 router = APIRouter()
 
 
-@router.post("/process_query")
-async def proccess_query(
-    request: ProcessQueryRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
+@router.post("/chat")
+async def chat(
+    request: ChatRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
     """
     This endpoint processes a user query and converts it into an SQL statement.
@@ -47,7 +47,7 @@ async def proccess_query(
         ```
     """
     try:
-        results = lang_to_sql_service.process_user_query(request.user_input, request.schema_name)
+        results = await lang_to_sql_service.chat(request.user_input, request.schema_name, request.chat_data, request.chat_id)
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",

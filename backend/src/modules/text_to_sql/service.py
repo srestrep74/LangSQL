@@ -7,6 +7,8 @@ from src.modules.text_to_sql.prompts.synthetic_data import (
     GENERATE_SYNTHETIC_DATA_PROMPT,
 )
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
+from src.modules.text_to_sql.models.models import Chat
+from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 
 
 class SyntheticDataModelService:
@@ -32,11 +34,19 @@ class SyntheticDataModelService:
 
 
 class LangToSqlService:
-    def __init__(self, query_adapter: QueryAdapter, llm_client: ILLMClient):
+    def __init__(self, query_adapter: QueryAdapter, llm_client: ILLMClient, TextToSqlRepository: TextToSqlRepository):
         self.query_adapter = query_adapter
         self.llm_client = llm_client
+        self.repository = TextToSqlRepository
 
-    def chat(self, user_input: str, schema_name: str, user_id: str, chat_id: Optional[str]) -> Dict:
+    async def chat(self, user_input: str, schema_name: str, chat_data: Chat, chat_id: Optional[str]) -> Dict:
+        print(chat_data, type(chat_data))
+        if not chat_id: 
+            chat_id = await self.repository.create_chat(chat_data)
+            if not chat_id:
+                print("ERrrir")
+            print(chat_id)
+        return 
         try:
             db_structure = self.query_adapter.get_db_structure(schema_name=schema_name)
             sql_query = self.llm_client.get_model_response(
@@ -51,6 +61,7 @@ class LangToSqlService:
             return response
         except Exception as e:
             return {"error": str(e)}
+        
 
     def get_response(self, user_input: str, schema_name: str):
         try:

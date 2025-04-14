@@ -10,6 +10,7 @@ from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModel
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
+from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 
 
 def get_db_manager() -> Engine:
@@ -31,9 +32,11 @@ def get_langchain_llm_client() -> ILLMClient:
 def get_apiclient_llm_client() -> ILLMClient:
     return APIClientLLMClient()
 
+def get_text_to_sql_repository() -> TextToSqlRepository:
+    return TextToSqlRepository()
 
-def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client)) -> LangToSqlService:
-    return LangToSqlService(query_adapter, llm_client)
+def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client), repository: TextToSqlRepository = Depends(get_text_to_sql_repository)) -> LangToSqlService:
+    return LangToSqlService(query_adapter, llm_client, repository)
 
 
 def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_apiclient_llm_client)) -> SyntheticDataModelService:

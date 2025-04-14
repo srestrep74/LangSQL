@@ -8,10 +8,11 @@ class GenerateSyntheticDataRequest(BaseModel):
     iterations: int
 
 class Message(BaseModel):
-    role: str
+    """Role will be 1 if the message is sended by an user, otherwise will be a 0."""
+    role: int
     message: str
     timestamp: datetime
 
 class Chat(BaseModel):
     user_id: str
-    messages: List[Message]
+    messages: List[Message] = []
