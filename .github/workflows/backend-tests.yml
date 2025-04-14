@@ -39,6 +39,7 @@ jobs:
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+          echo "API_URL=${{ secrets.API_URL }}" >> .env
 
       - name: Run Python tests
         id: test
