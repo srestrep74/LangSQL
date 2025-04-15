@@ -40,6 +40,12 @@ jobs:
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
           echo "API_URL=${{ secrets.API_URL }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRE_DAYS=${{ secrets.REFRESH_TOKEN_EXPIRE_DAYS }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> .env
+          echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> .env
 
       - name: Run Python tests
         id: test
