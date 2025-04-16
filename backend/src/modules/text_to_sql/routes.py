@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Body
 
 from src.config.dependencies import (
     get_lang_to_sql_service,
@@ -8,6 +8,7 @@ from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
 from src.modules.text_to_sql.schemas.ChatRequest import ChatRequest
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 router = APIRouter()
 
@@ -46,6 +47,7 @@ async def chat(
         }
         ```
     """
+
     try:
         results = await lang_to_sql_service.chat(request.user_input, request.schema_name, request.chat_data, request.chat_id)
         return ResponseManager.success_response(
@@ -63,7 +65,8 @@ async def chat(
 
 @router.post("/generate_synthetic_data")
 async def generate_synthetic_data(
-    request: GenerateSyntheticDataRequest,
+    connection: DatabaseConnection,
+    iterations: int = Body(..., embed=True),
     synthetic_data_model_service: SyntheticDataModelService = Depends(get_synthetic_data_model_service)
 ):
     """
@@ -98,9 +101,7 @@ async def generate_synthetic_data(
         ```
     """
     try:
-        schema_name = request.schema_name
-        iterations = request.iterations
-        results = synthetic_data_model_service.generate_synthetic_data(iterations=iterations, schema_name=schema_name)
+        results = synthetic_data_model_service.generate_synthetic_data(iterations, connection)
 
         return ResponseManager.success_response(
             data={"results": results},
