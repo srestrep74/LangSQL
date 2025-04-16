@@ -5,6 +5,7 @@ from src.modules.alerts.service import AlertService
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.service import QueryService
 
+
 class CronJob:
     def __init__(self):
         self.scheduler = AsyncIOScheduler()

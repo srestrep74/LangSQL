@@ -32,8 +32,10 @@ def get_langchain_llm_client() -> ILLMClient:
 def get_apiclient_llm_client() -> ILLMClient:
     return APIClientLLMClient()
 
+
 def get_text_to_sql_repository() -> TextToSqlRepository:
     return TextToSqlRepository()
+
 
 def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client), repository: TextToSqlRepository = Depends(get_text_to_sql_repository)) -> LangToSqlService:
     return LangToSqlService(query_adapter, llm_client, repository)

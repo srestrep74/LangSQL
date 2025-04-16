@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-import pytest, json
+import pytest
+import json
 from datetime import datetime
 from fastapi.testclient import TestClient
 
@@ -21,6 +22,7 @@ database_connection = DatabaseConnection(
     database_name="test_db",
     schema_name="inventory"
 )
+
 
 class TestAlert:
     def test_create_alert(self):

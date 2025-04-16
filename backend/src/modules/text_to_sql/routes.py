@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status, Body
+from typing import Optional
 
 from src.config.dependencies import (
     get_lang_to_sql_service,
     get_synthetic_data_model_service,
 )
-from src.modules.text_to_sql.models.models import GenerateSyntheticDataRequest
-from src.modules.text_to_sql.schemas.ChatRequest import ChatRequest
+from src.modules.text_to_sql.models.models import Chat
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
@@ -15,14 +15,21 @@ router = APIRouter()
 
 @router.post("/chat")
 async def chat(
-    request: ChatRequest, lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
+    connection: DatabaseConnection,
+    user_input: str = Body(..., embed=True),
+    chat_data: Chat = Body(..., embed=True),
+    chat_id: Optional[str] = Body(None, embed=True),
+    lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
 ):
     """
     This endpoint processes a user query and converts it into an SQL statement.
 
     Args:
-        request (ProcessQueryRequest): The user input containing the query and schema name.
-        lang_to_sql_service (LangToSqlService): A service for processing user queries into SQL. Retrieved via `Depends(get_lang_to_sql_service)`.
+        connection (DatabaseConnection): The database connection details including type, credentials, host, port, and schema.
+        user_input (str): The user's query that needs to be converted into SQL.
+        chat_data (Chat): Chat-related information, including user ID and previous messages.
+        chat_id (Optional[str]): The identifier for an existing chat. If None, a new chat will be created.
+        lang_to_sql_service (LangToSqlService): A service for processing user queries into SQL, injected via `Depends(get_lang_to_sql_service)`.
 
     Returns:
         Successful Response (`200 OK`)
@@ -47,9 +54,8 @@ async def chat(
         }
         ```
     """
-
     try:
-        results = await lang_to_sql_service.chat(request.user_input, request.schema_name, request.chat_data, request.chat_id)
+        results = await lang_to_sql_service.chat(connection, user_input, chat_data, chat_id)
         return ResponseManager.success_response(
             data={"results": results},
             message="Success",

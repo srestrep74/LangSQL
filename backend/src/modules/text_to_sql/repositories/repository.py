@@ -1,4 +1,3 @@
-from typing import Optional
 from bson import ObjectId
 
 from src.config.database import database
@@ -13,12 +12,11 @@ class TextToSqlRepository:
         try:
             chat_data = chat_data.dict()
             results = await self.collection.insert_one(chat_data)
-            print(chat_data, "chat data")
             return str(results.inserted_id)
         except Exception as e:
             print(f"Error creating chat: {e}")
             return None
-        
+
     async def add_message(self, chat_id: str, message: Message) -> bool:
         try:
             message = message.dict()
@@ -33,7 +31,6 @@ class TextToSqlRepository:
             print(f"Error adding message: {e}")
             return False
 
-        
     async def get_chat(self, chat_id: str) -> Chat:
         try:
             result = await self.collection.find_one({"_id": ObjectId(chat_id)})

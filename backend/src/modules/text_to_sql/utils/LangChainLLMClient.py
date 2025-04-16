@@ -25,7 +25,7 @@ class LangChainLLMClient(ILLMClient):
             max_output_tokens=200,
             stop=[";"]
         )
-    
+
     def get_model_response(self, db_structure: str, user_input: str, schema_name) -> str:
         message = AI_INPUT_PROMPT.format(
             db_structure=db_structure, user_input=user_input, schema_name=schema_name
