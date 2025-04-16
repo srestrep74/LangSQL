@@ -1,6 +1,5 @@
 from typing import Optional
 from bson import ObjectId
-from datetime import datetime, UTC
 
 from src.config.database import database
 from src.modules.text_to_sql.models.models import Message, Chat
@@ -10,7 +9,7 @@ class TextToSqlRepository:
     def __init__(self):
         self.collection = database["Chats"]
 
-    async def create_chat(self, chat_data: Chat) -> Chat:
+    async def create_chat(self, chat_data: Chat) -> str:
         try:
             chat_data = chat_data.dict()
             results = await self.collection.insert_one(chat_data)
@@ -20,19 +19,19 @@ class TextToSqlRepository:
             print(f"Error creating chat: {e}")
             return None
         
-    async def add_message(self, chat_id: str, message: dict) -> Message:
+    async def add_message(self, chat_id: str, message: Message) -> bool:
         try:
-            
+            message = message.dict()
             update_result = await self.collection.update_one(
                 {"_id": ObjectId(chat_id)},
                 {"$push": {"messages": message}}
             )
 
             if update_result.modified_count == 1:
-                return Message(**message)
+                return True
         except Exception as e:
             print(f"Error adding message: {e}")
-            return None
+            return False
 
         
     async def get_chat(self, chat_id: str) -> Chat:
