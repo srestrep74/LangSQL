@@ -62,6 +62,7 @@ class PostgreSQLManager(IDatabaseManager):
                 return [{"message": "Query executed successfully"}]
             except Exception as e:
                 transaction.rollback()
+                print(f"Error executing query: {e}")
                 raise e
 
     def get_engine(self) -> Engine:

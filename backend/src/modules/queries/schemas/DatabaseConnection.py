@@ -10,4 +10,4 @@ class DatabaseConnection(BaseModel):
     host: str
     port: int
     database_name: str
-    schema_name: Optional[str]
+    schema_name: Optional[str] = None
