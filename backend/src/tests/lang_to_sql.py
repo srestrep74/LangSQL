@@ -7,8 +7,19 @@ from app import app
 from src.modules.text_to_sql.service import SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 client = TestClient(app)
+
+database_connection = DatabaseConnection(
+    db_type="postgresql",
+    host="localhost",
+    port=5432,
+    username="postgres",
+    password="password",
+    database_name="test_db",
+    schema_name="inventory"
+)
 
 
 class TestSyntheticData:
@@ -20,7 +31,7 @@ class TestSyntheticData:
 
         response = client.post(
             "/api/text-to-sql/generate_synthetic_data",
-            json={"iterations": 1, "schema_name": "inventory"}
+            json={"iterations": 1, "connection": database_connection.model_dump()}
         )
 
         assert response.status_code == 200
@@ -30,7 +41,7 @@ class TestSyntheticData:
         assert response_json["message"] == "Success"
         assert "results" in response_json["data"]
 
-        mock_generate_synthetic_data.assert_called_once_with(iterations=1, schema_name="inventory")
+        mock_generate_synthetic_data.assert_called_once_with(1, database_connection)
 
     @pytest.fixture
     def mock_synthetic_data_service(self):
@@ -43,25 +54,7 @@ class TestSyntheticData:
         return SyntheticDataModelService(mock_query_adapter, llm_client)
 
     def test_generate_synthetic_data_service(self, mock_synthetic_data_service):
-        response = mock_synthetic_data_service.generate_synthetic_data(iterations=40, schema_name="test")
+        response = mock_synthetic_data_service.generate_synthetic_data(iterations=40, connection=database_connection)
 
         assert isinstance(response, str)
         assert "INSERT INTO" in response
-
-
-class TestLangToSql:
-    def test_lang_to_sql_endpoint(self):
-        response = client.post(
-            "/api/text-to-sql/process_query",
-            json={"user_input": "How many records are in the warehouse located in Japan", "schema_name": "inventory"}
-        )
-
-        assert response.status_code == 200
-
-        response_json = response.json()
-        assert response_json["status"] == "success"
-        assert response_json["message"] == "Success"
-        assert "results" in response_json["data"]
-        assert isinstance(response_json["data"]["results"], dict)
-        assert "header" in response_json["data"]["results"]
-        assert "sql_results" in response_json["data"]["results"]

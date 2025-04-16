@@ -7,6 +7,9 @@ import ConfigurationView from '@/views/ConfigurationView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import LoginView from '@/views/LoginView.vue'
 import { userStore } from '@/store/userStore'
+import ShowAlertsView from '@/views/ShowAlertsView.vue'
+import ShowAlertView from '@/views/ShowAlertView.vue'
+import EditAlertView from '@/views/EditAlertView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,9 +33,27 @@ const router = createRouter({
     },
     {
       path: '/alerts',
-      name: 'alert',
+      name: 'alerts',
+      component: ShowAlertsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/alerts/create',
+      name: 'create_alert',
       component: CreateAlertView,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/alerts/:id',
+      name: 'alert_details',
+      component: ShowAlertView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/alerts/:id/edit',
+      name: 'alert_edit',
+      component: EditAlertView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/configuration',

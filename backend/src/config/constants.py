@@ -22,3 +22,6 @@ class Settings:
     ALGORITHM: str = os.getenv('ALGORITHM')
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS'))
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES'))
+    GMAIL_USERNAME: str = os.getenv('GMAIL_USERNAME')
+    GMAIL_APP_PASSWORD: str = os.getenv('GMAIL_APP_PASSWORD')
+    API_URL: str = os.getenv('API_URL')
