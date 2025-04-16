@@ -3,10 +3,8 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AlertService from '../services/AlertService';
 
-// Vue Router
 const router = useRouter();
 
-// Form fields
 const notificationEmails = ref('');
 const prompt = ref('');
 const expirationDate = ref('');
@@ -25,6 +23,7 @@ const submitForm = async () => {
     await AlertService.postCreateAlert(formData);
     isLoading.value = false;
     alert('Alert created successfully!');
+    router.push({ name: 'alerts' });
   } catch (error) {
     isLoading.value = false;
     alert('Failed to create alert. Please try again.');
