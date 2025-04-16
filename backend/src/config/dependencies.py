@@ -1,22 +1,22 @@
 from fastapi import Depends
-from sqlalchemy.engine import Engine
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
-from src.config.constants import Settings
 from src.modules.queries.service import QueryService
-from src.modules.queries.utils.DatabaseManager import DatabaseManager
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
+from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
 
 
-def get_db_manager() -> Engine:
-    return DatabaseManager(Settings.DB_URL)
+def get_db_manager(connection: DatabaseConnection) -> IDatabaseManager:
+    return DatabaseManagerFactory.create_manager(connection)
 
 
-def get_query_service(db_manager: DatabaseManager = Depends(get_db_manager)) -> QueryService:
+def get_query_service(db_manager: IDatabaseManager = Depends(get_db_manager)) -> QueryService:
     return QueryService(db_manager)
 
 

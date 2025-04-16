@@ -74,14 +74,10 @@ const generateData = async () => {
     showToast.value = false;
   }, 7000);
 
-  const data = {
-    schema_name: "inventory",
-    iterations: dataAmount.value
-  };
 
   try {
-    const response = await SyntheticDataService.postSyntheticData(data);
-    
+    const response = await SyntheticDataService.postSyntheticData(dataAmount.value);
+
     if (response.status === "success") {
       alert("Data generation request successful! You can now check your database.");
       setTimeout(() => {
@@ -108,7 +104,7 @@ const generateData = async () => {
     <div class="description">
       <h2 class="text-custom-purple">Synthetic Data Generation</h2>
       <p>
-        This tool allows you to generate synthetic data based on your database schema. 
+        This tool allows you to generate synthetic data based on your database schema.
         Enter the number of records you want to generate (in multiples of 40, up to 400) and click the button below.
       </p>
     </div>
@@ -122,13 +118,13 @@ const generateData = async () => {
 
     <div class="input-section">
       <label for="data-amount" class="text-custom-purple">Number of records to generate:</label>
-      <input 
-        type="number" 
-        id="data-amount" 
-        v-model.number="dataAmount" 
-        min="40" 
-        max="400" 
-        step="40" 
+      <input
+        type="number"
+        id="data-amount"
+        v-model.number="dataAmount"
+        min="40"
+        max="400"
+        step="40"
         class="form-control"
         @input="validateInput"
       />
