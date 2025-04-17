@@ -9,7 +9,7 @@ class GenerateSyntheticDataRequest(BaseModel):
 
 
 class Message(BaseModel):
-    """Role will be 1 if the message is sended by an user, otherwise will be a 0."""
+    """Role will be 1 if the message is sent by an user, otherwise will be a 0."""
     role: int
     message: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

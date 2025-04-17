@@ -79,7 +79,7 @@ class LangToSqlService:
         except Exception as e:
             return {"error": str(e)}
 
-    async def get_messages(self, chat_id: str) -> Chat:
+    async def get_messages(self, chat_id: str) -> Dict:
         response = await self.repository.get_chat(chat_id)
         messages = response.messages
         response = {
