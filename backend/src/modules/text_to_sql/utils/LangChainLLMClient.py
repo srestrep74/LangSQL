@@ -7,6 +7,7 @@ from src.modules.text_to_sql.prompts.lang_to_sql import (
     HUMAN_RESPONSE_PROMPT,
 )
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
+from src.modules.text_to_sql.models.models import Chat
 
 
 class LangChainLLMClient(ILLMClient):
@@ -26,9 +27,13 @@ class LangChainLLMClient(ILLMClient):
             stop=[";"]
         )
 
-    def get_model_response(self, db_structure: str, user_input: str, schema_name) -> str:
+    def get_model_response(self, db_structure: str, user_input: str, schema_name: str, chat_history: Chat, db_type: str) -> str:
         message = AI_INPUT_PROMPT.format(
-            db_structure=db_structure, user_input=user_input, schema_name=schema_name
+            db_structure=db_structure,
+            user_input=user_input,
+            schema_name=schema_name,
+            chat_history=chat_history,
+            db_type=db_type
         )
         try:
             llm_response = self.llm.invoke([HumanMessage(content=message)])
@@ -37,7 +42,6 @@ class LangChainLLMClient(ILLMClient):
             return e
 
     def get_human_response(self, question: str) -> str:
-        return "HOLA"
         message = HUMAN_RESPONSE_PROMPT.format(
             human_question=question
         )

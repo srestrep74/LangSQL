@@ -58,11 +58,13 @@ class LangToSqlService:
                 return {"error": "user message not saved into the database."}
 
             db_structure = self.query_adapter.get_db_structure(connection)
+            db_type = connection.db_type
+            chat_history = await self.get_messages(chat_id)
             sql_query = self.llm_client.get_model_response(
-                db_structure, user_input, connection.schema_name)
+                db_structure, user_input, connection.schema_name, chat_history, db_type)
             sql_results = self.query_adapter.execute_query(sql_query, connection)
             human_response = self.llm_client.get_human_response(user_input)
-            bot_message = Message(role=0, message=human_response + str(sql_results))
+            bot_message = Message(role=0, message=human_response + '\n' + str(sql_results))
             saved_bot_message = await self.repository.add_message(chat_id, bot_message)
 
             if not saved_bot_message:
@@ -77,10 +79,11 @@ class LangToSqlService:
         except Exception as e:
             return {"error": str(e)}
 
-    async def get_chat(self, chat_id: str) -> Chat:
-        chat = await self.repository.get_chat(chat_id)
+    async def get_messages(self, chat_id: str) -> Chat:
+        response = await self.repository.get_chat(chat_id)
+        messages = response.messages
         response = {
-            "chat": chat
+            "messages": messages
         }
         return response
 

@@ -69,6 +69,58 @@ async def chat(
         )
 
 
+@router.get("/get_messages")
+async def get_messages(
+    chat_id: str = Body(..., embed=True),
+    lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
+):
+    """
+    Endpoint to retrieve messages from an existing chat.
+
+    Args:
+        chat_id (str): The unique identifier for the chat from which messages will be retrieved.
+        lang_to_sql_service (LangToSqlService): A dependency injected service for managing chat data retrieval.
+
+    Returns:
+        Successful Response (`200 OK`)
+        ```json
+        {
+            "status": "success",
+            "message": "Success",
+            "data": {
+                "results": ["Message 1", "Message 2", "..."]
+            }
+        }
+        ```
+
+        Error Response (`400 Bad Request`)
+        ```json
+        {
+            "status": "error",
+            "message": "Error retrieving messages",
+            "details": {
+                "error": "Error description"
+            }
+        }
+        ```
+    """
+    try:
+        results = await lang_to_sql_service.get_messages(chat_id)
+
+        return ResponseManager.success_response(
+            data={"results": results},
+            message="Success",
+            status_code=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return ResponseManager.error_response(
+            message="Error",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details={"error": str(e)},
+        )
+
+
 @router.post("/generate_synthetic_data")
 async def generate_synthetic_data(
     connection: DatabaseConnection,
