@@ -60,3 +60,34 @@ class TestAlert:
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
         assert response.json()["data"]["user"] == alert_dict["user"]
+
+    @patch("src.modules.alerts.service.AlertRepository")
+    def test_update_alert(self, MockAlertRepository):
+        mock_alert_repo = MockAlertRepository.return_value
+
+        updated_alert = Alert(
+            id=Settings.TEST_ALERT,
+            user=Settings.TEST_USER,
+            notification_emails=["updated@test.com"],
+            prompt="Updated prompt",
+            sent=True,
+            expiration_date=datetime.utcnow().isoformat(),
+            sql_query=None
+        )
+
+        mock_alert_repo.update_alert = AsyncMock(return_value=updated_alert)
+
+        alert_patch_data = {
+            "notification_emails": ["updated@test.com"],
+            "prompt": "Updated prompt"
+        }
+
+        response = client.patch(
+            f"/api/alerts/{Settings.TEST_ALERT}",
+            data=json.dumps(alert_patch_data, default=str),
+            headers={"Content-Type": "application/json"}
+        )
+
+        print(response.json())
+        assert response.status_code == 200
+        assert response.json()["message"] == "Success"
