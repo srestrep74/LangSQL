@@ -25,3 +25,4 @@ class Settings:
     GMAIL_USERNAME: str = os.getenv('GMAIL_USERNAME')
     GMAIL_APP_PASSWORD: str = os.getenv('GMAIL_APP_PASSWORD')
     API_URL: str = os.getenv('API_URL')
+    TEST_USER: str = os.getenv('TEST_USER')

@@ -1,13 +1,12 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest, json
 from datetime import datetime
 from fastapi.testclient import TestClient
 
 from app import app
+from src.config.constants import Settings
 from src.modules.alerts.models.models import AlertCreate
-from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
-from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 client = TestClient(app)
@@ -23,10 +22,21 @@ database_connection = DatabaseConnection(
 )
 
 class TestAlert:
-    def test_create_alert(self):
+    @patch("src.modules.alerts.service.AlertRepository")
+    def test_create_alert(self, MockAlertRepository):
+        mock_alert_repo = MockAlertRepository.return_value
+        mock_alert_repo.create_alert = AsyncMock(return_value={
+            "id": "mocked_id",
+            "user": Settings.TEST_USER,
+            "notification_emails": ["test@test.com"],
+            "prompt": "Most expensive product",
+            "sent": False,
+            "expiration_date": datetime.utcnow().isoformat()
+        })
+
         alert_data = AlertCreate(
             notification_emails=["test@test.com"],
-            user="test_user",
+            user=Settings.TEST_USER,
             prompt="Most expensive product",
             sent=False,
             expiration_date=datetime.utcnow(),
@@ -46,11 +56,7 @@ class TestAlert:
             headers={"Content-Type": "application/json"}
         )
 
+        print(response)
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
         assert response.json()["data"]["user"] == alert_dict["user"]
-
-        alert_id = response.json()["data"]["id"]
-        response = client.delete(
-            f"/api/alerts/{alert_id}?user_id={alert_dict['user']}"
-        )
