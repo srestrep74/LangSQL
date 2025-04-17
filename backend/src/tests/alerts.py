@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app import app
 from src.config.constants import Settings
-from src.modules.alerts.models.models import AlertCreate
+from src.modules.alerts.models.models import AlertCreate, Alert
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 client = TestClient(app)
@@ -25,14 +25,14 @@ class TestAlert:
     @patch("src.modules.alerts.service.AlertRepository")
     def test_create_alert(self, MockAlertRepository):
         mock_alert_repo = MockAlertRepository.return_value
-        mock_alert_repo.create_alert = AsyncMock(return_value={
-            "id": "mocked_id",
-            "user": Settings.TEST_USER,
-            "notification_emails": ["test@test.com"],
-            "prompt": "Most expensive product",
-            "sent": False,
-            "expiration_date": datetime.utcnow().isoformat()
-        })
+        mock_alert_repo.create_alert = AsyncMock(return_value=Alert(
+            id="mocked_id",
+            user=Settings.TEST_USER,
+            notification_emails=["test@test.com"],
+            prompt="Most expensive product",
+            sent=False,
+            expiration_date=datetime.utcnow().isoformat()
+        ))
 
         alert_data = AlertCreate(
             notification_emails=["test@test.com"],
@@ -56,7 +56,7 @@ class TestAlert:
             headers={"Content-Type": "application/json"}
         )
 
-        print(response)
+        print(response.json())
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
         assert response.json()["data"]["user"] == alert_dict["user"]
