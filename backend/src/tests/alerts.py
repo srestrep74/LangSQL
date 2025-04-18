@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock, patch
+import asyncio
 
 import pytest, json
 from datetime import datetime
@@ -7,19 +8,11 @@ from fastapi.testclient import TestClient
 from app import app
 from src.config.constants import Settings
 from src.modules.alerts.models.models import AlertCreate, Alert
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.alerts.utils.cron_job import CronJob
+from src.tests.utils.database_connection import database_connection
 
 client = TestClient(app)
 
-database_connection = DatabaseConnection(
-    db_type="postgresql",
-    host="localhost",
-    port=5432,
-    username="postgres",
-    password="password",
-    database_name="test_db",
-    schema_name="inventory"
-)
 
 class TestAlert:
     @patch("src.modules.alerts.service.AlertRepository")
@@ -91,3 +84,39 @@ class TestAlert:
         print(response.json())
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
+
+    @patch("src.modules.alerts.service.EmailSender.send_email", new_callable=AsyncMock)
+    @patch("src.modules.alerts.service.AlertRepository.update_alert", new_callable=AsyncMock)
+    @patch("src.modules.alerts.service.AlertRepository.get_alerts", new_callable=AsyncMock)
+    @patch("src.modules.auth.repositories.repository.UserRepository.get_by_id", new_callable=AsyncMock)
+    def test_check_alert(self, mock_get_user_by_id, mock_get_alerts, mock_update_alert, mock_send_email):
+        mock_get_alerts.return_value = [
+            Alert(
+                id=Settings.TEST_ALERT,
+                user=Settings.TEST_USER,
+                notification_emails=["test@test.com"],
+                prompt="Check if inventory is low",
+                sent=False,
+                expiration_date=datetime.utcnow().isoformat(),
+                sql_query="SELECT * FROM inventory WHERE stock < 10"
+            )
+        ]
+
+        mock_get_user_by_id.return_value = type("User", (), {
+            "credentials": [{
+                "dbType": "postgresql",
+                "host": "localhost",
+                "port": 5432,
+                "user": "postgres",
+                "password": "password",
+                "db_name": "test_db"
+            }]
+        })()
+
+        with patch("src.modules.alerts.service.QueryAdapter.execute_query", return_value=[{"id": 1}]):
+            cron_job = CronJob()
+            result = asyncio.run(cron_job.trigger_alert_check())
+            assert result is True
+
+        mock_send_email.assert_called_once()
+        mock_update_alert.assert_called_once()
