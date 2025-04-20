@@ -8,6 +8,8 @@ from src.modules.text_to_sql.prompts.synthetic_data import (
 )
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.text_to_sql.models.models import Chat, Message
+from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 
 
 class SyntheticDataModelService:
@@ -38,17 +40,36 @@ class SyntheticDataModelService:
 
 
 class LangToSqlService:
-    def __init__(self, query_adapter: QueryAdapter, llm_client: ILLMClient):
+    def __init__(self, query_adapter: QueryAdapter, llm_client: ILLMClient, TextToSqlRepository: TextToSqlRepository):
         self.query_adapter = query_adapter
         self.llm_client = llm_client
+        self.repository = TextToSqlRepository
 
-    def process_user_query(self, user_input: str, connection: DatabaseConnection) -> Dict:
+    async def chat(self, connection: DatabaseConnection, user_input: str, chat_data: Chat, chat_id: str) -> Dict:
+        if not chat_id:
+            chat_id = await self.repository.create_chat(chat_data)
+            if not chat_id:
+                return None
         try:
+            user_message = Message(role=1, message=user_input)
+            saved_user_message = await self.repository.add_message(chat_id, user_message)
+
+            if not saved_user_message:
+                return {"error": "user message not saved into the database."}
+
             db_structure = self.query_adapter.get_db_structure(connection)
+            db_type = connection.db_type
+            chat_history = await self.get_messages(chat_id)
             sql_query = self.llm_client.get_model_response(
-                db_structure, user_input, connection.schema_name)
+                db_structure, user_input, connection.schema_name, chat_history, db_type)
             sql_results = self.query_adapter.execute_query(sql_query, connection)
             human_response = self.llm_client.get_human_response(user_input)
+            bot_message = Message(role=0, message=human_response + '\n' + str(sql_results))
+            saved_bot_message = await self.repository.add_message(chat_id, bot_message)
+
+            if not saved_bot_message:
+                return {"error": "bot message not saved into the database."}
+
             response = {
                 "header": human_response,
                 "sql_query": sql_query,
@@ -57,6 +78,14 @@ class LangToSqlService:
             return response
         except Exception as e:
             return {"error": str(e)}
+
+    async def get_messages(self, chat_id: str) -> Dict:
+        response = await self.repository.get_chat(chat_id)
+        messages = response.messages
+        response = {
+            "messages": messages
+        }
+        return response
 
     def get_response(self, user_input: str, connection: DatabaseConnection):
         try:
