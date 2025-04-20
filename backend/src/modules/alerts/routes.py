@@ -88,7 +88,7 @@ async def get_alert(alert_id: str):
         return ResponseManager.error_response("Alert not found", status_code=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 @router.get("", tags=["alerts"], responses={200: {"model": list[Alert], "description": "Alerts retrieved successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
 async def get_all_alerts(user_id: str):
@@ -107,4 +107,3 @@ async def get_all_alerts(user_id: str):
         return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    

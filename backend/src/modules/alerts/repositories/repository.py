@@ -41,7 +41,7 @@ class AlertRepository:
             return None
         except Exception:
             return None
-        
+
     async def get_alerts(self, user_id: Optional[str] = None) -> list[Alert]:
         try:
             alerts = []

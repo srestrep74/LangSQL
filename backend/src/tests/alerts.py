@@ -1,7 +1,8 @@
 from unittest.mock import AsyncMock, patch
 import asyncio
 
-import pytest, json
+import pytest
+import json
 from datetime import datetime
 from fastapi.testclient import TestClient
 
@@ -12,6 +13,7 @@ from src.modules.alerts.utils.cron_job import CronJob
 from src.tests.utils.database_connection import database_connection
 
 client = TestClient(app)
+
 
 
 class TestAlert:

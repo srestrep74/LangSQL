@@ -16,6 +16,7 @@ import httpx
 
 api_url = Settings().API_URL
 
+
 class AlertService:
     def __init__(self, text_to_sql_adapter: TextToSQLAdapter = Depends(get_text_to_sql_adapter), query_adapter: QueryAdapter = Depends(get_query_adapter)):
         self.text_to_sql_adapter = text_to_sql_adapter
@@ -24,7 +25,7 @@ class AlertService:
         self.query_adapter = query_adapter
 
     async def create_alert(self, alert_data: AlertCreate) -> Alert:
-        #sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
+        # sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
         alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
         alert_create = AlertCreate(**alert_data_dict, sql_query=None)
 
@@ -32,7 +33,7 @@ class AlertService:
 
         user_id = alert_data.user
         alert_id = saved_alert.id
-        
+
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.post(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
@@ -51,14 +52,14 @@ class AlertService:
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
         return await self.alert_repository.delete_alert(alert_id)
-    
+
     async def get_alert(self, alert_id: str) -> Optional[Alert]:
         return await self.alert_repository.get_by_id(alert_id)
-    
+
     async def get_alerts(self, user_id: str) -> list[Alert]:
         result = await self.alert_repository.get_alerts(user_id)
         return result
-    
+
     async def check_alerts(self):
         try:
             alerts = await self.alert_repository.get_alerts()
