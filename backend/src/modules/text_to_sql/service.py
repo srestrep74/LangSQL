@@ -82,11 +82,11 @@ class LangToSqlService:
         }
         return response
 
-    def get_response(self, user_input: str, connection: DatabaseConnection):
+    def get_response(self, user_input: str, connection: DatabaseConnection) -> str:
         try:
             db_structure = self.query_adapter.get_db_structure(connection)
-            sql_query = self.llm_client.get_model_response(
-                db_structure, user_input, connection.schema_name)
+            sql_query = self.llm_client.get_response(
+                db_structure, user_input, connection.schema_name, connection.db_type)
             return sql_query
         except Exception as e:
-            return {"error": str(e)}
+            return str(e)

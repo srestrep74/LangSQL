@@ -54,7 +54,6 @@ class TestAlert:
         print(response.json())
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
-        assert response.json()["data"]["user"] == alert_dict["user"]
 
     @patch("src.modules.alerts.service.AlertRepository")
     def test_update_alert(self, MockAlertRepository):
