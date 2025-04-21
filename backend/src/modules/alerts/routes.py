@@ -4,6 +4,7 @@ from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.service import AlertService
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 
 router = APIRouter()
@@ -11,7 +12,7 @@ alert_service = AlertService()
 
 
 @router.post("/create", tags=["alerts"], responses={200: {"model": Alert, "description": "Alert created successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
-async def create_alert(alert_data: AlertCreate, alert_service: AlertService = Depends()):
+async def create_alert(alert_data: AlertCreate, connection: DatabaseConnection, alert_service: AlertService = Depends()):
     """
     Creates a new alert in the database.
 
@@ -23,7 +24,7 @@ async def create_alert(alert_data: AlertCreate, alert_service: AlertService = De
         Alert: The newly created alert.
     """
     try:
-        result = await alert_service.create_alert(alert_data)
+        result = await alert_service.create_alert(alert_data, connection)
         return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

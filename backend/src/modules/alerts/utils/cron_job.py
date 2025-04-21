@@ -19,7 +19,9 @@ class CronJob:
                 query_adapter = QueryAdapter(query_service)
                 alert_service = AlertService(query_adapter=query_adapter)
                 await alert_service.check_alerts()
+                return True
             except Exception as e:
+                return False
                 print(f"Error calling alert check: {str(e)}")
 
     def start(self):
