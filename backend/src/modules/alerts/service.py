@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional
 
 from fastapi import Depends
 
@@ -24,10 +24,10 @@ class AlertService:
         self.email_sender = EmailSender()
         self.query_adapter = query_adapter
 
-    async def create_alert(self, alert_data: AlertCreate) -> Alert:
-        # sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
+    async def create_alert(self, alert_data: AlertCreate, connection: DatabaseConnection) -> Alert:
+        sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, connection)
         alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
-        alert_create = AlertCreate(**alert_data_dict, sql_query=None)
+        alert_create = AlertCreate(**alert_data_dict, sql_query=sql_query)
 
         saved_alert = await self.alert_repository.create_alert(alert_create)
 
@@ -36,7 +36,7 @@ class AlertService:
 
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
+                await client.post(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
 
@@ -48,7 +48,7 @@ class AlertService:
     async def delete_alert(self, alert_id: str, user_id: str) -> bool:
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.delete(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
+                await client.delete(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
         return await self.alert_repository.delete_alert(alert_id)

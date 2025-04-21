@@ -13,13 +13,15 @@ class CronJob:
         self.scheduler.add_job(self.trigger_alert_check, self.trigger)
 
     async def trigger_alert_check(self):
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient():
             try:
                 query_service = QueryService(db_manager=None)
                 query_adapter = QueryAdapter(query_service)
                 alert_service = AlertService(query_adapter=query_adapter)
                 await alert_service.check_alerts()
+                return True
             except Exception as e:
+                return False
                 print(f"Error calling alert check: {str(e)}")
 
     def start(self):
