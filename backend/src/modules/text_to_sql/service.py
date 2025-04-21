@@ -19,7 +19,6 @@ class SyntheticDataModelService:
 
     def generate_synthetic_data(self, iterations: int, connection: DatabaseConnection) -> str:
         iterations = iterations // 40
-        print(f"Generando datos sintéticos para {iterations} iteraciones...")
         db_structure = self.query_adapter.get_db_structure(connection)
         user_input = GENERATE_SYNTHETIC_DATA_PROMPT.format(
             db_structure=db_structure, schema_name=connection.schema_name)
@@ -27,13 +26,9 @@ class SyntheticDataModelService:
 
         for _ in range(iterations):
             try:
-                print(f"Generando datos sintéticos para la iteración {_ + 1}...")
                 last_query = self.llm_client.get_model_response(user_input)
-                print("LlM response:", last_query)
                 last_query = SQLUtils.clean_sql_query(last_query)
-                print("Insertando datos sintéticos...")
                 self.query_adapter.execute_query(last_query, connection)
-                print("Datos sintéticos insertados correctamente.")
             except Exception as e:
                 return {"error": str(e)}
         return last_query
