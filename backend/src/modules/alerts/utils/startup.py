@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
 from src.modules.alerts.utils.cron_job import CronJob
 
 

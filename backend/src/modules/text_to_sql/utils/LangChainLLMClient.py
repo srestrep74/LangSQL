@@ -2,13 +2,13 @@ from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from src.config.constants import Settings
+from src.modules.text_to_sql.models.models import Chat
 from src.modules.text_to_sql.prompts.lang_to_sql import (
     AI_INPUT_PROMPT,
     HUMAN_RESPONSE_PROMPT,
     AI_ALERT_INPUT_PROMPT
 )
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
-from src.modules.text_to_sql.models.models import Chat
 
 
 class LangChainLLMClient(ILLMClient):

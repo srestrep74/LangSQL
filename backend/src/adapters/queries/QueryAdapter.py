@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
-from src.modules.queries.service import QueryService
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
 
 

@@ -1,7 +1,9 @@
-from typing import Any, Dict, List, Iterator, Optional
 from contextlib import contextmanager
+from typing import Any, Dict, Iterator, List, Optional
+
 from sqlalchemy import MetaData, text
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection, Engine
+
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
 
 

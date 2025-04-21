@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
 from src.modules.queries.utils.SQLUtils import SQLUtils
 

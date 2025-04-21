@@ -1,13 +1,12 @@
 from typing import Any, Dict
 
-from fastapi import APIRouter, Body, status
+from fastapi import APIRouter, Body, HTTPException, status
 
 from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.service import UserService
+from src.modules.auth.utils.util import refresh_access_token
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
-from src.modules.auth.utils.util import refresh_access_token
-from fastapi import HTTPException
 
 router = APIRouter()
 service = UserService()

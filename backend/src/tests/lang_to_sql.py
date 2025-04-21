@@ -1,14 +1,14 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-import json
 from fastapi.testclient import TestClient
 
 from app import app
-from src.modules.text_to_sql.service import SyntheticDataModelService, LangToSqlService
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.tests.utils.database_connection import database_connection
 
 client = TestClient(app)

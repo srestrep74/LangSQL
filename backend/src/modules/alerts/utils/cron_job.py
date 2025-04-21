@@ -1,8 +1,9 @@
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from src.modules.alerts.service import AlertService
+
 from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.modules.alerts.service import AlertService
 from src.modules.queries.service import QueryService
 
 

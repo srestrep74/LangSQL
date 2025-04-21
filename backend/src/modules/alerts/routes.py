@@ -6,7 +6,6 @@ from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
-
 router = APIRouter()
 alert_service = AlertService()
 
