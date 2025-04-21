@@ -24,10 +24,10 @@ class AlertService:
         self.email_sender = EmailSender()
         self.query_adapter = query_adapter
 
-    async def create_alert(self, alert_data: AlertCreate) -> Alert:
-        # sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, "inventory")
+    async def create_alert(self, alert_data: AlertCreate, connection: DatabaseConnection) -> Alert:
+        sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, connection)
         alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
-        alert_create = AlertCreate(**alert_data_dict, sql_query=None)
+        alert_create = AlertCreate(**alert_data_dict, sql_query=sql_query)
 
         saved_alert = await self.alert_repository.create_alert(alert_create)
 
