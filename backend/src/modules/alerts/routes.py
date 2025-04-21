@@ -5,7 +5,6 @@ from src.modules.alerts.service import AlertService
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
 
-
 router = APIRouter()
 alert_service = AlertService()
 

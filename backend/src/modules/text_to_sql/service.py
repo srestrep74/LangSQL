@@ -2,14 +2,14 @@ import json
 from typing import Dict
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.utils.SQLUtils import SQLUtils
+from src.modules.text_to_sql.models.models import Chat, Message
 from src.modules.text_to_sql.prompts.synthetic_data import (
     GENERATE_SYNTHETIC_DATA_PROMPT,
 )
-from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
-from src.modules.text_to_sql.models.models import Chat, Message
 from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
+from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
 
 class SyntheticDataModelService:

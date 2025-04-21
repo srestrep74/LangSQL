@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock, patch
+
 from fastapi.testclient import TestClient
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection, Engine
 
 from app import app
-from src.modules.queries.utils.PostgreSQLManager import PostgreSQLManager
-from src.modules.queries.utils.MySQLManager import MySQLManager
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
 from src.modules.queries.utils.DatabaseType import DatabaseType
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.queries.utils.MySQLManager import MySQLManager
+from src.modules.queries.utils.PostgreSQLManager import PostgreSQLManager
 
 client = TestClient(app)
 

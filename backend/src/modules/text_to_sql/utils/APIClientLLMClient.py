@@ -1,4 +1,5 @@
 import google.generativeai as genai
+
 from src.config.constants import Settings
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 

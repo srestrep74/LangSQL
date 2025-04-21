@@ -4,8 +4,7 @@ from bson import ObjectId
 
 from src.modules.auth.models.models import User, UserCreate, UserPatch
 from src.modules.auth.repositories.repository import UserRepository
-
-from src.modules.auth.utils.util import hash_password, verify_password, create_tokens
+from src.modules.auth.utils.util import create_tokens, hash_password, verify_password
 
 
 class UserService:

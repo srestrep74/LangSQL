@@ -3,10 +3,10 @@ import urllib.parse
 from fastapi import APIRouter, Depends, status
 
 from src.config.dependencies import get_query_service
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.schemas.ExecutionQueryRequest import ExecutionQueryRequest
 from src.modules.queries.service import QueryService
 from src.utils.ResponseManager import ResponseManager
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 router = APIRouter()
 

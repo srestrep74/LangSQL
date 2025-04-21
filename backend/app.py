@@ -1,17 +1,16 @@
-from fastapi import Request
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from src.modules.alerts.routes import router as alerts_router
+from src.modules.alerts.utils.startup import lifespan
 from src.modules.auth.routes import router as auth_router
 from src.modules.control_panel.routes import router as control_panel_router
 from src.modules.queries.routes import router as queries_router
 from src.modules.reports.routes import router as reports_router
 from src.modules.text_to_sql.routes import router as text_to_sql_router
-from src.modules.alerts.utils.startup import lifespan
 
 app = FastAPI(
     title="LangSQL",
