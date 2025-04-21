@@ -10,6 +10,9 @@ import { userStore } from '@/store/userStore'
 import ShowAlertsView from '@/views/ShowAlertsView.vue'
 import ShowAlertView from '@/views/ShowAlertView.vue'
 import EditAlertView from '@/views/EditAlertView.vue'
+import ConfigurationDatabaseView from '@/views/ConfigurationDatabaseView.vue'
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,6 +75,12 @@ const router = createRouter({
       name: 'login',
       component: LoginView,
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/databases',
+      name: 'databases',
+      component: ConfigurationDatabaseView,
+      meta: { requiresAuth: true }
     }
   ],
 })

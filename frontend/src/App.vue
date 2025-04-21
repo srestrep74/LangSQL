@@ -47,6 +47,9 @@ const logout = () => {
                 <router-link to="/synthetic_data" class="nav-link text-custom-purple">Synthetic Data</router-link>
               </li>
               <li class="nav-item">
+                <router-link to="/databases" class="nav-link text-custom-purple">Databases</router-link>
+              </li>
+              <li class="nav-item">
                 <router-link to="/configuration" class="nav-link text-custom-purple">Configuration</router-link>
               </li>
               
