@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Optional
 
 from fastapi import Depends
 
@@ -36,7 +36,7 @@ class AlertService:
 
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
+                await client.post(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
 
@@ -48,7 +48,7 @@ class AlertService:
     async def delete_alert(self, alert_id: str, user_id: str) -> bool:
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.delete(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
+                await client.delete(f"{api_url}/auth/{user_id}/alerts/{alert_id}")
             except Exception as e:
                 print(f"Error calling alert check: {str(e)}")
         return await self.alert_repository.delete_alert(alert_id)

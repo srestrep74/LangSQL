@@ -1,9 +1,13 @@
 from unittest.mock import MagicMock, patch
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.engine import Engine, Connection
 
 from app import app
+from src.modules.queries.utils.PostgreSQLManager import PostgreSQLManager
+from src.modules.queries.utils.MySQLManager import MySQLManager
+from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
+from src.modules.queries.utils.DatabaseType import DatabaseType
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 client = TestClient(app)
 
@@ -32,9 +36,9 @@ QUERY_RESULTS = [
     {"id": 2, "name": "Jane Smith"}
 ]
 
+
 class TestPostgreSQLManager:
     def test_get_db_structure(self):
-        from src.modules.queries.utils.PostgreSQLManager import PostgreSQLManager
         manager = MagicMock(spec=PostgreSQLManager)
         mock_structure = {
             'test_table': {
@@ -54,7 +58,6 @@ class TestPostgreSQLManager:
         assert 'foreign_keys' in structure['test_table']
 
     def test_execute_query(self):
-        from src.modules.queries.utils.PostgreSQLManager import PostgreSQLManager
         manager = MagicMock(spec=PostgreSQLManager)
         mock_results = [
             {"id": 1, "name": "Test"},
@@ -68,9 +71,9 @@ class TestPostgreSQLManager:
         assert results[1]["id"] == 2
         assert results[1]["name"] == "Another"
 
+
 class TestMySQLManager:
     def test_get_db_structure(self):
-        from src.modules.queries.utils.MySQLManager import MySQLManager
         manager = MagicMock(spec=MySQLManager)
         mock_structure = {
             'products': {
@@ -116,7 +119,6 @@ class TestMySQLManager:
         assert fks[1]['references'] == 'categories'
 
     def test_execute_query(self):
-        from src.modules.queries.utils.MySQLManager import MySQLManager
         manager = MagicMock(spec=MySQLManager)
         mock_results = [
             {"id": 1, "name": "Laptop", "price": 999.99},
@@ -135,7 +137,6 @@ class TestMySQLManager:
         assert result[0]["message"] == "Query executed successfully"
 
     def test_schema_usage(self):
-        from src.modules.queries.utils.MySQLManager import MySQLManager
         mock_engine = MagicMock(spec=Engine)
         mock_conn = MagicMock(spec=Connection)
         mock_engine.connect.return_value = mock_conn
@@ -149,16 +150,14 @@ class TestMySQLManager:
         mock_result.keys.return_value = ['id', 'name']
         mock_result.fetchall.return_value = [(1, 'Test'), (2, 'Another')]
         mock_conn.execute.return_value = mock_result
-        with patch('sqlalchemy.text') as mock_text:
-            results = manager.execute_query("SELECT * FROM test_table", schema_name="test_schema")
+        with patch('sqlalchemy.text'):
+            manager.execute_query("SELECT * FROM test_table", schema_name="test_schema")
             assert mock_conn.execute.call_count >= 2
             mock_transaction.commit.assert_called_once()
 
+
 class TestDatabaseManagerFactory:
     def test_register_and_create_manager(self):
-        from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
-        from src.modules.queries.utils.DatabaseType import DatabaseType
-        from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
         mock_manager_class = MagicMock()
         DatabaseManagerFactory.register(DatabaseType.POSTGRESQL, mock_manager_class)
         test_connection = DatabaseConnection(

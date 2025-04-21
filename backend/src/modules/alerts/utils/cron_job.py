@@ -13,7 +13,7 @@ class CronJob:
         self.scheduler.add_job(self.trigger_alert_check, self.trigger)
 
     async def trigger_alert_check(self):
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient():
             try:
                 query_service = QueryService(db_manager=None)
                 query_adapter = QueryAdapter(query_service)
