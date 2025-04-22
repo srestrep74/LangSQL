@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, status
 
 from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.service import AlertService
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 router = APIRouter()
 alert_service = AlertService()
