@@ -1,7 +1,6 @@
-from typing import Dict
 
-from src.modules.text_to_sql.service import LangToSqlService
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.text_to_sql.service import LangToSqlService
 
 
 class TextToSQLAdapter:

@@ -23,8 +23,11 @@ class AlertService:
         self.email_sender = EmailSender()
         self.query_adapter = query_adapter
 
+    async def get_sql_query(self, prompt: str, connection: DatabaseConnection) -> str:
+        return self.text_to_sql_adapter.get_response(prompt, connection)
+
     async def create_alert(self, alert_data: AlertCreate, connection: DatabaseConnection) -> Alert:
-        sql_query = self.text_to_sql_adapter.get_response(alert_data.prompt, connection)
+        sql_query = await self.get_sql_query(alert_data.prompt, connection)
         alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
         alert_create = AlertCreate(**alert_data_dict, sql_query=sql_query)
 
@@ -41,7 +44,14 @@ class AlertService:
 
         return saved_alert
 
-    async def update_alert(self, alert_id: str, alert_data: AlertPatch) -> Optional[Alert]:
+    async def update_alert(self, alert_id: str, alert_data: AlertPatch, connection: DatabaseConnection) -> Optional[Alert]:
+        existing_alert = await self.alert_repository.get_by_id(alert_id)
+
+        if alert_data.prompt != existing_alert.prompt:
+            sql_query = await self.get_sql_query(alert_data.prompt, connection)
+            alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
+            alert_data = AlertPatch(**alert_data_dict, sql_query=sql_query)
+
         return await self.alert_repository.update_alert(alert_id, alert_data)
 
     async def delete_alert(self, alert_id: str, user_id: str) -> bool:

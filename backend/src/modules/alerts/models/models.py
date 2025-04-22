@@ -41,4 +41,5 @@ class AlertPatch(BaseModel):
     notification_emails: Optional[List[EmailStr]] = None
     prompt: Optional[str] = None
     expiration_date: Optional[datetime] = None
+    sql_query: Optional[str] = None
     sent: Optional[bool] = None

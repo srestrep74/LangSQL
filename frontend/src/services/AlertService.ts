@@ -133,12 +133,23 @@ class AlertService {
       const emails = typeof formData.notification_emails === 'string'
       ? formData.notification_emails.split(',').map((e: string) => e.trim())
       : formData.notification_emails;
-    
+      
       const dataToSend = {
-        notification_emails: emails,
-        prompt: formData.prompt,
-        expiration_date: formData.expiration_date
-      };    
+        connection: {
+          db_type: dbCredentials.dbType,
+          username: dbCredentials.user,
+          password: dbCredentials.password,
+          host: dbCredentials.host,
+          port: dbCredentials.port,
+          database_name: dbCredentials.db_name,
+          schema_name: dbCredentials.schema_name ?? null,
+        },
+        alert_data: {
+          notification_emails: emails,
+          prompt: formData.prompt,
+          expiration_date: formData.expiration_date,
+        }
+      };
 
       console.log('Data to send:', dataToSend);
   

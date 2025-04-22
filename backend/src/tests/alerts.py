@@ -1,20 +1,18 @@
-from unittest.mock import AsyncMock, patch
 import asyncio
-import pytest
 import json
 from datetime import datetime
+from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
 from app import app
 from src.config.constants import Settings
-from src.modules.alerts.models.models import AlertCreate, Alert
+from src.modules.alerts.models.models import Alert, AlertCreate
+from src.modules.alerts.routes import alert_service
 from src.modules.alerts.utils.cron_job import CronJob
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.tests.utils.database_connection import database_connection
 
 client = TestClient(app)
-
 
 
 class TestAlert:
@@ -56,9 +54,9 @@ class TestAlert:
         assert response.status_code == 200
         assert response.json()["message"] == "Success"
 
-    @patch("src.modules.alerts.service.AlertRepository")
-    def test_update_alert(self, MockAlertRepository):
-        mock_alert_repo = MockAlertRepository.return_value
+    @patch("src.modules.alerts.service.AlertService.get_sql_query", new_callable=AsyncMock)
+    def test_update_alert(self, mock_get_sql_query):
+        mock_get_sql_query.return_value = None
 
         updated_alert = Alert(
             id=Settings.TEST_ALERT,
@@ -70,22 +68,29 @@ class TestAlert:
             sql_query=None
         )
 
-        mock_alert_repo.update_alert = AsyncMock(return_value=updated_alert)
+        with patch.object(alert_service, "alert_repository") as mock_repo:
+            mock_repo.get_by_id = AsyncMock(return_value=updated_alert)
+            mock_repo.update_alert = AsyncMock(return_value=updated_alert)
 
-        alert_patch_data = {
-            "notification_emails": ["updated@test.com"],
-            "prompt": "Updated prompt"
-        }
+            alert_patch_data = {
+                "notification_emails": ["updated@test.com"],
+                "prompt": "Updated prompt"
+            }
 
-        response = client.patch(
-            f"/api/alerts/{Settings.TEST_ALERT}",
-            data=json.dumps(alert_patch_data, default=str),
-            headers={"Content-Type": "application/json"}
-        )
+            connection_dict = database_connection.model_dump()
 
-        print(response.json())
-        assert response.status_code == 200
-        assert response.json()["message"] == "Success"
+            response = client.patch(
+                f"/api/alerts/{Settings.TEST_ALERT}",
+                data=json.dumps({
+                    "connection": connection_dict,
+                    "alert_data": alert_patch_data
+                }, default=str),
+                headers={"Content-Type": "application/json"}
+            )
+
+            print(response.json())
+            assert response.status_code == 200
+            assert response.json()["message"] == "Success"
 
     @patch("src.modules.alerts.service.EmailSender.send_email", new_callable=AsyncMock)
     @patch("src.modules.alerts.service.AlertRepository.update_alert", new_callable=AsyncMock)

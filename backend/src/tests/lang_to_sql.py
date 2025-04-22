@@ -8,8 +8,8 @@ from app import app
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
-from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 from src.tests.utils.database_connection import database_connection
+from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 
 client = TestClient(app)
 

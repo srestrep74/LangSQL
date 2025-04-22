@@ -4,9 +4,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from src.config.constants import Settings
 from src.modules.text_to_sql.models.models import Chat
 from src.modules.text_to_sql.prompts.lang_to_sql import (
+    AI_ALERT_INPUT_PROMPT,
     AI_INPUT_PROMPT,
     HUMAN_RESPONSE_PROMPT,
-    AI_ALERT_INPUT_PROMPT
 )
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 
@@ -41,7 +41,7 @@ class LangChainLLMClient(ILLMClient):
             return llm_response.content
         except Exception as e:
             return e
-        
+
     def get_response(self, db_structure: str, user_input: str, schema_name: str, db_type: str) -> str:
         message = AI_ALERT_INPUT_PROMPT.format(
             db_structure=db_structure,
