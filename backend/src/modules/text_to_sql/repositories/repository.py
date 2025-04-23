@@ -1,5 +1,5 @@
 from bson import ObjectId
-
+from typing import List
 from src.config.database import database
 from src.modules.text_to_sql.models.models import Message, Chat
 
@@ -41,3 +41,19 @@ class TextToSqlRepository:
             return None
         except Exception:
             return None
+    
+    async def get_users_chats(self, user_id: str) -> List[Chat]:
+        try:
+            chats = []
+            async for chat in self.collection.find({"user_id": user_id}):
+                chat["id"] = str(chat["_id"])
+                del chat["_id"]
+                chats.append(
+                    {
+                        "chat_id": chat["id"],
+                        "title": chat.get("title", "Untitled Chat")
+                    }
+                )
+            return chats
+        except Exception:
+            return []

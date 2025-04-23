@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List, Optional
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.utils.SQLUtils import SQLUtils
@@ -45,11 +45,23 @@ class LangToSqlService:
         self.llm_client = llm_client
         self.repository = TextToSqlRepository
 
-    async def chat(self, connection: DatabaseConnection, user_input: str, chat_data: Chat, chat_id: str) -> Dict:
+    async def chat(self, connection: DatabaseConnection, user_input: Optional[str], chat_data: Chat, chat_id: str) -> Dict:
         if not chat_id:
             chat_id = await self.repository.create_chat(chat_data)
             if not chat_id:
                 return None
+        if not user_input:
+            chats = await self.get_chats(chat_data.user_id)
+            full_chat = await self.get_messages(chat_id)
+            response = {
+                "chat_id": chat_id,
+                "header": "Chat",
+                "sql_query": "",
+                "sql_results": [],
+                "chats": chats,
+                "messages": full_chat["messages"]
+            }
+            return response
         try:
             user_message = Message(role=1, message=user_input)
             saved_user_message = await self.repository.add_message(chat_id, user_message)
@@ -70,10 +82,16 @@ class LangToSqlService:
             if not saved_bot_message:
                 return {"error": "bot message not saved into the database."}
 
+            chats = await self.get_chats(chat_data.user_id)
+            full_chat = await self.get_messages(chat_id)
+
             response = {
+                "chat_id": chat_id,
                 "header": human_response,
                 "sql_query": sql_query,
-                "sql_results": json.dumps(sql_results)
+                "sql_results": json.dumps(sql_results),
+                "chats": chats,
+                "messages": full_chat["messages"]
             }
             return response
         except Exception as e:
@@ -93,5 +111,11 @@ class LangToSqlService:
             sql_query = self.llm_client.get_model_response(
                 db_structure, user_input, connection.schema_name)
             return sql_query
+        except Exception as e:
+            return {"error": str(e)}
+    
+    async def get_chats(self, user_id: str) -> List[Chat]:
+        try:
+            return await self.repository.get_users_chats(user_id)
         except Exception as e:
             return {"error": str(e)}

@@ -16,7 +16,7 @@ router = APIRouter()
 @router.post("/chat")
 async def chat(
     connection: DatabaseConnection,
-    user_input: str = Body(..., embed=True),
+    user_input: Optional[str] = Body(None, embed=True),
     chat_data: Chat = Body(..., embed=True),
     chat_id: Optional[str] = Body(None, embed=True),
     lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)

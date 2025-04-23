@@ -2,18 +2,20 @@ import api, { isAxiosError } from '@/services/ApiBase';
 import type { ApiResponse, QueryResults } from '@/interfaces/ApiResponse';
 import type { ApiErrorResponse } from '@/interfaces/ApiErrorResponse';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
+import { userStore } from '@/store/userStore';
 
 
 class TextToSqlService {
-  async processQuery(query: string): Promise<QueryResults> {
+  async processQuery(query: string, currentChatId?: string | null): Promise<QueryResults> {
     try {
 
       const credentials = dbCredentialsStore.credentials;
+      const userId = userStore.user?.id;
       if (!credentials) {
         throw new Error('No database credentials found');
       }
 
-      const response = await api.post<ApiResponse>('/text-to-sql/process_query', {
+      const response = await api.post<ApiResponse>('/text-to-sql/chat', {
         user_input: query,
         connection : {
           db_type: credentials.dbType,
@@ -23,13 +25,17 @@ class TextToSqlService {
           port: credentials.port,
           database_name: credentials.db_name,
           schema_name: credentials.schema_name
-        }
+        },
+        chat_data: {
+          user_id: userId,
+        },
+        chat_id: currentChatId || null
       });
 
       if (!response.data?.data?.results) {
         throw new Error('Invalid response structure from API');
       }
-
+      console.log(response.data.data.results);
       return response.data.data.results;
     } catch (error: unknown) {
       if (isAxiosError(error)) {
