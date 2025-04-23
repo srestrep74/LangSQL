@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TextToSqlService from '@/services/TextToSqlService';
-import type { QueryResults } from '@/interfaces/ApiResponse';
+import type { QueryResults, ChatData } from '@/interfaces/ApiResponse';
+import { dbCredentialsStore } from '@/store/dbCredentialsStore';
+import { userStore } from '@/store/userStore';
 
 const userQuery = ref('');
 const chatMessages = ref<Array<{ type: string; content: string }>>([]);
@@ -10,6 +12,14 @@ const isLoading = ref(false);
 const sendQuery = async () => {
   if (!userQuery.value.trim()) return;
 
+  if (!dbCredentialsStore.credentials) {
+    chatMessages.value.push({
+      type: 'bot',
+      content: 'Database credentials are missing. Please configure the database connection first.'
+    });
+    return;
+  }
+
   chatMessages.value.push({ type: 'user', content: userQuery.value });
 
   const loadingMessage = { type: 'bot', content: '<span class="loading-dots">Processing Query</span>' };
@@ -17,7 +27,15 @@ const sendQuery = async () => {
   isLoading.value = true;
 
   try {
-    const response: QueryResults = await TextToSqlService.proccessQuery(userQuery.value);
+    const chatData: ChatData = {
+      user_id: userStore.user?.id || '',
+      messages: chatMessages.value.map(message => ({
+        role: message.type === 'user' ? 1 : 0,
+        message: message.content,
+        timestamp: new Date().toISOString()
+      }))
+    };
+    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value, chatData);
 
     if (!response || !response.header) {
       throw new Error('Invalid response from backend');

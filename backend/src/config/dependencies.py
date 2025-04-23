@@ -1,22 +1,23 @@
 from fastapi import Depends
-from sqlalchemy.engine import Engine
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
-from src.config.constants import Settings
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.service import QueryService
-from src.modules.queries.utils.DatabaseManager import DatabaseManager
+from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
+from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
+from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
 
 
-def get_db_manager() -> Engine:
-    return DatabaseManager(Settings.DB_URL)
+def get_db_manager(connection: DatabaseConnection) -> IDatabaseManager:
+    return DatabaseManagerFactory.create_manager(connection)
 
 
-def get_query_service(db_manager: DatabaseManager = Depends(get_db_manager)) -> QueryService:
+def get_query_service(db_manager: IDatabaseManager = Depends(get_db_manager)) -> QueryService:
     return QueryService(db_manager)
 
 
@@ -32,8 +33,12 @@ def get_apiclient_llm_client() -> ILLMClient:
     return APIClientLLMClient()
 
 
-def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client)) -> LangToSqlService:
-    return LangToSqlService(query_adapter, llm_client)
+def get_text_to_sql_repository() -> TextToSqlRepository:
+    return TextToSqlRepository()
+
+
+def get_lang_to_sql_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_langchain_llm_client), repository: TextToSqlRepository = Depends(get_text_to_sql_repository)) -> LangToSqlService:
+    return LangToSqlService(query_adapter, llm_client, repository)
 
 
 def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_query_adapter), llm_client: ILLMClient = Depends(get_apiclient_llm_client)) -> SyntheticDataModelService:

@@ -1,17 +1,14 @@
 name: Python Tests
 
 on:
-  pull_request:
-    branches:
-      - develop
-      - test/gitflows
+  workflow_call:
 
 permissions:
   contents: read
   issues: write 
 
 jobs:
-  tests:
+  backend-tests:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -36,31 +33,43 @@ jobs:
           echo "TEXTTOSQL_API_KEY=${{ secrets.TEXTTOSQL_API_KEY }}" >> .env
           echo "TEXTTOSQL_BASE_URL=${{ secrets.TEXTTOSQL_BASE_URL }}" >> .env
           echo "TEXTTOSQL_MODEL_NAME=${{ secrets.TEXTTOSQL_MODEL_NAME }}" >> .env
+          echo "TEXTTOSQL_TEMPERATURE =${{ secrets.TEXTTOSQL_TEMPERATURE }}" >> .env
           echo "SYNTHETIC_DATA_MODEL_API_KEY=${{ secrets.SYNTHETIC_DATA_MODEL_API_KEY }}" >> .env
           echo "SYNTHETIC_DATA_BASE_URL=${{ secrets.SYNTHETIC_DATA_BASE_URL }}" >> .env
           echo "SYNTHETIC_DATA_MODEL=${{ secrets.SYNTHETIC_DATA_MODEL }}" >> .env
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
           echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+          echo "API_URL=${{ secrets.API_URL }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRE_DAYS=${{ secrets.REFRESH_TOKEN_EXPIRE_DAYS }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> .env
+          echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> .env
+          echo "TEST_USER=${{ secrets.TEST_USER }}" >> .env
+          echo "TEST_ALERT=${{ secrets.TEST_ALERT }}" >> .env
 
       - name: Run Python tests
         id: test
         run: | 
           pytest src/tests/* | tee test_results.txt
           echo "status=${PIPESTATUS[0]}" >> $GITHUB_ENV
-        continue-on-error: true
 
       - name: Install GitHub CLI
+        if: always()
         run: |
           sudo apt update && sudo apt install -y gh
 
       - name: Create Issue on Failure (GH CLI)
+        if: env.status != 0
         run: |
-          if [ "$status" -ne 0 ]; then
-            STATUS="Failure"
             gh issue create --title "Test Run: $STATUS in $GITHUB_REF_NAME" \
                           --body "$(cat test_results.txt | head -c 6000)" \
                           --label "test-failure"
-          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail job if tests failed
+        if: env.status != '0'
+        run: exit 1

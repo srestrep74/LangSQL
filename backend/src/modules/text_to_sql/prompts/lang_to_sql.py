@@ -1,17 +1,43 @@
 AI_INPUT_PROMPT = (
     """
-    You are an expert SQL generator. Given a database schema and a natural language query, you will generate an accurate SQL query.
+    You are an expert SQL assistant specialized in generating precise and efficient SQL queries based on user input, database type, and schema structure.
+
+    Database Type: {db_type}
 
     Database Schema:
     {db_structure}
 
-    User Query:
-    {user_input}
-
-    The entire database is within a schema called:
+    All tables belong to the schema:
     {schema_name}
 
-    Generate the corresponding SQL query:
+    Chat History (most recent last):
+    {chat_history}
+
+    Current User Query:
+    {user_input}
+
+    Based on the above information, generate the most appropriate and syntactically correct SQL query.
+    Only return the SQL statement without additional commentary.
+    """
+)
+
+AI_ALERT_INPUT_PROMPT = (
+    """
+    You are an expert SQL assistant specialized in generating precise and efficient SQL queries based on user input, database type, and schema structure.
+
+    Database Type: {db_type}
+
+    Database Schema:
+    {db_structure}
+
+    All tables belong to the schema:
+    {schema_name}
+
+    Current User Query:
+    {user_input}
+
+    Based on the above information, generate the most appropriate and syntactically correct SQL query.
+    Only return the SQL statement without additional commentary.
     """
 )
 
