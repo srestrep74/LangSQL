@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import TextToSqlService from '@/services/TextToSqlService';
-import type { QueryResults } from '@/interfaces/ApiResponse';
+import type { QueryResults, ChatData } from '@/interfaces/ApiResponse';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
+import { userStore } from '@/store/userStore';
 
 const userQuery = ref('');
 const chatMessages = ref<Array<{ type: string; content: string }>>([]);
@@ -26,7 +27,15 @@ const sendQuery = async () => {
   isLoading.value = true;
 
   try {
-    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value);
+    const chatData: ChatData = {
+      user_id: userStore.user?.id || '',
+      messages: chatMessages.value.map(message => ({
+        role: message.type === 'user' ? 1 : 0,
+        message: message.content,
+        timestamp: new Date().toISOString()
+      }))
+    };
+    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value, chatData);
 
     if (!response || !response.header) {
       throw new Error('Invalid response from backend');

@@ -7,6 +7,17 @@ export interface QueryResults {
     sql_results: string;
 }
 
+export interface ChatData {
+    user_id: string;
+    messages: Message[];
+}
+
+export interface Message {
+    role: number;
+    message: string;
+    timestamp: string;
+}
+
 export interface ApiResponse {
     status: string;
     message: string;
