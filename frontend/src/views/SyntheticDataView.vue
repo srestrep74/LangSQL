@@ -4,9 +4,7 @@ import { useRouter } from 'vue-router';
 import SyntheticDataService from '../services/SyntheticDataService';
 
 const router = useRouter();
-/**
-This will be replaced for an API call in the next sprint
-*/
+
 const databaseSchema = ref(`{
   "Product": {
     "id": "int",
@@ -50,6 +48,8 @@ const databaseSchema = ref(`{
 
 const dataAmount = ref(40);
 const errorMessage = ref('');
+const toastMessage = ref('');
+const toastType = ref<'info' | 'success' | 'danger'>('info');
 const showToast = ref(false);
 
 const validateInput = () => {
@@ -64,24 +64,28 @@ const validateInput = () => {
   }
 };
 
-const generateData = async () => {
-  validateInput();
-  if (errorMessage.value) return;
-
+const triggerToast = (message: string, type: 'info' | 'success' | 'danger') => {
+  toastMessage.value = message;
+  toastType.value = type;
   showToast.value = true;
 
   setTimeout(() => {
     showToast.value = false;
-  }, 7000);
+  }, 4000);
+};
 
+const generateData = async () => {
+  validateInput();
+  if (errorMessage.value) return;
+
+  triggerToast('⏳ Data is being generated. You will be notified shortly.', 'info');
 
   try {
     const response = await SyntheticDataService.postSyntheticData(dataAmount.value);
 
     if (response.status === "success") {
-      alert("Data generation request successful! You can now check your database.");
+      triggerToast("✅ Data generation request successful! Redirecting...", 'success');
       setTimeout(() => {
-        showToast.value = false;
         router.push('/');
       }, 2000);
     } else {
@@ -89,16 +93,15 @@ const generateData = async () => {
     }
   } catch (error) {
     console.error("Failed to generate data:", error);
-    alert("An error occurred while generating data. Please try again.");
-    showToast.value = false;
+    triggerToast("❌ An error occurred while generating data. Please try again.", 'danger');
   }
 };
 </script>
 
 <template>
   <div class="synthetic-data-view">
-    <div v-if="showToast" class="toast-message">
-      <p>Data is being generated. You will be notified when the process is complete.</p>
+    <div v-if="showToast" :class="['toast-message', toastType]">
+      <p>{{ toastMessage }}</p>
     </div>
 
     <div class="description">
@@ -204,6 +207,32 @@ const generateData = async () => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   animation: fadeIn 0.5s ease-in-out;
+}
+
+.toast-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.toast-message.info {
+  background-color: #6c757d;
+}
+
+.toast-message.success {
+  background-color: #198754;
+}
+
+.toast-message.danger {
+  background-color: #dc3545;
 }
 
 @keyframes fadeIn {
