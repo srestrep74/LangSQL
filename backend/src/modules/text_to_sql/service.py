@@ -17,7 +17,7 @@ class SyntheticDataModelService:
         self.query_adapter = query_adapter
         self.llm_client = llm_client
 
-    def generate_synthetic_data(self, iterations: int, connection: DatabaseConnection) -> str:
+    async def generate_synthetic_data(self, iterations: int, connection: DatabaseConnection) -> str:
         iterations = iterations // 40
         db_structure = self.query_adapter.get_db_structure(connection)
         user_input = GENERATE_SYNTHETIC_DATA_PROMPT.format(
