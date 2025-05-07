@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 import httpx
 from fastapi import Depends
@@ -74,6 +75,8 @@ class AlertService:
             alerts = await self.alert_repository.get_alerts()
             for alert in alerts:
                 if alert.sent:
+                    continue
+                if alert.expiration_date and datetime.now() > alert.expiration_date:
                     continue
                 try:
                     user_id = alert.user
