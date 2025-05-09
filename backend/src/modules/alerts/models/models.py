@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from pydantic import BaseModel, EmailStr
 
@@ -16,6 +16,7 @@ class AlertCreate(BaseModel):
     sent: bool = False
     expiration_date: datetime
     sql_query: Optional[str] = None
+    credentials: Optional[List[Dict[str, Any]]] = None
     creation_date: datetime = datetime.utcnow()
     user: str
 
