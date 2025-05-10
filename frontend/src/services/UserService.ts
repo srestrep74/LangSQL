@@ -7,7 +7,7 @@ class UserService {
   async register(userData: UserCreate): Promise<any> {
     try {
       const response = await api.post<any>('/auth/create', userData);
-      
+
       if (response.data.status !== 'success') {
         throw new Error(response.data.message || 'Registration failed');
       }
@@ -24,11 +24,11 @@ class UserService {
   async login(credentials: { email: string; password: string }): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
-      
+
       if (response.data.status !== 'success') {
         throw new Error(response.data.message || 'Login failed');
       }
-      
+
       return response.data;
     } catch (error: unknown) {
       if (isAxiosError(error)) {
