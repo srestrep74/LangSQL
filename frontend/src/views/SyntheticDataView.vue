@@ -1,51 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import SyntheticDataService from '../services/SyntheticDataService';
 
 const router = useRouter();
 
-const databaseSchema = ref(`{
-  "Product": {
-    "id": "int",
-    "name": "string",
-    "description": "string",
-    "standard_cost": "double",
-    "profit": "double",
-    "price": "double",
-    "category_id": "int"
-  },
-  "WarehouseProduct": {
-    "id": "int",
-    "product_id": "int",
-    "warehouse_id": "int",
-    "quantity": "int"
-  },
-  "Warehouse": {
-    "id": "int",
-    "region": "string",
-    "country": "string",
-    "state": "string",
-    "city": "string",
-    "postal_code": "int",
-    "address": "string",
-    "name": "string"
-  },
-  "Employee": {
-    "id": "int",
-    "name": "string",
-    "email": "string",
-    "phone": "string",
-    "hire_date": "date_time",
-    "job_title": "string",
-    "warehouse_id": "int"
-  },
-  "Category": {
-    "id": "int",
-    "name": "string"
-  }
-}`);
-
+const databaseSchema = ref<string | null>(null);
 const dataAmount = ref(40);
 const errorMessage = ref('');
 const toastMessage = ref('');
@@ -96,6 +57,16 @@ const generateData = async () => {
     triggerToast("❌ An error occurred while generating data. Please try again.", 'danger');
   }
 };
+
+onMounted(async () => {
+  try {
+    const schema = await SyntheticDataService.getDatabaseSchema();
+    databaseSchema.value = JSON.stringify(schema, null, 2);
+  } catch (error) {
+    triggerToast('❌ Failed to load database schema.', 'danger');
+    console.error(error);
+  }
+});
 </script>
 
 <template>
@@ -115,7 +86,8 @@ const generateData = async () => {
     <div class="schema-section">
       <h3 class="text-custom-purple">Database Schema</h3>
       <div class="schema-display">
-        <pre>{{ databaseSchema }}</pre>
+        <pre v-if="databaseSchema">{{ databaseSchema }}</pre>
+        <p v-else class="text-muted">Loading Schema...</p>
       </div>
     </div>
 

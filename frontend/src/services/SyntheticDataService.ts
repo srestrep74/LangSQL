@@ -11,22 +11,20 @@ class SyntheticDataService {
       }
 
       const response = await api.post('/queries/db_structure/', {
-        connection: {
-          db_type: credentials.dbType,
-          username: credentials.user,
-          password: credentials.password,
-          host: credentials.host,
-          port: credentials.port,
-          database_name: credentials.db_name,
-          schema_name: credentials.schema_name
-        }
+        db_type: credentials.dbType,
+        username: credentials.user,
+        password: credentials.password,
+        host: credentials.host,
+        port: credentials.port,
+        database_name: credentials.db_name,
+        schema_name: credentials.schema_name
       });
 
       if (!response.data) {
         throw new Error('Empty response from server');
       }
 
-      return response.data.db_structure;
+      return response.data.data.db_structure;
     } catch (error: unknown) {
       if (isAxiosError(error)) {
         const errorData = error.response?.data as ApiErrorResponse;
