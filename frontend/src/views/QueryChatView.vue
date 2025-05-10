@@ -15,7 +15,6 @@ const isLoading = ref(false);
 const currentChatId = ref<string | null>(null);
 const userChats = ref<any[]>([]);
 
-// Load chat if ID is provided in the route
 onMounted(async () => {
   if (route.params.chatId) {
     currentChatId.value = route.params.chatId as string;
@@ -25,7 +24,6 @@ onMounted(async () => {
   }
 });
 
-// Watch for changes in the route
 watch(() => route.params.chatId, async (newChatId) => {
   if (newChatId) {
     currentChatId.value = newChatId as string;
@@ -33,7 +31,6 @@ watch(() => route.params.chatId, async (newChatId) => {
   }
 });
 
-// Load existing chats for the user
 async function loadChats() {
   if (!dbCredentialsStore.credentials) return;
 
@@ -44,28 +41,21 @@ async function loadChats() {
     };
 
     const response = await TextToSqlService.processQuery('', chatData);
-    console.log("Load chats response:", response);
 
     if (response && response.chats) {
       userChats.value = response.chats;
     } else {
-      console.warn("No chats found in response:", response);
       userChats.value = [];
     }
   } catch (error) {
-    console.error('Error loading chats:', error);
     userChats.value = [];
   }
 }
 
-// Process and extract SQL results from a bot message
 function processBotMessage(message: string): void {
-  // Check if the message contains SQL results
   if (message.includes('[{') && message.includes('}]')) {
-    // Try to extract the array part
     const parts = message.split(/(\[{.*}\])/);
     if (parts.length >= 3) {
-      // Add the text part if not empty
       const headerText = parts[0].trim();
       if (headerText) {
         chatMessages.value.push({
@@ -74,38 +64,29 @@ function processBotMessage(message: string): void {
         });
       }
 
-      // Try to parse and display the SQL results
       try {
         const jsonText = parts[1];
         const extractedData = JSON.parse(jsonText.replace(/'/g, '"'));
         if (Array.isArray(extractedData) && extractedData.length > 0) {
-          // Determine a good title for the table
           let tableTitle = 'SQL Results';
-
-          // If there's text before the array, use it as the title
           if (headerText) {
-            // Sometimes the text has a colon at the end - remove it for the title
             tableTitle = headerText.replace(/\:$/, '').trim();
           }
-
           addSqlResultsTable(extractedData, tableTitle);
         }
       } catch (parseError) {
-        console.error("Failed to parse SQL results in message:", parseError);
         chatMessages.value.push({
           type: 'bot',
           content: message.replace(/\n/g, '<br>')
         });
       }
     } else {
-      // Just add the message as is
       chatMessages.value.push({
         type: 'bot',
         content: message.replace(/\n/g, '<br>')
       });
     }
   } else {
-    // No SQL results in this message
     chatMessages.value.push({
       type: 'bot',
       content: message.replace(/\n/g, '<br>')
@@ -113,7 +94,6 @@ function processBotMessage(message: string): void {
   }
 }
 
-// Load chat history for a specific chat
 async function loadChatHistory(chatId: string) {
   if (!dbCredentialsStore.credentials) {
     chatMessages.value = [{
@@ -132,42 +112,29 @@ async function loadChatHistory(chatId: string) {
       messages: []
     };
 
-    console.log(`Attempting to load chat history for ID: ${chatId}`);
-
     try {
       const response = await TextToSqlService.processQuery('', chatData, chatId);
-      console.log("Chat history response:", response);
 
       if (response && response.messages) {
-        // Process each message in the history
         for (const msg of response.messages) {
           if (msg.role === 1) {
-            // User message
             chatMessages.value.push({
               type: 'user',
               content: msg.message
             });
           } else {
-            // Bot message - process and format it
             processBotMessage(msg.message);
           }
         }
 
-        // Also update the chat list if available
         if (response.chats) {
           userChats.value = response.chats;
         }
       } else {
-        console.warn("No messages found in response:", response);
-        // If no messages but response is valid, just show empty chat
         chatMessages.value = [];
       }
     } catch (error: any) {
-      console.error('API error loading chat history:', error);
-
-      // If this chat doesn't exist, create a new chat
       if (error.message && error.message.includes("no attribute 'messages'")) {
-        console.log("Chat not found, creating a new one");
         currentChatId.value = null;
         chatMessages.value = [];
         router.push('/chat');
@@ -181,7 +148,6 @@ async function loadChatHistory(chatId: string) {
     }
 
   } catch (error) {
-    console.error('Unexpected error loading chat history:', error);
     chatMessages.value.push({
       type: 'bot',
       content: 'Error loading chat history. Please try again.'
@@ -191,12 +157,10 @@ async function loadChatHistory(chatId: string) {
   }
 }
 
-// Select a chat from history
 function selectChat(chatId: string) {
   router.push(`/chat/${chatId}`);
 }
 
-// Create a new chat
 function createNewChat() {
   currentChatId.value = null;
   chatMessages.value = [];
@@ -236,7 +200,6 @@ const sendQuery = async () => {
       currentChatId.value
     );
 
-    // If this is a new chat, get the chat ID from the response
     if (!currentChatId.value && response.chat_id) {
       currentChatId.value = response.chat_id;
       router.push(`/chat/${currentChatId.value}`);
@@ -253,7 +216,6 @@ const sendQuery = async () => {
 
     await formatBotResponse(response);
 
-    // Update chat list after sending a message
     if (response.chats) {
       userChats.value = response.chats;
     }
@@ -273,95 +235,67 @@ const sendQuery = async () => {
 };
 
 async function formatBotResponse(response: QueryResults): Promise<void> {
-  // First add the human response header
   if (response.header) {
     const formattedHeader = response.header
       .replace(/\n/g, '<br>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-    // Check if the header contains SQL results as text
     const arrayPattern = /\[(.*)\]/;
     const match = formattedHeader.match(arrayPattern);
 
     if (match && match[0].includes('{') && match[0].includes('}')) {
-      // There appears to be JSON array data in the text
       try {
-        // Extract just the array part
         let jsonText = match[0];
         const extractedData = JSON.parse(jsonText.replace(/'/g, '"'));
 
         if (Array.isArray(extractedData) && extractedData.length > 0) {
-          // Remove the array part from the header
           const cleanHeader = formattedHeader.replace(jsonText, '').trim();
-
-          // Determine a good title for the table
           let tableTitle = 'SQL Results';
-
-          // If there's text before the array, use it as the title
           if (cleanHeader) {
-            // Sometimes the text has a colon at the end - remove it for the title
             tableTitle = cleanHeader.replace(/\:$/, '').trim();
           }
-
-          // Add the header text if it's not empty
           if (cleanHeader && !cleanHeader.endsWith('<br>')) {
             chatMessages.value.push({ type: 'bot', content: cleanHeader });
           }
-
-          // Add the data as a formatted table
           addSqlResultsTable(extractedData, tableTitle);
           return;
         }
-      } catch (error) {
-        console.error("Failed to parse SQL results from text:", error);
-        // Fall back to adding the original message
-      }
+      } catch (error) {}
     }
 
-    // If no SQL data was extracted, add the original header
     chatMessages.value.push({ type: 'bot', content: formattedHeader });
   }
 
-  // Then add SQL results if they exist separately
   if (response.sql_results) {
     try {
-      // Handle the sql_results which could be a string or an array
       let sqlResults;
 
       if (typeof response.sql_results === 'string') {
-        // Try to parse the string as JSON
         try {
           const fixedJsonString = response.sql_results.replace(/'/g, '"');
           sqlResults = JSON.parse(fixedJsonString);
         } catch (parseError) {
-          console.error("Error parsing SQL results:", parseError);
           sqlResults = [];
         }
       } else if (Array.isArray(response.sql_results)) {
-        // If it's already an array, use it directly
         sqlResults = response.sql_results;
       } else {
-        // Default to empty array if not a string or array
         sqlResults = [];
       }
 
       if (Array.isArray(sqlResults) && sqlResults.length > 0) {
-        // Determine the title based on the SQL query
         let tableTitle = 'Query Results';
 
         if (response.sql_query) {
-          // Extract SELECT statement for the title
           const queryMatch = response.sql_query.match(/SELECT\s+(.*?)\s+FROM/i);
           if (queryMatch && queryMatch[1]) {
             if (queryMatch[1].includes('*')) {
-              // If it's SELECT *, use the table name instead
               const tableMatch = response.sql_query.match(/FROM\s+(\w+)/i);
               if (tableMatch && tableMatch[1]) {
                 tableTitle = `Data from ${tableMatch[1]}`;
               }
             } else {
-              // Use a shortened version of the SELECT clause
               const fields = queryMatch[1].split(',').map(f => f.trim());
               if (fields.length > 2) {
                 tableTitle = `Selected Fields (${fields.length})`;
@@ -378,7 +312,6 @@ async function formatBotResponse(response: QueryResults): Promise<void> {
         chatMessages.value.push({ type: 'bot', content: 'No results found in the query.' });
       }
     } catch (error) {
-      console.error("Error rendering SQL results:", error);
       chatMessages.value.push({ type: 'bot', content: 'Error displaying SQL results.' });
     }
   }
@@ -389,7 +322,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
 
   const columns = Object.keys(data[0]);
 
-  // Format table headers - capitalize and replace underscores with spaces
   const tableHeaders = columns.map(column => {
     const formattedHeader = column
       .replace(/_/g, ' ')
@@ -397,7 +329,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
     return `<th>${formattedHeader}</th>`;
   }).join('');
 
-  // Format table rows with better value handling
   const tableRows = data.map((row: Record<string, any>) =>
     `<tr>${columns.map(column => {
       const value = row[column];
@@ -406,7 +337,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       if (value === null) {
         formattedValue = '<span class="null-value">NULL</span>';
       } else if (typeof value === 'number') {
-        // Format numbers with commas for thousands and fixed decimal places
         formattedValue = Number.isInteger(value)
           ? value.toLocaleString()
           : value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -443,7 +373,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
 
 <template>
   <main class="container d-flex" style="height: 90vh; margin-top: 20px;">
-    <!-- Chat history sidebar -->
     <div class="chat-sidebar">
       <div class="chat-sidebar-header">
         <h3>Your Chats</h3>
@@ -476,7 +405,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       </div>
     </div>
 
-    <!-- Main chat area -->
     <div class="chat-main">
       <div class="chat-container w-100 d-flex flex-column">
         <div v-if="isLoading && chatMessages.length === 0" class="loading-message">
@@ -531,14 +459,12 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Chat layout */
 .container {
   gap: 20px;
   padding: 0 15px;
   max-width: 1400px;
 }
 
-/* Sidebar styles */
 .chat-sidebar {
   width: 280px;
   border-right: 1px solid #ddd;
@@ -614,7 +540,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   padding: 20px 0;
 }
 
-/* Main chat area */
 .chat-main {
   flex: 1;
   display: flex;
@@ -647,7 +572,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   padding: 20px;
 }
 
-/* SQL Table Styles - Enhanced version */
 .sql-table-container {
   overflow-x: auto;
   margin-top: 15px;
@@ -788,7 +712,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   animation: dots 1.5s steps(3, end) infinite;
 }
 
-/* Modal de carga */
 .loading-modal {
   position: fixed;
   top: 0;
@@ -811,7 +734,6 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   text-align: center;
 }
 
-/* SQL Results Section */
 .sql-results-section {
   margin: 20px 0;
   background: white;

@@ -46,16 +46,13 @@ class LangToSqlService:
         self.repository = TextToSqlRepository
 
     async def chat(self, connection: DatabaseConnection, user_input: Optional[str], chat_data: Chat, chat_id: str) -> Dict:
-        # If chat_id is provided, verify it exists
         if chat_id:
             existing_chat = await self.repository.get_chat(chat_id)
             if not existing_chat:
-                # If the chat doesn't exist, create a new one
                 chat_id = await self.repository.create_chat(chat_data)
                 if not chat_id:
                     return {"error": "Failed to create chat"}
         elif not chat_id:
-            # If no chat_id was provided, create a new one
             chat_id = await self.repository.create_chat(chat_data)
             if not chat_id:
                 return {"error": "Failed to create chat"}
