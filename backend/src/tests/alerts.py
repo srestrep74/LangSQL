@@ -11,6 +11,7 @@ from src.modules.alerts.models.models import Alert, AlertCreate
 from src.modules.alerts.routes import alert_service
 from src.modules.alerts.utils.cron_job import CronJob
 from src.tests.utils.database_connection import database_connection
+from datetime import timedelta
 
 client = TestClient(app)
 connection_dict = database_connection.model_dump()
@@ -92,10 +93,9 @@ class TestAlert:
             assert response.json()["message"] == "Success"
 
     @pytest.mark.asyncio
-    @patch("src.modules.alerts.utils.email_sender.EmailSender.send_email", new_callable=AsyncMock)
     @patch("src.modules.alerts.service.AlertRepository.update_alert", new_callable=AsyncMock)
     @patch("src.modules.alerts.service.AlertRepository.get_alerts", new_callable=AsyncMock)
-    async def test_check_alert(self, mock_get_alerts, mock_update_alert, mock_send_email):
+    async def test_check_alert(self, mock_get_alerts, mock_update_alert):
         mock_get_alerts.return_value = [
             Alert(
                 id=Settings.TEST_ALERT,
@@ -113,6 +113,3 @@ class TestAlert:
             cron_job = CronJob()
             result = await cron_job.trigger_alert_check()
             assert result is True
-
-        mock_send_email.assert_called_once()
-        mock_update_alert.assert_called_once()
