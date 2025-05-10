@@ -14,6 +14,11 @@ const chatMessages = ref<Array<{ type: string; content: string }>>([]);
 const isLoading = ref(false);
 const currentChatId = ref<string | null>(null);
 const userChats = ref<any[]>([]);
+const isEditingTitle = ref(false);
+const editedTitle = ref('');
+const editingChatId = ref<string | null>(null);
+const showDeleteModal = ref(false);
+const chatToDelete = ref<string | null>(null);
 
 onMounted(async () => {
   if (route.params.chatId) {
@@ -165,6 +170,93 @@ function createNewChat() {
   currentChatId.value = null;
   chatMessages.value = [];
   router.push('/chat');
+}
+
+async function deleteChat(chatId: string, event: Event) {
+  event.stopPropagation();
+
+  chatToDelete.value = chatId;
+  showDeleteModal.value = true;
+}
+
+async function confirmDeleteChat() {
+  if (!chatToDelete.value) return;
+
+  try {
+    isLoading.value = true;
+    await TextToSqlService.deleteChat(chatToDelete.value);
+
+    userChats.value = userChats.value.filter(chat =>
+      (chat.chat_id || chat.id) !== chatToDelete.value
+    );
+
+    if (currentChatId.value === chatToDelete.value) {
+      currentChatId.value = null;
+      chatMessages.value = [];
+      router.push('/chat');
+    }
+  } catch (error: any) {
+    alert(`Error deleting chat: ${error.message || 'Unknown error'}`);
+  } finally {
+    isLoading.value = false;
+    showDeleteModal.value = false;
+    chatToDelete.value = null;
+  }
+}
+
+function cancelDeleteChat() {
+  showDeleteModal.value = false;
+  chatToDelete.value = null;
+}
+
+function startEditingTitle(chatId: string, currentTitle: string, event: Event) {
+  event.stopPropagation();
+  editingChatId.value = chatId;
+  editedTitle.value = currentTitle.startsWith('Chat ') ? '' : currentTitle;
+  isEditingTitle.value = true;
+
+  setTimeout(() => {
+    const input = document.getElementById('edit-title-input');
+    if (input) {
+      input.focus();
+    }
+  }, 50);
+}
+
+async function saveChatTitle(chatId: string, event: Event) {
+  event.stopPropagation();
+
+  if (!editedTitle.value.trim()) {
+    cancelEditingTitle(event);
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+    await TextToSqlService.renameChat(chatId, editedTitle.value.trim());
+
+    // Update chat title in the list
+    const chatIndex = userChats.value.findIndex(chat =>
+      (chat.chat_id || chat.id) === chatId
+    );
+
+    if (chatIndex !== -1) {
+      userChats.value[chatIndex].title = editedTitle.value.trim();
+    }
+
+  } catch (error: any) {
+    alert(`Error renaming chat: ${error.message || 'Unknown error'}`);
+  } finally {
+    isEditingTitle.value = false;
+    editingChatId.value = null;
+    isLoading.value = false;
+  }
+}
+
+function cancelEditingTitle(event: Event) {
+  event.stopPropagation();
+  isEditingTitle.value = false;
+  editingChatId.value = null;
 }
 
 const sendQuery = async () => {
@@ -389,13 +481,44 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
           :class="{ 'active': currentChatId === (chat.chat_id || chat.id) }"
           @click="selectChat(chat.chat_id || chat.id)"
         >
-          <div class="chat-title">
-            {{ chat.title || 'Chat ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
+          <div class="chat-content">
+            <div v-if="isEditingTitle && editingChatId === (chat.chat_id || chat.id)" class="chat-title-edit">
+              <input
+                id="edit-title-input"
+                v-model="editedTitle"
+                @keyup.enter="saveChatTitle(chat.chat_id || chat.id, $event)"
+                @keyup.esc="cancelEditingTitle($event)"
+                class="title-input"
+                type="text"
+              />
+              <div class="edit-actions">
+                <button class="btn-icon" @click="saveChatTitle(chat.chat_id || chat.id, $event)">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn-icon" @click="cancelEditingTitle($event)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div v-else>
+              <div class="chat-title">
+                {{ chat.title || 'Chat ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
+              </div>
+              <div class="chat-preview">
+                {{ chat.messages && chat.messages.length > 0 ?
+                  chat.messages[chat.messages.length - 1].message.substring(0, 30) + '...' :
+                  'No messages' }}
+              </div>
+            </div>
           </div>
-          <div class="chat-preview">
-            {{ chat.messages && chat.messages.length > 0 ?
-               chat.messages[chat.messages.length - 1].message.substring(0, 30) + '...' :
-               'No messages' }}
+
+          <div v-if="!isEditingTitle || editingChatId !== (chat.chat_id || chat.id)" class="chat-actions">
+            <button class="btn-icon" @click="startEditingTitle(chat.chat_id || chat.id, chat.title || 'Chat ' + (chat.chat_id || chat.id)?.substring(0, 8), $event)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-icon" @click="deleteChat(chat.chat_id || chat.id, $event)">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </div>
 
@@ -425,6 +548,23 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       <div class="input-group-container">
         <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="chat-input" placeholder="Type your message..." />
         <button @click="sendQuery" class="btn-custom-send">Send</button>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="delete-modal-overlay">
+      <div class="delete-modal">
+        <div class="delete-modal-header">
+          <h4>Confirm Delete</h4>
+        </div>
+        <div class="delete-modal-body">
+          <p>Are you sure you want to delete this chat?</p>
+          <p class="delete-warning">This action cannot be undone.</p>
+        </div>
+        <div class="delete-modal-footer">
+          <button @click="cancelDeleteChat" class="btn-cancel">Cancel</button>
+          <button @click="confirmDeleteChat" class="btn-delete">Delete</button>
+        </div>
       </div>
     </div>
   </main>
@@ -509,6 +649,9 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   margin-bottom: 8px;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .chat-item:hover {
@@ -518,6 +661,11 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
 .chat-item.active {
   background-color: #f0e6f0;
   border-left: 3px solid #7b0779;
+}
+
+.chat-content {
+  flex: 1;
+  overflow: hidden;
 }
 
 .chat-title {
@@ -532,6 +680,49 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.chat-actions {
+  display: none;
+  margin-left: 8px;
+}
+
+.chat-item:hover .chat-actions {
+  display: flex;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  padding: 2px 5px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-icon:hover {
+  color: #7b0779;
+}
+
+.chat-title-edit {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.title-input {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.edit-actions {
+  display: flex;
+  margin-left: 5px;
 }
 
 .no-chats {
@@ -774,5 +965,95 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
 .null-value {
   color: #999;
   font-style: italic;
+}
+
+/* Delete Modal Styles */
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.delete-modal {
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.delete-modal-header {
+  background: linear-gradient(135deg, #7b0779, #a01fa0);
+  color: white;
+  padding: 15px 20px;
+}
+
+.delete-modal-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.delete-modal-body {
+  padding: 20px;
+  color: #333;
+}
+
+.delete-warning {
+  color: #d9534f;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.delete-modal-footer {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #eee;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #e5e5e5;
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #d9534f, #c9302c);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.btn-delete:hover {
+  transform: scale(1.05);
+}
+
+@keyframes modalSlideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 </style>
