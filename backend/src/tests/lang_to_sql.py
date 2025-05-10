@@ -101,8 +101,9 @@ class TestSyntheticData:
 
         return SyntheticDataModelService(mock_query_adapter, llm_client)
 
-    def test_generate_synthetic_data_service(self, mock_synthetic_data_service):
-        response = mock_synthetic_data_service.generate_synthetic_data(iterations=40, connection=database_connection)
+    @pytest.mark.asyncio
+    async def test_generate_synthetic_data_service(self, mock_synthetic_data_service):
+        response = await mock_synthetic_data_service.generate_synthetic_data(iterations=40, connection=database_connection)
 
         assert isinstance(response, str)
         assert "INSERT INTO" in response

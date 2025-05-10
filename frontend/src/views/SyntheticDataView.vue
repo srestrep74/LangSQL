@@ -1,55 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import SyntheticDataService from '../services/SyntheticDataService';
 
 const router = useRouter();
-/**
-This will be replaced for an API call in the next sprint
-*/
-const databaseSchema = ref(`{
-  "Product": {
-    "id": "int",
-    "name": "string",
-    "description": "string",
-    "standard_cost": "double",
-    "profit": "double",
-    "price": "double",
-    "category_id": "int"
-  },
-  "WarehouseProduct": {
-    "id": "int",
-    "product_id": "int",
-    "warehouse_id": "int",
-    "quantity": "int"
-  },
-  "Warehouse": {
-    "id": "int",
-    "region": "string",
-    "country": "string",
-    "state": "string",
-    "city": "string",
-    "postal_code": "int",
-    "address": "string",
-    "name": "string"
-  },
-  "Employee": {
-    "id": "int",
-    "name": "string",
-    "email": "string",
-    "phone": "string",
-    "hire_date": "date_time",
-    "job_title": "string",
-    "warehouse_id": "int"
-  },
-  "Category": {
-    "id": "int",
-    "name": "string"
-  }
-}`);
 
+const databaseSchema = ref<string | null>(null);
 const dataAmount = ref(40);
 const errorMessage = ref('');
+const toastMessage = ref('');
+const toastType = ref<'info' | 'success' | 'danger'>('info');
 const showToast = ref(false);
 
 const validateInput = () => {
@@ -64,24 +25,28 @@ const validateInput = () => {
   }
 };
 
-const generateData = async () => {
-  validateInput();
-  if (errorMessage.value) return;
-
+const triggerToast = (message: string, type: 'info' | 'success' | 'danger') => {
+  toastMessage.value = message;
+  toastType.value = type;
   showToast.value = true;
 
   setTimeout(() => {
     showToast.value = false;
-  }, 7000);
+  }, 4000);
+};
 
+const generateData = async () => {
+  validateInput();
+  if (errorMessage.value) return;
+
+  triggerToast('⏳ Data is being generated. You will be notified shortly.', 'info');
 
   try {
     const response = await SyntheticDataService.postSyntheticData(dataAmount.value);
 
     if (response.status === "success") {
-      alert("Data generation request successful! You can now check your database.");
+      triggerToast("✅ Data generation request successful! Redirecting...", 'success');
       setTimeout(() => {
-        showToast.value = false;
         router.push('/');
       }, 2000);
     } else {
@@ -89,16 +54,25 @@ const generateData = async () => {
     }
   } catch (error) {
     console.error("Failed to generate data:", error);
-    alert("An error occurred while generating data. Please try again.");
-    showToast.value = false;
+    triggerToast("❌ An error occurred while generating data. Please try again.", 'danger');
   }
 };
+
+onMounted(async () => {
+  try {
+    const schema = await SyntheticDataService.getDatabaseSchema();
+    databaseSchema.value = JSON.stringify(schema, null, 2);
+  } catch (error) {
+    triggerToast('❌ Failed to load database schema.', 'danger');
+    console.error(error);
+  }
+});
 </script>
 
 <template>
   <div class="synthetic-data-view">
-    <div v-if="showToast" class="toast-message">
-      <p>Data is being generated. You will be notified when the process is complete.</p>
+    <div v-if="showToast" :class="['toast-message', toastType]">
+      <p>{{ toastMessage }}</p>
     </div>
 
     <div class="description">
@@ -112,7 +86,8 @@ const generateData = async () => {
     <div class="schema-section">
       <h3 class="text-custom-purple">Database Schema</h3>
       <div class="schema-display">
-        <pre>{{ databaseSchema }}</pre>
+        <pre v-if="databaseSchema">{{ databaseSchema }}</pre>
+        <p v-else class="text-muted">Loading Schema...</p>
       </div>
     </div>
 
@@ -204,6 +179,32 @@ const generateData = async () => {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   animation: fadeIn 0.5s ease-in-out;
+}
+
+.toast-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 5px;
+  color: white;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.toast-message.info {
+  background-color: #6c757d;
+}
+
+.toast-message.success {
+  background-color: #198754;
+}
+
+.toast-message.danger {
+  background-color: #dc3545;
 }
 
 @keyframes fadeIn {
