@@ -1,11 +1,11 @@
+import base64
+import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from src.config.constants import Settings
 
-import base64
-import os
 
 def get_base64_logo() -> str:
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +16,7 @@ def get_base64_logo() -> str:
     except Exception as e:
         print(f"Error loading logo: {e}")
         return ""
+
 
 class EmailSender:
     def __init__(self):
@@ -52,7 +53,7 @@ class EmailSender:
                     </body>
                 </html>
                 """, "html")
-            )
+                       )
 
             try:
                 with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:

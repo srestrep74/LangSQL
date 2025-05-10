@@ -1,5 +1,5 @@
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 import httpx
 from fastapi import Depends
@@ -12,7 +12,6 @@ from src.config.dependencies import get_query_adapter, get_text_to_sql_adapter
 from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.repositories.repository import AlertRepository
 from src.modules.alerts.utils.email_sender import EmailSender
-from src.modules.auth.repositories.repository import UserRepository
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 api_url = Settings().API_URL

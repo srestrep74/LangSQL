@@ -1,8 +1,8 @@
-import asyncio, pytest
 import json
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app import app
@@ -11,7 +11,6 @@ from src.modules.alerts.models.models import Alert, AlertCreate
 from src.modules.alerts.routes import alert_service
 from src.modules.alerts.utils.cron_job import CronJob
 from src.tests.utils.database_connection import database_connection
-from datetime import timedelta
 
 client = TestClient(app)
 connection_dict = database_connection.model_dump()
