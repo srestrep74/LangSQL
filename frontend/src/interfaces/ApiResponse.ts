@@ -31,8 +31,12 @@ export interface QueryResults {
 export interface ApiResponse {
     status: string;
     message: string;
-    data: {
+    data?: {
         results: QueryResults;
+    };
+    details?: {
+        error: string;
+        [key: string]: any;
     };
     status_code: number;
 }

@@ -46,10 +46,20 @@ class LangToSqlService:
         self.repository = TextToSqlRepository
 
     async def chat(self, connection: DatabaseConnection, user_input: Optional[str], chat_data: Chat, chat_id: str) -> Dict:
-        if not chat_id:
+        # If chat_id is provided, verify it exists
+        if chat_id:
+            existing_chat = await self.repository.get_chat(chat_id)
+            if not existing_chat:
+                # If the chat doesn't exist, create a new one
+                chat_id = await self.repository.create_chat(chat_data)
+                if not chat_id:
+                    return {"error": "Failed to create chat"}
+        elif not chat_id:
+            # If no chat_id was provided, create a new one
             chat_id = await self.repository.create_chat(chat_data)
             if not chat_id:
-                return None
+                return {"error": "Failed to create chat"}
+        
         if not user_input:
             chats = await self.get_chats(chat_data.user_id)
             full_chat = await self.get_messages(chat_id)
@@ -99,11 +109,13 @@ class LangToSqlService:
 
     async def get_messages(self, chat_id: str) -> Dict:
         response = await self.repository.get_chat(chat_id)
+        if response is None:
+            return {"messages": []}
+        
         messages = response.messages
-        response = {
+        return {
             "messages": messages
         }
-        return response
 
     def get_response(self, user_input: str, connection: DatabaseConnection):
         try:
@@ -114,8 +126,9 @@ class LangToSqlService:
         except Exception as e:
             return {"error": str(e)}
     
-    async def get_chats(self, user_id: str) -> List[Chat]:
+    async def get_chats(self, user_id: str) -> List[Dict]:
         try:
             return await self.repository.get_users_chats(user_id)
         except Exception as e:
-            return {"error": str(e)}
+            print(f"Error getting chats for user {user_id}: {str(e)}")
+            return []
