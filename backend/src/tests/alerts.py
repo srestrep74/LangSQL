@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, pytest
 import json
 from datetime import datetime
 from unittest.mock import AsyncMock, patch
@@ -91,10 +91,11 @@ class TestAlert:
             assert response.status_code == 200
             assert response.json()["message"] == "Success"
 
-    @patch("src.modules.alerts.service.EmailSender.send_email", new_callable=AsyncMock)
+    @pytest.mark.asyncio
+    @patch("src.modules.alerts.utils.email_sender.EmailSender.send_email", new_callable=AsyncMock)
     @patch("src.modules.alerts.service.AlertRepository.update_alert", new_callable=AsyncMock)
     @patch("src.modules.alerts.service.AlertRepository.get_alerts", new_callable=AsyncMock)
-    def test_check_alert(self, mock_get_alerts, mock_update_alert, mock_send_email):
+    async def test_check_alert(self, mock_get_alerts, mock_update_alert, mock_send_email):
         mock_get_alerts.return_value = [
             Alert(
                 id=Settings.TEST_ALERT,
@@ -110,7 +111,7 @@ class TestAlert:
 
         with patch("src.modules.alerts.service.QueryAdapter.execute_query", return_value=[{"id": 1}]):
             cron_job = CronJob()
-            result = asyncio.run(cron_job.trigger_alert_check())
+            result = await cron_job.trigger_alert_check()
             assert result is True
 
         mock_send_email.assert_called_once()
