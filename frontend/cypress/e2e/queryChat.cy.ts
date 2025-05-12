@@ -16,7 +16,7 @@ describe('Chat Interface E2E Tests', () => {
       win.sessionStorage.setItem('dbCredentials', JSON.stringify(mockDBCredentials));
     });
 
-    cy.intercept('POST', '**/text-to-sql/process_query', (req) => {
+    cy.intercept('POST', '**/text-to-sql/chat', (req) => {
       if (req.body?.user_input?.toLowerCase().includes('error')) {
         req.reply({
           statusCode: 500,
@@ -37,7 +37,7 @@ describe('Chat Interface E2E Tests', () => {
       }
     }).as('queryRequest');
 
-    cy.intercept('POST', '**/text-to-sql/process_query', (req) => {
+    cy.intercept('POST', '**/text-to-sql/chat', (req) => {
       expect(req.headers['authorization']).to.exist;
       expect(req.headers['authorization']).to.include(mockAccessToken);
     });

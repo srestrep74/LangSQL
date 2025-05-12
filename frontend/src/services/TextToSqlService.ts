@@ -1,11 +1,11 @@
 import api, { isAxiosError } from '@/services/ApiBase';
-import type { ApiResponse, QueryResults } from '@/interfaces/ApiResponse';
+import type { ApiResponse, ChatData, QueryResults } from '@/interfaces/ApiResponse';
 import type { ApiErrorResponse } from '@/interfaces/ApiErrorResponse';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 
 
 class TextToSqlService {
-  async processQuery(query: string): Promise<QueryResults> {
+  async processQuery(query: string, chatData: ChatData): Promise<QueryResults> {
     try {
 
       const credentials = dbCredentialsStore.credentials;
@@ -13,7 +13,7 @@ class TextToSqlService {
         throw new Error('No database credentials found');
       }
 
-      const response = await api.post<ApiResponse>('/text-to-sql/process_query', {
+      const response = await api.post<ApiResponse>('/text-to-sql/chat', {
         user_input: query,
         connection : {
           db_type: credentials.dbType,
@@ -23,7 +23,8 @@ class TextToSqlService {
           port: credentials.port,
           database_name: credentials.db_name,
           schema_name: credentials.schema_name
-        }
+        },
+        chat_data: chatData
       });
 
       if (!response.data?.data?.results) {
