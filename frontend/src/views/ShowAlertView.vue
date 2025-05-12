@@ -23,6 +23,22 @@ const fetchAlert = async () => {
   }
 };
 
+function formatDate(dateStr: string) {
+  const isoStr = dateStr.endsWith('Z') ? dateStr : dateStr + 'Z';
+  const date = new Date(isoStr);
+
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(date);
+}
+
 onMounted(() => {
   fetchAlert();
 });
@@ -87,13 +103,6 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<script lang="ts">
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return date.toLocaleString();
-}
-</script>
 
 <style scoped>
 .text-custom-purple {
