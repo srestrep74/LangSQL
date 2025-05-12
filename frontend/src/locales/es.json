@@ -1,0 +1,16 @@
+{
+    "message": {
+      "database": {
+        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero."
+      },
+      "query": {
+        "processing": "Procesando Consulta",
+        "error": "Error al procesar tu consulta. Por favor intenta nuevamente.",
+        "results": "Resultados SQL:"
+      },
+      "ui": {
+        "placeholder": "Escribe tu mensaje...",
+        "send": "Enviar"
+      }
+    }
+  }
