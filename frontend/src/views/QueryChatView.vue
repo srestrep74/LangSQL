@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router';
 import TextToSqlService from '@/services/TextToSqlService';
 import type { QueryResults, ChatData } from '@/interfaces/ApiResponse';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 import { userStore } from '@/store/userStore';
+
+const { t, locale } = useI18n()
 
 const route = useRoute();
 const router = useRouter();
@@ -73,7 +76,7 @@ function processBotMessage(message: string): void {
         const jsonText = parts[1];
         const extractedData = JSON.parse(jsonText.replace(/'/g, '"'));
         if (Array.isArray(extractedData) && extractedData.length > 0) {
-          let tableTitle = 'SQL Results';
+          let tableTitle = t('message.query.results');
           if (headerText) {
             tableTitle = headerText.replace(/\:$/, '').trim();
           }
@@ -103,7 +106,7 @@ async function loadChatHistory(chatId: string) {
   if (!dbCredentialsStore.credentials) {
     chatMessages.value = [{
       type: 'bot',
-      content: 'Database credentials are missing. Please configure the database connection first.'
+      content: t('message.database.credentialsMissing')
     }];
     return;
   }
@@ -148,14 +151,14 @@ async function loadChatHistory(chatId: string) {
 
       chatMessages.value.push({
         type: 'bot',
-        content: `Error loading chat: ${error.message || 'Unknown error'}`
+        content: `${t('message.ui.errorLoadingChat')}: ${error.message || t('message.ui.unknownError')}`
       });
     }
 
   } catch (error) {
     chatMessages.value.push({
       type: 'bot',
-      content: 'Error loading chat history. Please try again.'
+      content: t('message.ui.errorLoadingHistory')
     });
   } finally {
     isLoading.value = false;
@@ -196,7 +199,7 @@ async function confirmDeleteChat() {
       router.push('/chat');
     }
   } catch (error: any) {
-    alert(`Error deleting chat: ${error.message || 'Unknown error'}`);
+    alert(`${t('message.ui.errorDeletingChat')}: ${error.message || t('message.ui.unknownError')}`);
   } finally {
     isLoading.value = false;
     showDeleteModal.value = false;
@@ -245,7 +248,7 @@ async function saveChatTitle(chatId: string, event: Event) {
     }
 
   } catch (error: any) {
-    alert(`Error renaming chat: ${error.message || 'Unknown error'}`);
+    alert(`${t('message.ui.errorRenamingChat')}: ${error.message || t('message.ui.unknownError')}`);
   } finally {
     isEditingTitle.value = false;
     editingChatId.value = null;
@@ -260,21 +263,24 @@ function cancelEditingTitle(event: Event) {
 }
 
 const sendQuery = async () => {
-  if (!userQuery.value.trim()) return;
+  if (!userQuery.value.trim()) return
 
   if (!dbCredentialsStore.credentials) {
     chatMessages.value.push({
       type: 'bot',
-      content: 'Database credentials are missing. Please configure the database connection first.'
-    });
-    return;
+      content: t('message.database.credentialsMissing')
+    })
+    return
   }
 
-  chatMessages.value.push({ type: 'user', content: userQuery.value });
+  chatMessages.value.push({ type: 'user', content: userQuery.value })
 
-  const loadingMessage = { type: 'bot', content: '<span class="loading-dots">Processing Query</span>' };
-  chatMessages.value.push(loadingMessage);
-  isLoading.value = true;
+  const loadingMessage = {
+    type: 'bot',
+    content: `<span class="loading-dots">${t('message.query.processing')}</span>`
+  }
+  chatMessages.value.push(loadingMessage)
+  isLoading.value = true
 
   try {
     const chatData: ChatData = {
@@ -298,12 +304,12 @@ const sendQuery = async () => {
     }
 
     if (!response || !response.header) {
-      throw new Error('Invalid response from backend');
+      throw new Error('Invalid response from backend')
     }
 
-    const index = chatMessages.value.indexOf(loadingMessage);
+    const index = chatMessages.value.indexOf(loadingMessage)
     if (index !== -1) {
-      chatMessages.value.splice(index, 1);
+      chatMessages.value.splice(index, 1)
     }
 
     await formatBotResponse(response);
@@ -313,14 +319,17 @@ const sendQuery = async () => {
     }
 
   } catch (error) {
-    console.error(error);
-    const index = chatMessages.value.indexOf(loadingMessage);
+    console.error(error)
+    const index = chatMessages.value.indexOf(loadingMessage)
     if (index !== -1) {
-      chatMessages.value.splice(index, 1);
+      chatMessages.value.splice(index, 1)
     }
-    chatMessages.value.push({ type: 'bot', content: 'Error processing your query. Please try again.' });
+    chatMessages.value.push({
+      type: 'bot',
+      content: t('message.query.error')
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 
   userQuery.value = '';
@@ -343,7 +352,7 @@ async function formatBotResponse(response: QueryResults): Promise<void> {
 
         if (Array.isArray(extractedData) && extractedData.length > 0) {
           const cleanHeader = formattedHeader.replace(jsonText, '').trim();
-          let tableTitle = 'SQL Results';
+          let tableTitle = t('message.query.results');
           if (cleanHeader) {
             tableTitle = cleanHeader.replace(/\:$/, '').trim();
           }
@@ -377,7 +386,7 @@ async function formatBotResponse(response: QueryResults): Promise<void> {
       }
 
       if (Array.isArray(sqlResults) && sqlResults.length > 0) {
-        let tableTitle = 'Query Results';
+        let tableTitle = t('message.ui.queryResults');
 
         if (response.sql_query) {
           const queryMatch = response.sql_query.match(/SELECT\s+(.*?)\s+FROM/i);
@@ -385,12 +394,12 @@ async function formatBotResponse(response: QueryResults): Promise<void> {
             if (queryMatch[1].includes('*')) {
               const tableMatch = response.sql_query.match(/FROM\s+(\w+)/i);
               if (tableMatch && tableMatch[1]) {
-                tableTitle = `Data from ${tableMatch[1]}`;
+                tableTitle = `${t('message.ui.dataFrom')} ${tableMatch[1]}`;
               }
             } else {
               const fields = queryMatch[1].split(',').map(f => f.trim());
               if (fields.length > 2) {
-                tableTitle = `Selected Fields (${fields.length})`;
+                tableTitle = `${t('message.ui.selectedFields')} (${fields.length})`;
               } else {
                 tableTitle = queryMatch[1].substring(0, 40);
                 if (queryMatch[1].length > 40) tableTitle += '...';
@@ -401,15 +410,15 @@ async function formatBotResponse(response: QueryResults): Promise<void> {
 
         addSqlResultsTable(sqlResults, tableTitle);
       } else {
-        chatMessages.value.push({ type: 'bot', content: 'No results found in the query.' });
+        chatMessages.value.push({ type: 'bot', content: t('message.ui.noResultsFound') });
       }
     } catch (error) {
-      chatMessages.value.push({ type: 'bot', content: 'Error displaying SQL results.' });
+      chatMessages.value.push({ type: 'bot', content: t('message.ui.errorDisplayingResults') });
     }
   }
 }
 
-function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
+function addSqlResultsTable(data: any[], title: string = t('message.query.results')): void {
   if (!Array.isArray(data) || data.length === 0) return;
 
   const columns = Object.keys(data[0]);
@@ -427,13 +436,13 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       let formattedValue: string;
 
       if (value === null) {
-        formattedValue = '<span class="null-value">NULL</span>';
+        formattedValue = `<span class="null-value">${t('message.ui.null')}</span>`;
       } else if (typeof value === 'number') {
         formattedValue = Number.isInteger(value)
           ? value.toLocaleString()
           : value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       } else if (typeof value === 'boolean') {
-        formattedValue = value ? 'True' : 'False';
+        formattedValue = value ? t('message.ui.true') : t('message.ui.false');
       } else {
         formattedValue = String(value);
       }
@@ -441,6 +450,8 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       return `<td>${formattedValue}</td>`;
     }).join('')}</tr>`
   ).join('');
+
+  const rowCount = t('message.ui.rowReturned', data.length);
 
   const tableHTML = `
     <div class="sql-results-section">
@@ -455,11 +466,17 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
           </tbody>
         </table>
       </div>
-      <div class="sql-results-info">${data.length} row${data.length !== 1 ? 's' : ''} returned</div>
+      <div class="sql-results-info">${data.length} ${rowCount}</div>
     </div>
   `;
 
   chatMessages.value.push({ type: 'bot', content: tableHTML });
+}
+
+// Language switcher function
+const changeLanguage = (lang: 'en' | 'es') => {
+  locale.value = lang
+  localStorage.setItem('userLanguage', lang)
 }
 </script>
 
@@ -467,9 +484,9 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   <main class="container d-flex" style="height: 90vh; margin-top: 20px;">
     <div class="chat-sidebar">
       <div class="chat-sidebar-header">
-        <h3>Your Chats</h3>
+        <h3>{{ t('message.ui.yourChats') }}</h3>
         <button @click="createNewChat" class="btn-new-chat">
-          <i class="fas fa-plus"></i> New Chat
+          <i class="fas fa-plus"></i> {{ t('message.ui.newChat') }}
         </button>
       </div>
 
@@ -490,6 +507,7 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
                 @keyup.esc="cancelEditingTitle($event)"
                 class="title-input"
                 type="text"
+                :placeholder="t('message.ui.enterTitle')"
               />
               <div class="edit-actions">
                 <button class="btn-icon" @click="saveChatTitle(chat.chat_id || chat.id, $event)">
@@ -502,12 +520,12 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
             </div>
             <div v-else>
               <div class="chat-title">
-                {{ chat.title || 'Chat ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
+                {{ chat.title || t('message.ui.chatPrefix') + ' ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
               </div>
               <div class="chat-preview">
                 {{ chat.messages && chat.messages.length > 0 ?
                   chat.messages[chat.messages.length - 1].message.substring(0, 30) + '...' :
-                  'No messages' }}
+                  t('message.ui.noMessages') }}
               </div>
             </div>
           </div>
@@ -523,7 +541,7 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
         </div>
 
         <div v-if="userChats.length === 0" class="no-chats">
-          No chats yet. Start a new conversation!
+          {{ t('message.ui.noChats') }}
         </div>
       </div>
     </div>
@@ -531,12 +549,12 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
     <div class="chat-main">
       <div class="chat-container w-100 d-flex flex-column">
         <div v-if="isLoading && chatMessages.length === 0" class="loading-message">
-          Loading chat history...
+          {{ t('message.ui.loadingHistory') }}
         </div>
 
         <div v-else-if="chatMessages.length === 0" class="empty-chat">
           <div class="empty-chat-message">
-            Start a new conversation by typing a question below
+            {{ t('message.ui.startConversation') }}
           </div>
         </div>
 
@@ -546,8 +564,8 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
       </div>
 
       <div class="input-group-container">
-        <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="chat-input" placeholder="Type your message..." />
-        <button @click="sendQuery" class="btn-custom-send">Send</button>
+        <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="chat-input" :placeholder="t('message.ui.placeholder')" />
+        <button @click="sendQuery" class="btn-custom-send">{{ t('message.ui.send') }}</button>
       </div>
     </div>
 
@@ -555,15 +573,15 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
     <div v-if="showDeleteModal" class="delete-modal-overlay">
       <div class="delete-modal">
         <div class="delete-modal-header">
-          <h4>Confirm Delete</h4>
+          <h4>{{ t('message.ui.confirmDelete') }}</h4>
         </div>
         <div class="delete-modal-body">
-          <p>Are you sure you want to delete this chat?</p>
-          <p class="delete-warning">This action cannot be undone.</p>
+          <p>{{ t('message.ui.deleteConfirmation') }}</p>
+          <p class="delete-warning">{{ t('message.ui.deleteWarning') }}</p>
         </div>
         <div class="delete-modal-footer">
-          <button @click="cancelDeleteChat" class="btn-cancel">Cancel</button>
-          <button @click="confirmDeleteChat" class="btn-delete">Delete</button>
+          <button @click="cancelDeleteChat" class="btn-cancel">{{ t('message.ui.cancel') }}</button>
+          <button @click="confirmDeleteChat" class="btn-delete">{{ t('message.ui.delete') }}</button>
         </div>
       </div>
     </div>
@@ -580,6 +598,31 @@ function addSqlResultsTable(data: any[], title: string = 'SQL Results'): void {
   margin-bottom: 10px;
   position: relative;
   animation: fadeIn 0.3s ease-out;
+}
+
+.language-switcher {
+  display: flex;
+  gap: 10px;
+}
+
+.language-switcher button {
+  padding: 5px 10px;
+  border: 1px solid #7b0779;
+  border-radius: 5px;
+  background: white;
+  color: #7b0779;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.language-switcher button.active {
+  background: #7b0779;
+  color: white;
+}
+
+.language-switcher button:hover {
+  background: #a01fa0;
+  color: white;
 }
 
 .user-message {

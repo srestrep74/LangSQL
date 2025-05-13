@@ -1,0 +1,46 @@
+{
+    "message": {
+      "database": {
+        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero."
+      },
+      "query": {
+        "processing": "Procesando Consulta",
+        "error": "Error al procesar tu consulta. Por favor intenta nuevamente.",
+        "results": "Resultados SQL:"
+      },
+      "ui": {
+        "placeholder": "Escribe tu mensaje...",
+        "send": "Enviar",
+        "yourChats": "Tus Conversaciones",
+        "newChat": "Nueva Conversación",
+        "noChats": "No hay conversaciones aún. ¡Inicia una nueva!",
+        "loadingHistory": "Cargando historial de conversación...",
+        "startConversation": "Inicia una nueva conversación escribiendo una pregunta abajo",
+        "confirmDelete": "Confirmar Eliminación",
+        "deleteConfirmation": "¿Estás seguro de que quieres eliminar esta conversación?",
+        "deleteWarning": "Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "errorLoadingChat": "Error al cargar la conversación",
+        "unknownError": "Error desconocido",
+        "errorLoadingHistory": "Error al cargar el historial de conversación. Por favor intenta nuevamente.",
+        "errorDeletingChat": "Error al eliminar la conversación",
+        "errorRenamingChat": "Error al renombrar la conversación",
+        "queryResults": "Resultados de la Consulta",
+        "dataFrom": "Datos de",
+        "selectedFields": "Campos Seleccionados",
+        "noResultsFound": "No se encontraron resultados en la consulta.",
+        "errorDisplayingResults": "Error al mostrar los resultados SQL.",
+        "null": "NULO",
+        "true": "Verdadero",
+        "false": "Falso", 
+        "rowReturned": {
+          "one": "fila retornada",
+          "other": "filas retornadas"
+        },
+        "enterTitle": "Ingresa un título...",
+        "chatPrefix": "Chat",
+        "noMessages": "Sin mensajes"
+      }
+    }
+  }
