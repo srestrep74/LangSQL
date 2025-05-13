@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
-import logo from './assets/logo.png';
-import { userStore } from '@/store/userStore';
-import { useRouter } from 'vue-router';
+import { RouterLink, RouterView } from 'vue-router'
+import logo from './assets/logo.png'
+import { userStore } from '@/store/userStore'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
-const router = useRouter();
+const router = useRouter()
+const { locale } = useI18n()
 
 const logout = () => {
-  userStore.logout();
-  router.push('/');
-};
+  userStore.logout()
+  router.push('/')
+}
+
+const changeLanguage = (lang: 'en' | 'es') => {
+  locale.value = lang
+  localStorage.setItem('userLanguage', lang)
+}
+
+const languageOptions = [
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' }
+]
 </script>
 
 <template>
@@ -52,8 +64,27 @@ const logout = () => {
               <li class="nav-item">
                 <router-link to="/configuration" class="nav-link text-custom-purple">Configuration</router-link>
               </li>
-              
-              <!-- User Dropdown -->
+            </template>
+            
+            <!-- Language Selector Dropdown -->
+            <li class="nav-item dropdown mx-2">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="languageDropdown" role="button" 
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-translate me-1"></i>
+                <span class="d-none d-lg-inline">{{ locale.toUpperCase() }}</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                <li v-for="lang in languageOptions" :key="lang.code">
+                  <a class="dropdown-item" href="#" @click.prevent="changeLanguage(lang.code)">
+                    <span class="me-2">{{ lang.flag }}</span>
+                    {{ lang.name }}
+                  </a>
+                </li>
+              </ul>
+            </li>
+            
+            <!-- User Dropdown (only when authenticated) -->
+            <template v-if="userStore.isAuthenticated">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" 
                    data-bs-toggle="dropdown" aria-expanded="false">
@@ -104,6 +135,32 @@ const logout = () => {
 </template>
 
 <style>
+.navbar-nav .dropdown-toggle {
+  cursor: pointer;
+}
+
+.bi-translate {
+  font-size: 1.2rem;
+  color: #7b0779;
+}
+
+/* Language dropdown item styles */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+  
+  .nav-item.dropdown {
+    margin-left: 0 !important;
+  }
+}
+
 .bg-light-gray {
   background-color: #f4f4f4;
 }
@@ -147,16 +204,11 @@ const logout = () => {
   font-family: 'Poppins', sans-serif;
 }
 
-/* User avatar styles */
 .user-avatar {
   color: #7b0779;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
-}
-
-bi-person-circle {  
-  color: #7b0779 !important;
 }
 
 .user-name {

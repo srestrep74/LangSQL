@@ -1,0 +1,16 @@
+{
+    "message": {
+      "database": {
+        "credentialsMissing": "Database credentials are missing. Please configure the database connection first."
+      },
+      "query": {
+        "processing": "Processing Query",
+        "error": "Error processing your query. Please try again.",
+        "results": "SQL Results:"
+      },
+      "ui": {
+        "placeholder": "Type your message...",
+        "send": "Send"
+      }
+    }
+  }

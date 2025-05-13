@@ -1,30 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import TextToSqlService from '@/services/TextToSqlService';
-import type { QueryResults, ChatData } from '@/interfaces/ApiResponse';
-import { dbCredentialsStore } from '@/store/dbCredentialsStore';
-import { userStore } from '@/store/userStore';
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import TextToSqlService from '@/services/TextToSqlService'
+import type { QueryResults, ChatData } from '@/interfaces/ApiResponse'
+import { dbCredentialsStore } from '@/store/dbCredentialsStore'
+import { userStore } from '@/store/userStore'
 
-const userQuery = ref('');
-const chatMessages = ref<Array<{ type: string; content: string }>>([]);
-const isLoading = ref(false);
+const { t, locale } = useI18n()
+const userQuery = ref('')
+const chatMessages = ref<Array<{ type: string; content: string }>>([])
+const isLoading = ref(false)
 
 const sendQuery = async () => {
-  if (!userQuery.value.trim()) return;
+  if (!userQuery.value.trim()) return
 
   if (!dbCredentialsStore.credentials) {
     chatMessages.value.push({
       type: 'bot',
-      content: 'Database credentials are missing. Please configure the database connection first.'
-    });
-    return;
+      content: t('message.database.credentialsMissing')
+    })
+    return
   }
 
-  chatMessages.value.push({ type: 'user', content: userQuery.value });
+  chatMessages.value.push({ type: 'user', content: userQuery.value })
 
-  const loadingMessage = { type: 'bot', content: '<span class="loading-dots">Processing Query</span>' };
-  chatMessages.value.push(loadingMessage);
-  isLoading.value = true;
+  const loadingMessage = { 
+    type: 'bot', 
+    content: `<span class="loading-dots">${t('message.query.processing')}</span>` 
+  }
+  chatMessages.value.push(loadingMessage)
+  isLoading.value = true
 
   try {
     const chatData: ChatData = {
@@ -34,33 +39,33 @@ const sendQuery = async () => {
         message: message.content,
         timestamp: new Date().toISOString()
       }))
-    };
-    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value, chatData);
+    }
+    const response: QueryResults = await TextToSqlService.processQuery(userQuery.value, chatData)
 
     if (!response || !response.header) {
-      throw new Error('Invalid response from backend');
+      throw new Error('Invalid response from backend')
     }
 
-    const index = chatMessages.value.indexOf(loadingMessage);
+    const index = chatMessages.value.indexOf(loadingMessage)
     if (index !== -1) {
-      chatMessages.value.splice(index, 1);
+      chatMessages.value.splice(index, 1)
     }
 
     const formattedHeader = response.header
       .replace(/\n/g, '<br>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
 
-    chatMessages.value.push({ type: 'bot', content: formattedHeader });
+    chatMessages.value.push({ type: 'bot', content: formattedHeader })
 
     if (response.sql_results) {
       try {
-        const fixedJsonString = response.sql_results.replace(/'/g, '"');
-        const sqlResults = JSON.parse(fixedJsonString);
-        const columns = Object.keys(sqlResults[0]);
+        const fixedJsonString = response.sql_results.replace(/'/g, '"')
+        const sqlResults = JSON.parse(fixedJsonString)
+        const columns = Object.keys(sqlResults[0])
 
-        const tableHeaders = columns.map(column => `<th>${column}</th>`).join('');
-        const tableRows = sqlResults.map((row: Record<string, string|number|null>) => `<tr>${columns.map(column => `<td>${row[column]}</td>`).join('')}</tr>`).join('');
+        const tableHeaders = columns.map(column => `<th>${column}</th>`).join('')
+        const tableRows = sqlResults.map((row: Record<string, string|number|null>) => `<tr>${columns.map(column => `<td>${row[column]}</td>`).join('')}</tr>`).join('')
 
         const tableHTML = `
           <div class="sql-table-container">
@@ -73,40 +78,67 @@ const sendQuery = async () => {
               </tbody>
             </table>
           </div>
-        `;
+        `
 
-        chatMessages.value.push({ type: 'bot', content: `SQL Results:<br>${tableHTML}` });
+        chatMessages.value.push({ 
+          type: 'bot', 
+          content: `${t('message.query.results')}<br>${tableHTML}` 
+        })
       } catch (error) {
-        console.error(error);
-        chatMessages.value.push({ type: 'bot', content: 'Error displaying SQL results.' });
+        console.error(error)
+        chatMessages.value.push({ 
+          type: 'bot', 
+          content: t('message.query.error') 
+        })
       }
     }
   } catch (error) {
-    console.error(error);
-    const index = chatMessages.value.indexOf(loadingMessage);
+    console.error(error)
+    const index = chatMessages.value.indexOf(loadingMessage)
     if (index !== -1) {
-      chatMessages.value.splice(index, 1);
+      chatMessages.value.splice(index, 1)
     }
-    chatMessages.value.push({ type: 'bot', content: 'Error processing your query. Please try again.' });
+    chatMessages.value.push({ 
+      type: 'bot', 
+      content: t('message.query.error') 
+    })
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 
-  userQuery.value = '';
-};
+  userQuery.value = ''
+}
+
+// Language switcher function
+const changeLanguage = (lang: 'en' | 'es') => {
+  locale.value = lang
+  localStorage.setItem('userLanguage', lang)
+}
 </script>
 
 <template>
   <main class="container d-flex flex-column align-items-center" style="height: 90vh; margin-top: 20px;">
     <div class="chat-container w-100 d-flex flex-column" style="max-width: 800px; height: calc(90vh - 120px); overflow-y: auto;">
-      <div v-for="(message, index) in chatMessages" :key="index" :class="['chat-message', message.type === 'user' ? 'user-message' : 'bot-message']">
+      <div 
+        v-for="(message, index) in chatMessages" 
+        :key="index" 
+        :class="['chat-message', message.type === 'user' ? 'user-message' : 'bot-message']"
+      >
         <div v-html="message.content"></div>
       </div>
     </div>
 
     <div class="input-group-container">
-      <input v-model="userQuery" @keyup.enter="sendQuery" type="text" class="chat-input" placeholder="Type your message..." />
-      <button @click="sendQuery" class="btn-custom-send">Send</button>
+      <input 
+        v-model="userQuery" 
+        @keyup.enter="sendQuery" 
+        type="text" 
+        class="chat-input" 
+        :placeholder="t('message.ui.placeholder')" 
+      />
+      <button @click="sendQuery" class="btn-custom-send">
+        {{ t('message.ui.send') }}
+      </button>
     </div>
   </main>
 </template>
@@ -121,6 +153,31 @@ const sendQuery = async () => {
   margin-bottom: 10px;
   position: relative;
   animation: fadeIn 0.3s ease-out;
+}
+
+.language-switcher {
+  display: flex;
+  gap: 10px;
+}
+
+.language-switcher button {
+  padding: 5px 10px;
+  border: 1px solid #7b0779;
+  border-radius: 5px;
+  background: white;
+  color: #7b0779;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.language-switcher button.active {
+  background: #7b0779;
+  color: white;
+}
+
+.language-switcher button:hover {
+  background: #a01fa0;
+  color: white;
 }
 
 .user-message {
