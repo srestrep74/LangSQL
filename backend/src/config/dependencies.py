@@ -11,6 +11,8 @@ from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModel
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
+from src.modules.reports.service import ReportService
+from src.modules.reports.repositories.repository import ReportRepository
 
 
 def get_db_manager(connection: DatabaseConnection) -> IDatabaseManager:
@@ -47,3 +49,12 @@ def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_q
 
 def get_text_to_sql_adapter(lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)):
     return TextToSQLAdapter(lang_to_sql_service)
+
+
+def get_report_repository() -> ReportRepository:
+    return ReportRepository()
+
+
+def get_report_service(query_adapter: QueryAdapter = Depends(get_query_adapter)) -> ReportService:
+    report_repository = get_report_repository()
+    return ReportService(report_repository, query_adapter)
