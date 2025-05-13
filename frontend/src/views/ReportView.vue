@@ -4,6 +4,8 @@ import ReportService from '@/services/ReportService';
 import type { GraphRequest, ChartData, ReportResponse, DBStructure } from '@/interfaces/ReportInterfaces';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 import { ChartUtils } from '@/utils/chartUtils';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const isLoading = ref(false);
 const error = ref('');
@@ -15,6 +17,11 @@ const generatedCharts = ref<Record<string, ChartData[]>>({});
 const isLoadingStructure = ref(false);
 const chartInsights = ref<Record<string, string[]>>({});
 const showDetails = ref<Record<string, boolean>>({});
+const isExportingPdf = ref(false);
+const exportProgress = ref(0);
+const exportProgressText = ref('');
+
+const reportContainerRef = ref<HTMLElement | null>(null);
 
 interface ChartRef {
   id: string;
@@ -73,18 +80,15 @@ onMounted(() => {
 
 const handleTableSelect = (table: string) => {
   if (selectedTables.value.includes(table)) {
-    // If table is already selected, remove it and its columns
     selectedTables.value = selectedTables.value.filter(t => t !== table);
     delete selectedTableColumns.value[table];
   } else {
-    // If table is not selected, add it with empty columns
     selectedTables.value.push(table);
     selectedTableColumns.value[table] = [];
   }
 };
 
 const handleColumnSelect = (table: string, column: string) => {
-  // Asegurarse de que la tabla existe en el objeto
   if (!selectedTableColumns.value[table]) {
     selectedTableColumns.value[table] = [];
   }
@@ -93,23 +97,18 @@ const handleColumnSelect = (table: string, column: string) => {
   const columnIndex = columns.indexOf(column);
 
   if (columnIndex === -1) {
-    // Add column if not already selected
     selectedTableColumns.value[table].push(column);
   } else {
-    // Remove column if already selected
     selectedTableColumns.value[table].splice(columnIndex, 1);
 
-    // If no columns are selected for this table, consider removing the table
     if (selectedTableColumns.value[table].length === 0) {
       delete selectedTableColumns.value[table];
       selectedTables.value = selectedTables.value.filter(t => t !== table);
     }
   }
 
-  // Forzar la actualización de la UI recreando el objeto
   selectedTableColumns.value = { ...selectedTableColumns.value };
 
-  // Log para depuración
   console.log('Selección actual:', selectedTableColumns.value, 'botón habilitado:', hasSelectedItems.value);
 };
 
@@ -118,7 +117,6 @@ const isColumnSelected = (table: string, column: string): boolean => {
 };
 
 const hasSelectedItems = computed(() => {
-  // Verifica que al menos una tabla tenga columnas seleccionadas
   return Object.keys(selectedTableColumns.value).length > 0 &&
     Object.values(selectedTableColumns.value).some(columns => columns.length > 0);
 });
@@ -191,7 +189,6 @@ const renderCharts = () => {
   requestAnimationFrame(processCharts);
 };
 
-// Monitor changes in selection for debugging
 watch(selectedTableColumns, (newVal) => {
   console.log('selectedTableColumns changed:', newVal);
   console.log('hasSelectedItems:', hasSelectedItems.value);
@@ -202,6 +199,255 @@ watch(chartRefs, () => {
     renderCharts();
   }
 }, { deep: true });
+
+const exportToPdf = async () => {
+  if (Object.keys(generatedCharts.value).length === 0) {
+    error.value = 'No hay gráficas para exportar. Por favor, genere algunas primero.';
+    return;
+  }
+
+  if (!reportContainerRef.value) {
+    error.value = 'Error al generar el PDF: No se encontró el contenedor de reportes.';
+    return;
+  }
+
+  isExportingPdf.value = true;
+  exportProgress.value = 0;
+  exportProgressText.value = 'Preparando el documento...';
+  error.value = '';
+
+  try {
+    Object.keys(showDetails.value).forEach(key => {
+      showDetails.value[key] = true;
+    });
+
+    exportProgress.value = 5;
+    exportProgressText.value = 'Renderizando elementos...';
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    exportProgress.value = 10;
+    exportProgressText.value = 'Creando documento PDF...';
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    exportProgress.value = 20;
+    exportProgressText.value = 'Generando portada...';
+    createCoverPage(pdf);
+
+    let currentY = 20;
+
+    const totalSections = Object.keys(generatedCharts.value).length;
+    let processedSections = 0;
+
+    for (const [key, charts] of Object.entries(generatedCharts.value)) {
+      if (typeof charts === 'string') {
+        processedSections++;
+        continue;
+      }
+
+      exportProgressText.value = `Procesando sección: ${key}...`;
+      exportProgress.value = 20 + Math.round((processedSections / totalSections) * 60);
+
+      pdf.addPage();
+      currentY = 20;
+
+      pdf.setFontSize(18);
+      pdf.setTextColor(123, 7, 121);
+      pdf.text(key, 20, currentY);
+      currentY += 15;
+
+      currentY = addInsightsToPdf(pdf, key, currentY);
+
+      const totalCharts = charts.length;
+      let processedCharts = 0;
+
+      for (const [index, chart] of charts.entries()) {
+        exportProgressText.value = `Procesando gráfica ${index + 1} de ${totalCharts} en ${key}...`;
+
+        if (currentY > 220) {
+          pdf.addPage();
+          currentY = 20;
+        }
+
+        pdf.setFontSize(14);
+        pdf.setTextColor(51, 51, 51);
+        pdf.text(`${chart.chart_type}`, 20, currentY);
+        currentY += 10;
+
+        try {
+          const canvas = getChartRef(key, index);
+          if (!canvas) {
+            processedCharts++;
+            continue;
+          }
+
+          const imgData = canvas.toDataURL('image/png', 1.0);
+
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth() - 40;
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+          pdf.addImage(imgData, 'PNG', 20, currentY, pdfWidth, pdfHeight);
+          currentY += pdfHeight + 20;
+        } catch (err) {
+          console.error(`Error al convertir gráfico ${index} de ${key}:`, err);
+        }
+
+        processedCharts++;
+        const sectionProgress = processedCharts / totalCharts;
+        const sectionWeight = 1 / totalSections;
+        const additionalProgress = sectionProgress * sectionWeight * 60;
+        exportProgress.value = 20 + Math.round((processedSections / totalSections) * 60 + additionalProgress);
+      }
+
+      processedSections++;
+    }
+
+    exportProgress.value = 85;
+    exportProgressText.value = 'Generando resumen y conclusiones...';
+    addSummaryPage(pdf);
+
+    exportProgress.value = 95;
+    exportProgressText.value = 'Guardando documento...';
+    pdf.save('informe-analisis-datos.pdf');
+
+    exportProgress.value = 100;
+    exportProgressText.value = '¡PDF generado con éxito!';
+
+    setTimeout(() => {
+      if (isExportingPdf.value) {
+        isExportingPdf.value = false;
+        exportProgress.value = 0;
+        exportProgressText.value = '';
+      }
+    }, 2000);
+  } catch (err: any) {
+    console.error('Error al generar el PDF:', err);
+    error.value = `Error al generar el PDF: ${err.message || 'Error desconocido'}`;
+    exportProgressText.value = 'Error al generar el PDF';
+  } finally {
+    if (exportProgress.value < 100) {
+      isExportingPdf.value = false;
+      exportProgress.value = 0;
+      exportProgressText.value = '';
+    }
+  }
+};
+
+const createCoverPage = (pdf: any) => {
+  const width = pdf.internal.pageSize.getWidth();
+  const height = pdf.internal.pageSize.getHeight();
+
+  pdf.setFillColor(123, 7, 121);
+  pdf.rect(0, 0, width, height, 'F');
+  pdf.setFillColor(46, 204, 113);
+  pdf.rect(0, height * 0.75, width, height * 0.25, 'F');
+
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(30);
+  pdf.setFont('helvetica', 'bold');
+  const title = 'INFORME DE ANÁLISIS DE DATOS';
+  const titleWidth = pdf.getStringUnitWidth(title) * 30 / pdf.internal.scaleFactor;
+  pdf.text(title, (width - titleWidth) / 2, height * 0.4);
+
+  pdf.setFontSize(16);
+  pdf.setFont('helvetica', 'normal');
+  const subtitle = 'Visualización e Insights de Datos';
+  const subtitleWidth = pdf.getStringUnitWidth(subtitle) * 16 / pdf.internal.scaleFactor;
+  pdf.text(subtitle, (width - subtitleWidth) / 2, height * 0.47);
+
+  const date = new Date().toLocaleDateString();
+  pdf.setFontSize(12);
+  pdf.text(`Generado el: ${date}`, width - 60, height - 20);
+
+};
+
+const addInsightsToPdf = (pdf: any, key: string, startY: number): number => {
+  let currentY = startY;
+
+  if (chartInsights.value[key] && chartInsights.value[key].length > 0) {
+    pdf.setFontSize(16);
+    pdf.setTextColor(51, 51, 51);
+    pdf.text('Insights Clave:', 20, currentY);
+    currentY += 10;
+
+    pdf.setFontSize(11);
+    pdf.setTextColor(80, 80, 80);
+
+    chartInsights.value[key].forEach(insight => {
+      const textLines = pdf.splitTextToSize(insight, pdf.internal.pageSize.getWidth() - 40);
+
+      if (currentY + (textLines.length * 6) > pdf.internal.pageSize.getHeight() - 20) {
+        pdf.addPage();
+        currentY = 20;
+      }
+
+      pdf.circle(22, currentY - 1, 1, 'F');
+
+      pdf.text(textLines, 25, currentY);
+      currentY += (textLines.length * 6) + 4;
+    });
+
+    currentY += 10;
+  }
+
+  return currentY;
+};
+
+const addSummaryPage = (pdf: any) => {
+  pdf.addPage();
+
+  const width = pdf.internal.pageSize.getWidth();
+
+  pdf.setFontSize(20);
+  pdf.setTextColor(123, 7, 121);
+  pdf.setFont('helvetica', 'bold');
+  pdf.text('Resumen y Conclusiones', width / 2, 30, { align: 'center' });
+
+  pdf.setDrawColor(46, 204, 113);
+  pdf.setLineWidth(1);
+  pdf.line(width / 4, 35, width * 3/4, 35);
+
+  let totalCharts = 0;
+  let totalInsights = 0;
+
+  Object.entries(generatedCharts.value).forEach(([key, charts]) => {
+    if (typeof charts === 'string') return;
+    totalCharts += charts.length;
+    totalInsights += (chartInsights.value[key]?.length || 0);
+  });
+
+  pdf.setFontSize(12);
+  pdf.setTextColor(80, 80, 80);
+  pdf.setFont('helvetica', 'normal');
+
+  let y = 50;
+
+  pdf.text(`• Total de secciones analizadas: ${Object.keys(generatedCharts.value).length}`, 30, y);
+  y += 10;
+
+  pdf.text(`• Total de visualizaciones generadas: ${totalCharts}`, 30, y);
+  y += 10;
+
+  pdf.text(`• Total de insights identificados: ${totalInsights}`, 30, y);
+  y += 20;
+
+  pdf.setFontSize(11);
+  pdf.text('Este informe fue generado automáticamente mediante el análisis de los datos seleccionados.', 30, y);
+  y += 7;
+  pdf.text('Las visualizaciones y los insights proporcionados tienen como objetivo ayudar en la toma de', 30, y);
+  y += 7;
+  pdf.text('decisiones basadas en datos para mejorar los procesos de negocio.', 30, y);
+
+  pdf.setFontSize(10);
+  pdf.setTextColor(150, 150, 150);
+  pdf.text('© LangSQL Analytics Tool', width / 2, pdf.internal.pageSize.getHeight() - 20, { align: 'center' });
+};
 </script>
 
 <template>
@@ -291,6 +537,19 @@ watch(chartRefs, () => {
               <span v-if="isLoadingStructure" class="btn-loader"></span>
               <span v-else>Refresh Schema</span>
             </button>
+
+            <button
+              v-if="Object.keys(generatedCharts).length > 0"
+              class="btn btn-export"
+              @click="exportToPdf"
+              :disabled="isExportingPdf"
+            >
+              <span v-if="isExportingPdf" class="btn-loader"></span>
+              <span v-else>
+                <i class="download-icon"></i>
+                Exportar PDF
+              </span>
+            </button>
           </div>
 
           <div v-if="!hasSelectedItems" class="selection-hint">
@@ -302,7 +561,11 @@ watch(chartRefs, () => {
       </div>
     </div>
 
-    <div v-if="Object.keys(generatedCharts).length > 0" class="report-container">
+    <div
+      v-if="Object.keys(generatedCharts).length > 0"
+      class="report-container"
+      ref="reportContainerRef"
+    >
       <div
         v-for="(charts, key) in generatedCharts"
         :key="key"
@@ -357,6 +620,17 @@ watch(chartRefs, () => {
             </div>
           </div>
         </template>
+      </div>
+    </div>
+
+    <div v-if="isExportingPdf" class="pdf-export-overlay">
+      <div class="pdf-export-modal">
+        <div class="export-spinner"></div>
+        <h3>Generando PDF</h3>
+        <div class="progress-bar-container">
+          <div class="progress-bar" :style="{ width: `${exportProgress}%` }"></div>
+        </div>
+        <p>{{ exportProgressText }}</p>
       </div>
     </div>
   </main>
@@ -794,6 +1068,53 @@ watch(chartRefs, () => {
   }
 }
 
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #7b0779;
+  color: #7b0779;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(123, 7, 121, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 7, 121, 0.1);
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-export:hover {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+}
+
+.btn-export:active {
+  transform: translateY(0);
+}
+
+.download-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' y1='15' x2='12' y2='3'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -806,5 +1127,69 @@ watch(chartRefs, () => {
   .tables-grid {
     grid-template-columns: 1fr;
   }
+
+  .btn-export {
+    margin-top: 0.5rem;
+  }
+}
+
+.pdf-export-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pdf-export-modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+}
+
+.pdf-export-modal h3 {
+  color: #7b0779;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.pdf-export-modal p {
+  color: #666;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.progress-bar-container {
+  height: 10px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #7b0779, #2ecc71);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.export-spinner {
+  margin: 0 auto 1.5rem;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(123, 7, 121, 0.2);
+  border-top-color: #7b0779;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 </style>
