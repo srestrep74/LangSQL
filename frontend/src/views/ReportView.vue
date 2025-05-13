@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import ReportService from '@/services/ReportService';
 import type { GraphRequest, ChartData, ReportResponse, DBStructure } from '@/interfaces/ReportInterfaces';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
@@ -9,8 +9,8 @@ const isLoading = ref(false);
 const error = ref('');
 const availableTables = ref<string[]>([]);
 const tableColumns = ref<Record<string, string[]>>({});
-const selectedTable = ref('');
-const selectedColumns = ref<string[]>([]);
+const selectedTables = ref<string[]>([]);
+const selectedTableColumns = ref<Record<string, string[]>>({});
 const generatedCharts = ref<Record<string, ChartData[]>>({});
 const isLoadingStructure = ref(false);
 const chartInsights = ref<Record<string, string[]>>({});
@@ -71,13 +71,61 @@ onMounted(() => {
   loadDatabaseStructure();
 });
 
-const handleTableSelect = () => {
-  selectedColumns.value = [];
+const handleTableSelect = (table: string) => {
+  if (selectedTables.value.includes(table)) {
+    // If table is already selected, remove it and its columns
+    selectedTables.value = selectedTables.value.filter(t => t !== table);
+    delete selectedTableColumns.value[table];
+  } else {
+    // If table is not selected, add it with empty columns
+    selectedTables.value.push(table);
+    selectedTableColumns.value[table] = [];
+  }
 };
 
+const handleColumnSelect = (table: string, column: string) => {
+  // Asegurarse de que la tabla existe en el objeto
+  if (!selectedTableColumns.value[table]) {
+    selectedTableColumns.value[table] = [];
+  }
+
+  const columns = selectedTableColumns.value[table];
+  const columnIndex = columns.indexOf(column);
+
+  if (columnIndex === -1) {
+    // Add column if not already selected
+    selectedTableColumns.value[table].push(column);
+  } else {
+    // Remove column if already selected
+    selectedTableColumns.value[table].splice(columnIndex, 1);
+
+    // If no columns are selected for this table, consider removing the table
+    if (selectedTableColumns.value[table].length === 0) {
+      delete selectedTableColumns.value[table];
+      selectedTables.value = selectedTables.value.filter(t => t !== table);
+    }
+  }
+
+  // Forzar la actualización de la UI recreando el objeto
+  selectedTableColumns.value = { ...selectedTableColumns.value };
+
+  // Log para depuración
+  console.log('Selección actual:', selectedTableColumns.value, 'botón habilitado:', hasSelectedItems.value);
+};
+
+const isColumnSelected = (table: string, column: string): boolean => {
+  return selectedTableColumns.value[table]?.includes(column) || false;
+};
+
+const hasSelectedItems = computed(() => {
+  // Verifica que al menos una tabla tenga columnas seleccionadas
+  return Object.keys(selectedTableColumns.value).length > 0 &&
+    Object.values(selectedTableColumns.value).some(columns => columns.length > 0);
+});
+
 const generateCharts = async () => {
-  if (!selectedTable.value || selectedColumns.value.length === 0) {
-    error.value = 'Please select a table and at least one column';
+  if (!hasSelectedItems.value) {
+    error.value = 'Please select at least one table and column';
     return;
   }
 
@@ -93,10 +141,10 @@ const generateCharts = async () => {
   showDetails.value = {};
 
   try {
-    const graphRequests: GraphRequest[] = [{
-      table: selectedTable.value,
-      columns: selectedColumns.value
-    }];
+    const graphRequests: GraphRequest[] = Object.entries(selectedTableColumns.value).map(([table, columns]) => ({
+      table,
+      columns
+    }));
 
     const response = await ReportService.generateCharts(graphRequests);
     generatedCharts.value = response as Record<string, ChartData[]>;
@@ -143,6 +191,12 @@ const renderCharts = () => {
   requestAnimationFrame(processCharts);
 };
 
+// Monitor changes in selection for debugging
+watch(selectedTableColumns, (newVal) => {
+  console.log('selectedTableColumns changed:', newVal);
+  console.log('hasSelectedItems:', hasSelectedItems.value);
+}, { deep: true });
+
 watch(chartRefs, () => {
   if (Object.keys(generatedCharts.value).length > 0) {
     renderCharts();
@@ -169,44 +223,61 @@ watch(chartRefs, () => {
         </div>
 
         <template v-else>
-          <div class="form-group">
-            <label for="table-select">Select Table</label>
-            <select
-              id="table-select"
-              class="form-control"
-              v-model="selectedTable"
-              @change="handleTableSelect"
-            >
-              <option value="">-- Select a table --</option>
-              <option v-for="table in availableTables" :key="table" :value="table">
-                {{ table }}
-              </option>
-            </select>
-          </div>
+          <div class="tables-section">
+            <h6 class="section-subtitle">Select Tables and Columns</h6>
+            <div class="tables-grid">
+              <div
+                v-for="table in availableTables"
+                :key="table"
+                class="table-card"
+                :class="{ 'table-selected': selectedTables.includes(table) }"
+              >
+                <div class="table-header" @click="handleTableSelect(table)">
+                  <h4 class="table-name">{{ table }}</h4>
+                  <span class="table-toggle">
+                    <i class="check-icon" v-if="selectedTables.includes(table)"></i>
+                  </span>
+                </div>
 
-          <div class="form-group" v-if="selectedTable">
-            <label>Select Columns to Analyze</label>
-            <div class="columns-container">
-              <div v-for="column in tableColumns[selectedTable]" :key="column" class="column-option">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  :id="`column-${column}`"
-                  :value="column"
-                  v-model="selectedColumns"
-                >
-                <label class="form-check-label" :for="`column-${column}`">
-                  {{ column }}
-                </label>
+                <div class="table-columns" v-if="selectedTables.includes(table)">
+                  <div
+                    v-for="column in tableColumns[table]"
+                    :key="`${table}-${column}`"
+                    class="column-option"
+                    :class="{ 'column-selected': isColumnSelected(table, column) }"
+                    @click="handleColumnSelect(table, column)"
+                  >
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      :id="`column-${table}-${column}`"
+                      :checked="isColumnSelected(table, column)"
+                      @click.stop
+                    >
+                    <label class="form-check-label" :for="`column-${table}-${column}`">
+                      {{ column }}
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+
+          <div class="selection-summary" v-if="Object.keys(selectedTableColumns).length > 0">
+            <h6>Selected Items:</h6>
+            <ul class="selection-list">
+              <li v-for="(columns, table) in selectedTableColumns" :key="table">
+                <strong>{{ table }}</strong>: {{ columns.join(', ') }}
+              </li>
+            </ul>
           </div>
 
           <div class="button-group">
             <button
               class="btn btn-primary"
               @click="generateCharts"
-              :disabled="isLoading || !selectedTable || selectedColumns.length === 0"
+              :disabled="isLoading || !hasSelectedItems"
+              :class="{ 'btn-enabled': hasSelectedItems }"
             >
               <span v-if="isLoading" class="btn-loader"></span>
               <span v-else>Generate Charts</span>
@@ -220,6 +291,10 @@ watch(chartRefs, () => {
               <span v-if="isLoadingStructure" class="btn-loader"></span>
               <span v-else>Refresh Schema</span>
             </button>
+          </div>
+
+          <div v-if="!hasSelectedItems" class="selection-hint">
+            Seleccione al menos una tabla y una columna para generar gráficos
           </div>
         </template>
 
@@ -331,37 +406,80 @@ watch(chartRefs, () => {
   color: #333;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
+.section-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
   color: #495057;
 }
 
-.form-control {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  transition: border-color 0.2s;
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.form-control:focus {
-  border-color: #7b0779;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(123, 7, 121, 0.1);
-}
-
-.columns-container {
-  max-height: 200px;
-  overflow-y: auto;
+.table-card {
   border: 1px solid #eee;
   border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.table-selected {
+  border-color: #7b0779;
+  box-shadow: 0 0 0 1px rgba(123, 7, 121, 0.2);
+}
+
+.table-header {
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.table-selected .table-header {
+  background-color: rgba(123, 7, 121, 0.05);
+  border-bottom-color: rgba(123, 7, 121, 0.1);
+}
+
+.table-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.table-toggle {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-selected .table-toggle {
+  border-color: #7b0779;
+  background-color: #7b0779;
+}
+
+.check-icon {
+  display: inline-block;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.table-columns {
+  max-height: 180px;
+  overflow-y: auto;
   padding: 0.5rem 0;
 }
 
@@ -369,10 +487,15 @@ watch(chartRefs, () => {
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .column-option:hover {
   background-color: #f8f9fa;
+}
+
+.column-selected {
+  background-color: rgba(123, 7, 121, 0.05);
 }
 
 .form-check-input {
@@ -389,6 +512,31 @@ watch(chartRefs, () => {
 
 .form-check-label {
   cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.selection-summary {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.selection-summary h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.selection-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.selection-list li {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
 }
 
 .button-group {
@@ -620,6 +768,32 @@ watch(chartRefs, () => {
   color: #6c757d;
 }
 
+.selection-hint {
+  margin-top: 1rem;
+  padding: 1rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.btn-enabled {
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 10px rgba(123, 7, 121, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(123, 7, 121, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(123, 7, 121, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(123, 7, 121, 0);
+  }
+}
+
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;
@@ -627,6 +801,10 @@ watch(chartRefs, () => {
 
   .button-group {
     flex-direction: column;
+  }
+
+  .tables-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
