@@ -49,7 +49,7 @@ class AlertService:
     async def update_alert(self, alert_id: str, alert_data: AlertPatch, connection: DatabaseConnection) -> Optional[Alert]:
         existing_alert = await self.alert_repository.get_by_id(alert_id)
 
-        if alert_data.prompt != existing_alert.prompt:
+        if alert_data.prompt is not None and alert_data.prompt != existing_alert.prompt:
             sql_query = await self.get_sql_query(alert_data.prompt, connection)
             alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
             alert_data = AlertPatch(**alert_data_dict, sql_query=sql_query)
