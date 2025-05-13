@@ -1,14 +1,14 @@
 import json
-import pytest
-
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app import app
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.text_to_sql.models.models import Chat, Message
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
-from src.modules.text_to_sql.models.models import Chat, Message
 from src.tests.utils.database_connection import database_connection
 from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 
@@ -95,9 +95,9 @@ def mock_service_with_memory():
     return LangToSqlService(mock_query_adapter, mock_llm_client, mock_repository)
 
 
-@pytest.mark.asyncio
 class TestLangToSqlService:
 
+    @pytest.mark.asyncio
     async def test_chat_with_complex_query_and_memory(self, setup_service, fake_connection, fake_chat_data):
         service, query_adapter, llm_client, repository = setup_service
         chat_id = "test-chat-id"
@@ -126,6 +126,7 @@ class TestLangToSqlService:
         llm_client.get_model_response.assert_called_once()
         assert repository.add_message.call_count == 2
 
+    @pytest.mark.asyncio
     async def test_get_messages_history(self, setup_service):
         service, _, _, repository = setup_service
         repository.get_chat = AsyncMock(return_value=MagicMock(messages=[
@@ -151,6 +152,7 @@ class TestLangToSqlService:
 
         assert "SELECT COUNT(*)" in response
 
+    @pytest.mark.asyncio
     async def test_chat_utilizes_query_history(self, setup_service, fake_connection):
         service, query_adapter, llm_client, repository = setup_service
         chat_id = "history-chat"
@@ -175,6 +177,7 @@ class TestLangToSqlService:
         assert "sql_query" in result
         assert "recent orders" in result["header"]
 
+    @pytest.mark.asyncio
     async def test_conversational_memory_for_follow_up_questions(self, mock_service_with_memory):
         connection = database_connection
         user_input = "¿Y cuánto ingreso generaron esas ventas?"
@@ -191,7 +194,7 @@ class TestLangToSqlService:
         assert result["header"] == "En enero, el ingreso total fue:"
         assert "MONTH" in result["sql_query"]
         assert "= 1" in result["sql_query"]
-        mock_service_with_memory.repository.get_chat.assert_called_once_with(chat_id)
+        mock_service_with_memory.repository.get_chat.assert_called_with(chat_id)
         assert mock_service_with_memory.repository.add_message.call_count == 2
 
 

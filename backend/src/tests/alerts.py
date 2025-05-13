@@ -26,32 +26,38 @@ class TestAlert:
             notification_emails=["test@test.com"],
             prompt="Most expensive product",
             sent=False,
-            expiration_date=datetime.utcnow().isoformat()
+            expiration_date=datetime.utcnow().isoformat(),
+            sql_query="SELECT MAX(price) FROM products"
         ))
 
-        alert_data = AlertCreate(
-            notification_emails=["test@test.com"],
-            user=Settings.TEST_USER,
-            prompt="Most expensive product",
-            sent=False,
-            expiration_date=datetime.utcnow(),
-        )
+        with patch("src.modules.alerts.routes.alert_service.alert_repository", mock_alert_repo):
+            with patch("src.modules.alerts.service.AlertService.get_sql_query",
+                       new_callable=AsyncMock,
+                       return_value="SELECT MAX(price) FROM products"):
 
-        alert_dict = alert_data.model_dump()
-        alert_dict["expiration_date"] = alert_dict["expiration_date"].isoformat()
+                alert_data = AlertCreate(
+                    notification_emails=["test@test.com"],
+                    user=Settings.TEST_USER,
+                    prompt="Most expensive product",
+                    sent=False,
+                    expiration_date=datetime.utcnow(),
+                    sql_query="SELECT MAX(price) FROM products"
+                )
 
-        response = client.post(
-            "/api/alerts/create",
-            data=json.dumps({
-                "connection": connection_dict,
-                "alert_data": alert_dict
-            }, default=str),
-            headers={"Content-Type": "application/json"}
-        )
+                alert_dict = alert_data.model_dump()
+                alert_dict["expiration_date"] = alert_dict["expiration_date"].isoformat()
 
-        print(response.json())
-        assert response.status_code == 200
-        assert response.json()["message"] == "Success"
+                response = client.post(
+                    "/api/alerts/create",
+                    data=json.dumps({
+                        "connection": connection_dict,
+                        "alert_data": alert_dict
+                    }, default=str),
+                    headers={"Content-Type": "application/json"}
+                )
+
+                assert response.status_code == 200
+                assert response.json()["message"] == "Success"
 
     @patch("src.modules.alerts.service.AlertService.get_sql_query", new_callable=AsyncMock)
     def test_update_alert(self, mock_get_sql_query):
@@ -87,7 +93,6 @@ class TestAlert:
                 headers={"Content-Type": "application/json"}
             )
 
-            print(response.json())
             assert response.status_code == 200
             assert response.json()["message"] == "Success"
 

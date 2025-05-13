@@ -1,0 +1,46 @@
+{
+    "message": {
+      "database": {
+        "credentialsMissing": "Database credentials are missing. Please configure the database connection first."
+      },
+      "query": {
+        "processing": "Processing Query",
+        "error": "Error processing your query. Please try again.",
+        "results": "SQL Results:"
+      },
+      "ui": {
+        "placeholder": "Type your message...",
+        "send": "Send",
+        "yourChats": "Your Chats",
+        "newChat": "New Chat",
+        "noChats": "No chats yet. Start a new conversation!",
+        "loadingHistory": "Loading chat history...",
+        "startConversation": "Start a new conversation by typing a question below",
+        "confirmDelete": "Confirm Delete",
+        "deleteConfirmation": "Are you sure you want to delete this chat?",
+        "deleteWarning": "This action cannot be undone.",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "errorLoadingChat": "Error loading chat",
+        "unknownError": "Unknown error",
+        "errorLoadingHistory": "Error loading chat history. Please try again.",
+        "errorDeletingChat": "Error deleting chat",
+        "errorRenamingChat": "Error renaming chat",
+        "queryResults": "Query Results",
+        "dataFrom": "Data from",
+        "selectedFields": "Selected Fields",
+        "noResultsFound": "No results found in the query.",
+        "errorDisplayingResults": "Error displaying SQL results.",
+        "null": "NULL",
+        "true": "True",
+        "false": "False", 
+        "rowReturned": {
+          "one": "row returned",
+          "other": "rows returned"
+        },
+        "enterTitle": "Enter chat title...",
+        "chatPrefix": "Chat",
+        "noMessages": "No messages"
+      }
+    }
+  }

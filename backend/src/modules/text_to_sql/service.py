@@ -1,5 +1,5 @@
 import json
-from typing import Dict
+from typing import Dict, List, Optional
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
@@ -40,11 +40,30 @@ class LangToSqlService:
         self.llm_client = llm_client
         self.repository = TextToSqlRepository
 
-    async def chat(self, connection: DatabaseConnection, user_input: str, chat_data: Chat, chat_id: str) -> Dict:
-        if not chat_id:
+    async def chat(self, connection: DatabaseConnection, user_input: Optional[str], chat_data: Chat, chat_id: str) -> Dict:
+        if chat_id:
+            existing_chat = await self.repository.get_chat(chat_id)
+            if not existing_chat:
+                chat_id = await self.repository.create_chat(chat_data)
+                if not chat_id:
+                    return {"error": "Failed to create chat"}
+        elif not chat_id:
             chat_id = await self.repository.create_chat(chat_data)
             if not chat_id:
-                return None
+                return {"error": "Failed to create chat"}
+
+        if not user_input:
+            chats = await self.get_chats(chat_data.user_id)
+            full_chat = await self.get_messages(chat_id)
+            response = {
+                "chat_id": chat_id,
+                "header": "Chat",
+                "sql_query": "",
+                "sql_results": [],
+                "chats": chats,
+                "messages": full_chat["messages"]
+            }
+            return response
         try:
             user_message = Message(role=1, message=user_input)
             saved_user_message = await self.repository.add_message(chat_id, user_message)
@@ -65,10 +84,16 @@ class LangToSqlService:
             if not saved_bot_message:
                 return {"error": "bot message not saved into the database."}
 
+            chats = await self.get_chats(chat_data.user_id)
+            full_chat = await self.get_messages(chat_id)
+
             response = {
+                "chat_id": chat_id,
                 "header": human_response,
                 "sql_query": sql_query,
-                "sql_results": json.dumps(sql_results)
+                "sql_results": json.dumps(sql_results),
+                "chats": chats,
+                "messages": full_chat["messages"]
             }
             return response
         except Exception as e:
@@ -76,11 +101,13 @@ class LangToSqlService:
 
     async def get_messages(self, chat_id: str) -> Dict:
         response = await self.repository.get_chat(chat_id)
+        if response is None:
+            return {"messages": []}
+
         messages = response.messages
-        response = {
+        return {
             "messages": messages
         }
-        return response
 
     def get_response(self, user_input: str, connection: DatabaseConnection) -> str:
         try:
@@ -89,4 +116,68 @@ class LangToSqlService:
                 db_structure, user_input, connection.schema_name, connection.db_type)
             return sql_query
         except Exception as e:
-            return str(e)
+            return {"error": str(e)}
+
+    async def get_chats(self, user_id: str) -> List[Dict]:
+        try:
+            return await self.repository.get_users_chats(user_id)
+        except Exception as e:
+            print(f"Error getting chats for user {user_id}: {str(e)}")
+            return []
+
+    async def delete_chat(self, chat_id: str, user_id: str) -> bool:
+        """
+        Delete a chat by its ID and validate the user owns it.
+
+        Args:
+            chat_id (str): The ID of the chat to delete
+            user_id (str): The ID of the user who owns the chat
+
+        Returns:
+            bool: True if deletion was successful, raises an exception otherwise
+        """
+        try:
+            chat = await self.repository.get_chat(chat_id)
+            if not chat:
+                raise Exception(f"Chat with ID {chat_id} not found")
+
+            if chat.user_id != user_id:
+                raise Exception("You don't have permission to delete this chat")
+
+            result = await self.repository.delete_chat(chat_id)
+            if not result:
+                raise Exception("Failed to delete chat")
+
+            return True
+        except Exception as e:
+            print(f"Error deleting chat {chat_id}: {str(e)}")
+            raise
+
+    async def rename_chat(self, chat_id: str, user_id: str, new_title: str) -> bool:
+        """
+        Rename a chat by its ID and validate the user owns it.
+
+        Args:
+            chat_id (str): The ID of the chat to rename
+            user_id (str): The ID of the user who owns the chat
+            new_title (str): The new title for the chat
+
+        Returns:
+            bool: True if renaming was successful, raises an exception otherwise
+        """
+        try:
+            chat = await self.repository.get_chat(chat_id)
+            if not chat:
+                raise Exception(f"Chat with ID {chat_id} not found")
+
+            if chat.user_id != user_id:
+                raise Exception("You don't have permission to rename this chat")
+
+            result = await self.repository.update_chat_title(chat_id, new_title)
+            if not result:
+                raise Exception("Failed to rename chat")
+
+            return True
+        except Exception as e:
+            print(f"Error renaming chat {chat_id}: {str(e)}")
+            raise
