@@ -79,13 +79,13 @@ async def delete_chat(
 ):
     """
     Endpoint to delete a specific chat.
-    
+
     Args:
         chat_id (str): The unique identifier for the chat to be deleted.
         user_id (str): The user ID associated with the chat.
         connection (DatabaseConnection): The database connection details.
         lang_to_sql_service (LangToSqlService): Service for chat operations.
-    
+
     Returns:
         Successful Response (`200 OK`)
         ```json
@@ -95,7 +95,7 @@ async def delete_chat(
             "data": {}
         }
         ```
-        
+
         Error Response (`400 Bad Request`)
         ```json
         {
@@ -109,7 +109,7 @@ async def delete_chat(
     """
     try:
         await lang_to_sql_service.delete_chat(chat_id, user_id)
-        
+
         return ResponseManager.success_response(
             data={},
             message="Chat deleted successfully",
@@ -133,14 +133,14 @@ async def rename_chat(
 ):
     """
     Endpoint to rename a specific chat.
-    
+
     Args:
         chat_id (str): The unique identifier for the chat to be renamed.
         user_id (str): The user ID associated with the chat.
         new_title (str): The new title for the chat.
         connection (DatabaseConnection): The database connection details.
         lang_to_sql_service (LangToSqlService): Service for chat operations.
-    
+
     Returns:
         Successful Response (`200 OK`)
         ```json
@@ -150,7 +150,7 @@ async def rename_chat(
             "data": {}
         }
         ```
-        
+
         Error Response (`400 Bad Request`)
         ```json
         {
@@ -164,7 +164,7 @@ async def rename_chat(
     """
     try:
         await lang_to_sql_service.rename_chat(chat_id, user_id, new_title)
-        
+
         return ResponseManager.success_response(
             data={},
             message="Chat renamed successfully",

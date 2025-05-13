@@ -1,5 +1,7 @@
-from bson import ObjectId
 from typing import List
+
+from bson import ObjectId
+
 from src.config.database import database
 from src.modules.text_to_sql.models.models import Chat, Message
 
@@ -41,7 +43,7 @@ class TextToSqlRepository:
             return None
         except Exception:
             return None
-    
+
     async def get_users_chats(self, user_id: str) -> List[Chat]:
         try:
             chats = []
@@ -57,14 +59,14 @@ class TextToSqlRepository:
             return chats
         except Exception:
             return []
-    
+
     async def delete_chat(self, chat_id: str) -> bool:
         """
         Delete a chat from the database by its ID.
-        
+
         Args:
             chat_id (str): The ID of the chat to delete
-            
+
         Returns:
             bool: True if deletion was successful, False otherwise
         """
@@ -74,15 +76,15 @@ class TextToSqlRepository:
         except Exception as e:
             print(f"Error deleting chat: {e}")
             return False
-    
+
     async def update_chat_title(self, chat_id: str, new_title: str) -> bool:
         """
         Update the title of a chat.
-        
+
         Args:
             chat_id (str): The ID of the chat to update
             new_title (str): The new title for the chat
-            
+
         Returns:
             bool: True if update was successful, False otherwise
         """

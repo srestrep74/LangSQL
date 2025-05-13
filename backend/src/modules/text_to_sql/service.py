@@ -51,7 +51,7 @@ class LangToSqlService:
             chat_id = await self.repository.create_chat(chat_data)
             if not chat_id:
                 return {"error": "Failed to create chat"}
-        
+
         if not user_input:
             chats = await self.get_chats(chat_data.user_id)
             full_chat = await self.get_messages(chat_id)
@@ -103,7 +103,7 @@ class LangToSqlService:
         response = await self.repository.get_chat(chat_id)
         if response is None:
             return {"messages": []}
-        
+
         messages = response.messages
         return {
             "messages": messages
@@ -117,22 +117,22 @@ class LangToSqlService:
             return sql_query
         except Exception as e:
             return {"error": str(e)}
-    
+
     async def get_chats(self, user_id: str) -> List[Dict]:
         try:
             return await self.repository.get_users_chats(user_id)
         except Exception as e:
             print(f"Error getting chats for user {user_id}: {str(e)}")
             return []
-    
+
     async def delete_chat(self, chat_id: str, user_id: str) -> bool:
         """
         Delete a chat by its ID and validate the user owns it.
-        
+
         Args:
             chat_id (str): The ID of the chat to delete
             user_id (str): The ID of the user who owns the chat
-            
+
         Returns:
             bool: True if deletion was successful, raises an exception otherwise
         """
@@ -140,28 +140,28 @@ class LangToSqlService:
             chat = await self.repository.get_chat(chat_id)
             if not chat:
                 raise Exception(f"Chat with ID {chat_id} not found")
-                
+
             if chat.user_id != user_id:
                 raise Exception("You don't have permission to delete this chat")
-                
+
             result = await self.repository.delete_chat(chat_id)
             if not result:
                 raise Exception("Failed to delete chat")
-                
+
             return True
         except Exception as e:
             print(f"Error deleting chat {chat_id}: {str(e)}")
             raise
-    
+
     async def rename_chat(self, chat_id: str, user_id: str, new_title: str) -> bool:
         """
         Rename a chat by its ID and validate the user owns it.
-        
+
         Args:
             chat_id (str): The ID of the chat to rename
             user_id (str): The ID of the user who owns the chat
             new_title (str): The new title for the chat
-            
+
         Returns:
             bool: True if renaming was successful, raises an exception otherwise
         """
@@ -169,14 +169,14 @@ class LangToSqlService:
             chat = await self.repository.get_chat(chat_id)
             if not chat:
                 raise Exception(f"Chat with ID {chat_id} not found")
-                
+
             if chat.user_id != user_id:
                 raise Exception("You don't have permission to rename this chat")
-                
+
             result = await self.repository.update_chat_title(chat_id, new_title)
             if not result:
                 raise Exception("Failed to rename chat")
-                
+
             return True
         except Exception as e:
             print(f"Error renaming chat {chat_id}: {str(e)}")

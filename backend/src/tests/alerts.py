@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from app import app
 from src.config.constants import Settings
-from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
+from src.modules.alerts.models.models import Alert, AlertCreate
 from src.modules.alerts.routes import alert_service
 from src.modules.alerts.utils.cron_job import CronJob
 from src.tests.utils.database_connection import database_connection
@@ -31,10 +31,10 @@ class TestAlert:
         ))
 
         with patch("src.modules.alerts.routes.alert_service.alert_repository", mock_alert_repo):
-            with patch("src.modules.alerts.service.AlertService.get_sql_query", 
-                       new_callable=AsyncMock, 
+            with patch("src.modules.alerts.service.AlertService.get_sql_query",
+                       new_callable=AsyncMock,
                        return_value="SELECT MAX(price) FROM products"):
-            
+
                 alert_data = AlertCreate(
                     notification_emails=["test@test.com"],
                     user=Settings.TEST_USER,
