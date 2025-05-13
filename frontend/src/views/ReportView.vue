@@ -63,9 +63,27 @@ const loadDatabaseStructure = async () => {
     availableTables.value = Object.keys(dbStructure);
     const columns: Record<string, string[]> = {};
     for (const [tableName, tableData] of Object.entries(dbStructure)) {
-      columns[tableName] = tableData.columns.map(col => col.name);
+      columns[tableName] = tableData.columns
+        .map(col => col.name)
+        .filter(colName => !colName.toLowerCase().includes('id'));
     }
     tableColumns.value = columns;
+
+    for (const table in selectedTableColumns.value) {
+      if (selectedTableColumns.value[table]) {
+        selectedTableColumns.value[table] = selectedTableColumns.value[table].filter(
+          colName => !colName.toLowerCase().includes('id')
+        );
+
+        if (selectedTableColumns.value[table].length === 0) {
+          delete selectedTableColumns.value[table];
+          selectedTables.value = selectedTables.value.filter(t => t !== table);
+        }
+      }
+    }
+
+    selectedTableColumns.value = { ...selectedTableColumns.value };
+
   } catch (err: any) {
     error.value = err.message || 'Error loading database structure';
     console.error('Error loading database structure:', err);
@@ -89,6 +107,10 @@ const handleTableSelect = (table: string) => {
 };
 
 const handleColumnSelect = (table: string, column: string) => {
+  if (column.toLowerCase().includes('id')) {
+    return;
+  }
+
   if (!selectedTableColumns.value[table]) {
     selectedTableColumns.value[table] = [];
   }
@@ -109,7 +131,7 @@ const handleColumnSelect = (table: string, column: string) => {
 
   selectedTableColumns.value = { ...selectedTableColumns.value };
 
-  console.log('Selección actual:', selectedTableColumns.value, 'botón habilitado:', hasSelectedItems.value);
+  console.log('Current selection:', selectedTableColumns.value, 'button enabled:', hasSelectedItems.value);
 };
 
 const isColumnSelected = (table: string, column: string): boolean => {
@@ -200,7 +222,6 @@ watch(chartRefs, () => {
   }
 }, { deep: true });
 
-// Función para exportar el reporte a PDF
 const exportToPdf = async () => {
   if (Object.keys(generatedCharts.value).length === 0) {
     error.value = 'No charts to export. Please generate some charts first.';
