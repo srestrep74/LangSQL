@@ -60,7 +60,7 @@ onMounted(() => {
 
 <template>
   <div class="container my-5">
-    <button class="btn btn-secondary mb-3" @click="goToAlerts()">← ← {{ t('message.alerts.backButton') }}</button>
+    <button class="btn btn-secondary mb-3" @click="goToAlerts()">← {{ t('message.alerts.backButton') }}</button>
 
     <h2 class="fw-bold text-custom-purple mb-4">{{ t('message.alerts.editAlert') }}</h2>
 
@@ -93,7 +93,7 @@ onMounted(() => {
         </div>
 
         <div class="mb-3">
-          <label for="expiration" class="form-label">{{ t('message.alerts.expirationLabel') }}</label>
+          <label for="expiration" class="form-label">{{ t('message.alerts.alertExpiration') }}</label>
           <input
             v-model="formData.expiration_date"
             type="datetime-local"

@@ -76,7 +76,7 @@ onMounted(() => {
         <div class="mb-3">
           <label class="form-label">
             {{ t('message.alerts.notificationEmails') }}:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.notificationEmailsTooltip')">?</span>
+            <span class="tooltip-icon" data-bs-toggle="tooltip" :title="t('message.alerts.notificationEmailsTooltip')">?</span>
           </label>
           <input v-model="notificationEmails" type="text" class="form-control">
         </div>
@@ -84,7 +84,7 @@ onMounted(() => {
         <div class="mb-3">
           <label class="form-label">
             {{ t('message.alerts.condition') }}:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.conditionTooltip')">?</span>
+            <span class="tooltip-icon" data-bs-toggle="tooltip" :title="t('message.alerts.conditionTooltip')">?</span>
           </label>
           <textarea v-model="prompt" class="form-control" rows="3"></textarea>
         </div>
@@ -92,7 +92,7 @@ onMounted(() => {
         <div class="mb-3">
           <label class="form-label">
             {{ t('message.alerts.expirationDate') }}:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.expirationDateTooltip')">?</span>
+            <span class="tooltip-icon" data-bs-toggle="tooltip" :title="t('message.alerts.expirationDateTooltip')">?</span>
           </label>
           <input v-model="expirationDate" type="datetime-local" class="form-control">
         </div>

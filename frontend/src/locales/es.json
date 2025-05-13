@@ -45,7 +45,7 @@
       "alerts": {
         "errorMessage": "Error al cargar la alerta",
         "loadingMessage": "Cargando detalles de la alerta...",
-        "backButton": "← Volver",
+        "backButton": "Volver",
         "alertDetails": "Detalles de la alerta",
         "alertPrompt": "Mensaje",
         "alertStatus": "Enviada",

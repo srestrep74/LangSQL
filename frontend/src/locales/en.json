@@ -45,7 +45,7 @@
       "alerts": {
         "errorMessage": "Failed to load alert",
         "loadingMessage": "Loading alert details...",
-        "backButton": "← Back",
+        "backButton": "Back",
         "alertDetails": "Alert Details",
         "alertPrompt": "Prompt",
         "alertStatus": "Sent",
