@@ -14,6 +14,36 @@ type MessageSchema = {
     ui: {
       placeholder: string
       send: string
+      yourChats: string
+      newChat: string
+      noChats: string
+      loadingHistory: string
+      startConversation: string
+      confirmDelete: string
+      deleteConfirmation: string
+      deleteWarning: string
+      cancel: string
+      delete: string
+      errorLoadingChat: string
+      unknownError: string
+      errorLoadingHistory: string
+      errorDeletingChat: string
+      errorRenamingChat: string
+      queryResults: string
+      dataFrom: string
+      selectedFields: string
+      noResultsFound: string
+      errorDisplayingResults: string
+      null: string
+      true: string
+      false: string
+      rowReturned: {
+        one: string
+        other: string
+      }
+      enterTitle: string
+      chatPrefix: string
+      noMessages: string
     }
   }
 }
@@ -21,8 +51,8 @@ type MessageSchema = {
 // Load modularized translations
 function loadLocaleMessages() {
   const locales = import.meta.glob('./locales/*.json', { eager: true })
-  const messages: Record<string, any> = {}
-  
+  const messages: { [key: string]: any } = {}
+
   for (const path in locales) {
     const matched = path.match(/\/([a-z0-9]+)\.json$/i)
     if (matched && matched[1]) {
@@ -30,11 +60,11 @@ function loadLocaleMessages() {
       messages[locale] = (locales[path] as any).default || locales[path]
     }
   }
-  
+
   return messages
 }
 
-const i18n = createI18n<[MessageSchema], 'en' | 'es'>({
+const i18n = createI18n({
   legacy: false,
   locale: 'en', // default language
   fallbackLocale: 'en',
