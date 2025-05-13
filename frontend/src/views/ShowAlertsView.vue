@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import AlertService from '../services/AlertService';
 import { useRouter } from 'vue-router';
 
@@ -10,6 +11,7 @@ const goToCreateAlert = () => {
 };
 
 const alerts = ref<Array<any>>([]);
+const { t, locale } = useI18n();
 const isLoading = ref(true);
 const errorMessage = ref('');
 
@@ -35,25 +37,25 @@ const fetchAlerts = async () => {
     const data = await AlertService.getAlerts();
     alerts.value = data?.data || [];
     if (alerts.value.length === 0) {
-      errorMessage.value = 'No alerts found.';
+      errorMessage.value = t('message.alerts.noAlertsFound');
     } else {
       errorMessage.value = '';
     }
   } catch (error: any) {
-    errorMessage.value = error.message || 'Failed to load alerts';
+    errorMessage.value = error.message || t('message.alerts.noAlertsLoaded');
   } finally {
     isLoading.value = false;
   }
 };
 
 const deleteAlert = async (alertId: number) => {
-  if (confirm('Are you sure you want to delete this alert?')) {
+  if (confirm(t('message.alerts.deleteConfirmation'))) {
     try {
       await AlertService.deleteAlert(alertId.toString());
       alerts.value = alerts.value.filter((alert) => alert.id !== alertId);
-      alert('Alert deleted successfully!');
+      alert(t('message.alerts.deleteSuccess'));
     } catch (error: any) {
-      alert(error.message || 'Failed to delete alert');
+      alert(error.message || t('message.alerts.deleteError'));
     }
   }
 };
@@ -74,14 +76,14 @@ onMounted(() => {
 <template>
   <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="fw-bold fs-3 text-custom-purple brand-text">Your Alerts</h2>
+      <h2 class="fw-bold fs-3 text-custom-purple brand-text">{{ t('message.alerts.title') }}</h2>
       <button @click="goToCreateAlert" class="btn btn-primary custom-btn">
-          + Create Alert
+          + {{ t('message.alerts.createAlert') }}
       </button>
     </div>
 
     <div v-if="isLoading" class="alert alert-info text-center" role="alert">
-      Loading alerts...
+      {{ t('message.alerts.loadingAlerts') }}
     </div>
 
     <div v-else-if="errorMessage" class="alert alert-danger text-center" role="alert">
@@ -89,18 +91,18 @@ onMounted(() => {
     </div>
 
     <div v-else-if="alerts.length === 0" class="alert alert-warning text-center" role="alert">
-      No alerts found.
+      {{ t('message.alerts.noAlertsFound') }}
     </div>
 
     <div v-else class="table-responsive">
       <table class="table table-hover table-bordered align-middle">
         <thead class="table-dark">
           <tr>
-            <th scope="col">Condition</th>
-            <th scope="col">Sent</th>
-            <th scope="col">Created At</th>
-            <th scope="col">Expires At</th>
-            <th scope="col">Options</th>
+            <th scope="col">{{ t('message.alerts.condition') }}</th>
+            <th scope="col">{{ t('message.alerts.alertStatus') }}</th>
+            <th scope="col">{{ t('message.alerts.alertCreation') }}</th>
+            <th scope="col">{{ t('message.alerts.alertExpiration') }}</th>
+            <th scope="col">{{ t('message.alerts.options') }}</th>
           </tr>
         </thead>
         <tbody>

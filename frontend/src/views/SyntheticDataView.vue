@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import SyntheticDataService from '../services/SyntheticDataService';
 
 const router = useRouter();
 
 const databaseSchema = ref<string | null>(null);
+const { t, locale } = useI18n();
 const dataAmount = ref(40);
 const errorMessage = ref('');
 const toastMessage = ref('');
@@ -15,10 +17,10 @@ const showToast = ref(false);
 
 const validateInput = () => {
   if (dataAmount.value < 40 || dataAmount.value > 400) {
-    errorMessage.value = 'The value must be between 40 and 400.';
+    errorMessage.value = t('message.syntheticData.errorMessage1');
     dataAmount.value = Math.max(40, Math.min(400, dataAmount.value));
   } else if (dataAmount.value % 40 !== 0) {
-    errorMessage.value = 'The value must be a multiple of 40.';
+    errorMessage.value = t('message.syntheticData.errorMessage2');
     dataAmount.value = Math.round(dataAmount.value / 40) * 40;
   } else {
     errorMessage.value = '';
@@ -39,13 +41,13 @@ const generateData = async () => {
   validateInput();
   if (errorMessage.value) return;
 
-  triggerToast('⏳ Data is being generated. You will be notified shortly.', 'info');
+  triggerToast(t('message.syntheticData.waitingMessage'), 'info');
 
   try {
     const response = await SyntheticDataService.postSyntheticData(dataAmount.value);
 
     if (response.status === "success") {
-      triggerToast("✅ Data generation request successful! Redirecting...", 'success');
+      triggerToast(t('message.syntheticData.successMessage'), 'success');
       setTimeout(() => {
         router.push('/');
       }, 2000);
@@ -53,8 +55,7 @@ const generateData = async () => {
       throw new Error(response.message);
     }
   } catch (error) {
-    console.error("Failed to generate data:", error);
-    triggerToast("❌ An error occurred while generating data. Please try again.", 'danger');
+    triggerToast(t('message.syntheticData.errorMessage3'), 'danger');
   }
 };
 
@@ -63,7 +64,7 @@ onMounted(async () => {
     const schema = await SyntheticDataService.getDatabaseSchema();
     databaseSchema.value = JSON.stringify(schema, null, 2);
   } catch (error) {
-    triggerToast('❌ Failed to load database schema.', 'danger');
+    triggerToast(t('message.syntheticData.errorMessage4'), 'danger');
     console.error(error);
   }
 });
@@ -76,23 +77,22 @@ onMounted(async () => {
     </div>
 
     <div class="description">
-      <h2 class="text-custom-purple">Synthetic Data Generation</h2>
+      <h2 class="text-custom-purple">{{ t('message.syntheticData.title') }}</h2>
       <p>
-        This tool allows you to generate synthetic data based on your database schema.
-        Enter the number of records you want to generate (in multiples of 40, up to 400) and click the button below.
+        {{ t('message.syntheticData.description') }}
       </p>
     </div>
 
     <div class="schema-section">
-      <h3 class="text-custom-purple">Database Schema</h3>
+      <h3 class="text-custom-purple">{{ t('message.syntheticData.databaseSchema') }}</h3>
       <div class="schema-display">
         <pre v-if="databaseSchema">{{ databaseSchema }}</pre>
-        <p v-else class="text-muted">Loading Schema...</p>
+        <p v-else class="text-muted">{{ t('message.syntheticData.loadingSchema') }}</p>
       </div>
     </div>
 
     <div class="input-section">
-      <label for="data-amount" class="text-custom-purple">Number of records to generate:</label>
+      <label for="data-amount" class="text-custom-purple">{{ t('message.syntheticData.numberOfRecords') }}</label>
       <input
         type="number"
         id="data-amount"
@@ -107,7 +107,7 @@ onMounted(async () => {
     </div>
 
     <div class="button-section">
-      <button @click="generateData" class="btn btn-custom-purple">Generate Data</button>
+      <button @click="generateData" class="btn btn-custom-purple">{{ t('message.syntheticData.generateData') }}</button>
     </div>
   </div>
 </template>

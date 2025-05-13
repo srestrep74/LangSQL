@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import AlertService from '../services/AlertService';
 
 const router = useRouter();
 
 const notificationEmails = ref('');
+const { t, locale } = useI18n();
 const prompt = ref('');
 const expirationDate = ref('');
 const isLoading = ref(false);
@@ -35,13 +37,13 @@ const submitForm = async () => {
 
     await AlertService.postCreateAlert(formData);
     isLoading.value = false;
-    triggerToast('✅ Alert created successfully!', 'success');
+    triggerToast(t('message.alerts.createSuccess'), 'success');
     setTimeout(() => {
       router.push({ name: 'alerts' });
     }, 1000);
   } catch (error) {
     isLoading.value = false;
-    triggerToast('❌ Failed to create alert. Please try again.', 'danger');
+    triggerToast(t('message.alerts.createError'), 'danger');
   }
 };
 
@@ -54,10 +56,10 @@ onMounted(() => {
 <template>
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-lg p-4 col-md-6">
-      <h2 class="fw-bold fs-3 text-custom-purple brand-text text-center mb-4">Create Alert</h2>
+      <h2 class="fw-bold fs-3 text-custom-purple brand-text text-center mb-4">{{ t('message.alerts.createTitle') }}</h2>
       
       <div v-if="isLoading" class="alert alert-info text-center fade show" role="alert">
-        ⏳ Generating your alert... You will be notified when is ready.
+        {{ t('message.alerts.generating') }}
       </div>
 
       <div v-if="showToast" :class="['toast align-items-center text-white show position-fixed top-0 end-0 m-3', 
@@ -73,30 +75,30 @@ onMounted(() => {
       <form @submit.prevent="submitForm">
         <div class="mb-3">
           <label class="form-label">
-            Emails to Notify:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="Enter multiple emails separated by commas">?</span>
+            {{ t('message.alerts.notificationEmails') }}:*
+            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.notificationEmailsTooltip')">?</span>
           </label>
           <input v-model="notificationEmails" type="text" class="form-control">
         </div>
 
         <div class="mb-3">
           <label class="form-label">
-            Condition:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="Specify the condition that triggers this alert">?</span>
+            {{ t('message.alerts.condition') }}:*
+            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.conditionTooltip')">?</span>
           </label>
           <textarea v-model="prompt" class="form-control" rows="3"></textarea>
         </div>
 
         <div class="mb-3">
           <label class="form-label">
-            Expiration Date:*
-            <span class="tooltip-icon" data-bs-toggle="tooltip" title="Choose when this alert should expire">?</span>
+            {{ t('message.alerts.expirationDate') }}:*
+            <span class="tooltip-icon" data-bs-toggle="tooltip" title="t('message.alerts.expirationDateTooltip')">?</span>
           </label>
           <input v-model="expirationDate" type="datetime-local" class="form-control">
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg btn-block custom-btn">
-          Submit
+          {{ t('message.alerts.submit') }}
         </button>
       </form>
     </div>
