@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
 from src.modules.queries.utils.SQLUtils import SQLUtils
 
@@ -8,6 +9,7 @@ class QueryService:
         self.db_manager = db_manager
 
     def get_db_structure(self, schema_name: Optional[str] = None) -> Dict[str, Any]:
+        print("get_db_structure called")
         return self.db_manager.get_db_structure(schema_name)
 
     def execute_query(self, query: str, schema_name: Optional[str] = None) -> List[Dict[str, Any]]:

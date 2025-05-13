@@ -28,6 +28,17 @@ export interface QueryResults {
     messages: ChatMessage[];
 }
 
+export interface ChatData {
+    user_id: string;
+    messages: Message[];
+}
+
+export interface Message {
+    role: number;
+    message: string;
+    timestamp: string;
+}
+
 export interface ApiResponse {
     status: string;
     message: string;

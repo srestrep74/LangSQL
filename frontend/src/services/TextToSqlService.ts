@@ -138,6 +138,88 @@ class TextToSqlService {
         throw new Error(response.data.details?.error || response.data.message || 'Unknown API error');
       }
 
+      if (response.data.status === 'error') {
+        throw new Error(response.data.details?.error || response.data.message || 'Unknown API error');
+      }
+
+      return true;
+    } catch (error: unknown) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data as ApiErrorResponse;
+        const errorMessage = errorData?.message || error.message || 'Error renaming chat';
+        throw new Error(errorMessage);
+      }
+
+      throw new Error('An unknown error occurred while renaming the chat');
+    }
+  }
+
+  async deleteChat(chatId: string): Promise<boolean> {
+    try {
+      const credentials = dbCredentialsStore.credentials;
+      if (!credentials) {
+        throw new Error('No database credentials found');
+      }
+
+      const response = await api.delete<ApiResponse>('/text-to-sql/chat', {
+        data: {
+          chat_id: chatId,
+          user_id: userStore.user?.id || '',
+          connection: {
+            db_type: credentials.dbType,
+            username: credentials.user,
+            password: credentials.password,
+            host: credentials.host,
+            port: credentials.port,
+            database_name: credentials.db_name,
+            schema_name: credentials.schema_name
+          }
+        }
+      });
+
+      if (response.data.status === 'error') {
+        throw new Error(response.data.details?.error || response.data.message || 'Unknown API error');
+      }
+
+      return true;
+    } catch (error: unknown) {
+      if (isAxiosError(error)) {
+        const errorData = error.response?.data as ApiErrorResponse;
+        const errorMessage = errorData?.message || error.message || 'Error deleting chat';
+        throw new Error(errorMessage);
+      }
+
+      throw new Error('An unknown error occurred while deleting the chat');
+    }
+  }
+
+  async renameChat(chatId: string, newTitle: string): Promise<boolean> {
+    try {
+      const credentials = dbCredentialsStore.credentials;
+      if (!credentials) {
+        throw new Error('No database credentials found');
+      }
+
+      const response = await api.put<ApiResponse>('/text-to-sql/chat/rename', {
+        chat_id: chatId,
+        user_id: userStore.user?.id || '',
+        new_title: newTitle,
+        connection: {
+          db_type: credentials.dbType,
+          username: credentials.user,
+          password: credentials.password,
+          host: credentials.host,
+          port: credentials.port,
+          database_name: credentials.db_name,
+          schema_name: credentials.schema_name
+        },
+        chat_data: chatData
+      });
+
+      if (response.data.status === 'error') {
+        throw new Error(response.data.details?.error || response.data.message || 'Unknown API error');
+      }
+
       return true;
     } catch (error: unknown) {
       if (isAxiosError(error)) {

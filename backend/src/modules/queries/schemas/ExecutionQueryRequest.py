@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 

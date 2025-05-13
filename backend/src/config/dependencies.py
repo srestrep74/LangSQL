@@ -2,15 +2,15 @@ from fastapi import Depends
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.service import QueryService
+from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
+from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
+from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
-from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
-from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
-from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 
 
 def get_db_manager(connection: DatabaseConnection) -> IDatabaseManager:

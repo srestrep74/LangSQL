@@ -47,6 +47,8 @@ jobs:
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> .env
           echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> .env
           echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> .env
+          echo "TEST_USER=${{ secrets.TEST_USER }}" >> .env
+          echo "TEST_ALERT=${{ secrets.TEST_ALERT }}" >> .env
 
       - name: Run Python tests
         id: test

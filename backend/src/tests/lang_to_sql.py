@@ -1,26 +1,17 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-import json
 from fastapi.testclient import TestClient
 
 from app import app
-from src.modules.text_to_sql.service import SyntheticDataModelService, LangToSqlService
-from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
-from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
+from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
+from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
+from src.tests.utils.database_connection import database_connection
+from src.tests.utils.mock_db_structure import MOCK_DB_STRUCTURE
 
 client = TestClient(app)
-
-database_connection = DatabaseConnection(
-    db_type="postgresql",
-    host="localhost",
-    port=5432,
-    username="postgres",
-    password="password",
-    database_name="test_db",
-    schema_name="inventory"
-)
 
 
 class TestLangToSqlService:
@@ -110,8 +101,9 @@ class TestSyntheticData:
 
         return SyntheticDataModelService(mock_query_adapter, llm_client)
 
-    def test_generate_synthetic_data_service(self, mock_synthetic_data_service):
-        response = mock_synthetic_data_service.generate_synthetic_data(iterations=40, connection=database_connection)
+    @pytest.mark.asyncio
+    async def test_generate_synthetic_data_service(self, mock_synthetic_data_service):
+        response = await mock_synthetic_data_service.generate_synthetic_data(iterations=40, connection=database_connection)
 
         assert isinstance(response, str)
         assert "INSERT INTO" in response

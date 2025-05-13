@@ -1,4 +1,3 @@
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
@@ -6,6 +5,8 @@ import jwt
 from fastapi import HTTPException, Security
 from fastapi.security import OAuth2PasswordBearer
 from jwt import PyJWTError
+from passlib.context import CryptContext
+
 from src.config.constants import Settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

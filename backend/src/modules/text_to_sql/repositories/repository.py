@@ -1,7 +1,7 @@
 from bson import ObjectId
 from typing import List
 from src.config.database import database
-from src.modules.text_to_sql.models.models import Message, Chat
+from src.modules.text_to_sql.models.models import Chat, Message
 
 
 class TextToSqlRepository:

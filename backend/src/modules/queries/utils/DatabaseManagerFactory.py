@@ -1,11 +1,12 @@
 import hashlib
-
 from typing import Dict, Type
+from urllib.parse import quote_plus
+
+from sqlalchemy import Engine, create_engine
+
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.utils.DatabaseType import DatabaseType
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
-from urllib.parse import quote_plus
-from sqlalchemy import Engine, create_engine
 
 
 class DatabaseManagerFactory:

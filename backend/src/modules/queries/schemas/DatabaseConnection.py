@@ -1,6 +1,8 @@
-from pydantic import BaseModel
-from src.modules.queries.utils.DatabaseType import DatabaseType
 from typing import Optional
+
+from pydantic import BaseModel
+
+from src.modules.queries.utils.DatabaseType import DatabaseType
 
 
 class DatabaseConnection(BaseModel):

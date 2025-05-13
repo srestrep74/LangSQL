@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, status, Body
 from typing import Optional
+
+from fastapi import APIRouter, Body, Depends, status
 
 from src.config.dependencies import (
     get_lang_to_sql_service,
     get_synthetic_data_model_service,
 )
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.text_to_sql.models.models import Chat
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.utils.ResponseManager import ResponseManager
-from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 router = APIRouter()
 
@@ -267,7 +268,7 @@ async def generate_synthetic_data(
         ```
     """
     try:
-        results = synthetic_data_model_service.generate_synthetic_data(iterations, connection)
+        results = await synthetic_data_model_service.generate_synthetic_data(iterations, connection)
 
         return ResponseManager.success_response(
             data={"results": results},

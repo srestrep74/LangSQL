@@ -1,17 +1,17 @@
-from fastapi import APIRouter, Depends, status, Query
+from fastapi import APIRouter, Depends, status
 
 from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.service import AlertService
+from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.utils.ResponseErrorModel import ResponseError
 from src.utils.ResponseManager import ResponseManager
-
 
 router = APIRouter()
 alert_service = AlertService()
 
 
 @router.post("/create", tags=["alerts"], responses={200: {"model": Alert, "description": "Alert created successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
-async def create_alert(alert_data: AlertCreate, alert_service: AlertService = Depends()):
+async def create_alert(alert_data: AlertCreate, connection: DatabaseConnection, alert_service: AlertService = Depends()):
     """
     Creates a new alert in the database.
 
@@ -23,14 +23,14 @@ async def create_alert(alert_data: AlertCreate, alert_service: AlertService = De
         Alert: The newly created alert.
     """
     try:
-        result = await alert_service.create_alert(alert_data)
+        result = await alert_service.create_alert(alert_data, connection)
         return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
     except Exception as e:
         return ResponseManager.error_response(str(e), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @router.patch("/{alert_id}", tags=["alerts"], responses={200: {"model": Alert, "description": "Alert updated successfully"}, 500: {"model": ResponseError, "description": "Internal Server Error"}})
-async def update_alert(alert_id: str, alert_data: AlertPatch):
+async def update_alert(alert_id: str, alert_data: AlertPatch, connection: DatabaseConnection, alert_service: AlertService = Depends()):
     """
     Updates an alert.
 
@@ -42,7 +42,7 @@ async def update_alert(alert_id: str, alert_data: AlertPatch):
         Alert: The updated alert.
     """
     try:
-        result = await alert_service.update_alert(alert_id, alert_data)
+        result = await alert_service.update_alert(alert_id, alert_data, connection)
         if result:
             return ResponseManager.success_response(result, status_code=status.HTTP_200_OK)
         return ResponseManager.error_response("Alert not found", status_code=status.HTTP_404_NOT_FOUND)
