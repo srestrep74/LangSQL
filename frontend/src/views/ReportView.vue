@@ -200,20 +200,21 @@ watch(chartRefs, () => {
   }
 }, { deep: true });
 
+// Función para exportar el reporte a PDF
 const exportToPdf = async () => {
   if (Object.keys(generatedCharts.value).length === 0) {
-    error.value = 'No hay gráficas para exportar. Por favor, genere algunas primero.';
+    error.value = 'No charts to export. Please generate some charts first.';
     return;
   }
 
   if (!reportContainerRef.value) {
-    error.value = 'Error al generar el PDF: No se encontró el contenedor de reportes.';
+    error.value = 'Error generating PDF: Report container not found.';
     return;
   }
 
   isExportingPdf.value = true;
   exportProgress.value = 0;
-  exportProgressText.value = 'Preparando el documento...';
+  exportProgressText.value = 'Preparing document...';
   error.value = '';
 
   try {
@@ -222,12 +223,12 @@ const exportToPdf = async () => {
     });
 
     exportProgress.value = 5;
-    exportProgressText.value = 'Renderizando elementos...';
+    exportProgressText.value = 'Rendering elements...';
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
     exportProgress.value = 10;
-    exportProgressText.value = 'Creando documento PDF...';
+    exportProgressText.value = 'Creating PDF document...';
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -236,7 +237,7 @@ const exportToPdf = async () => {
     });
 
     exportProgress.value = 20;
-    exportProgressText.value = 'Generando portada...';
+    exportProgressText.value = 'Generating cover page...';
     createCoverPage(pdf);
 
     let currentY = 20;
@@ -250,7 +251,7 @@ const exportToPdf = async () => {
         continue;
       }
 
-      exportProgressText.value = `Procesando sección: ${key}...`;
+      exportProgressText.value = `Processing section: ${key}...`;
       exportProgress.value = 20 + Math.round((processedSections / totalSections) * 60);
 
       pdf.addPage();
@@ -267,7 +268,7 @@ const exportToPdf = async () => {
       let processedCharts = 0;
 
       for (const [index, chart] of charts.entries()) {
-        exportProgressText.value = `Procesando gráfica ${index + 1} de ${totalCharts} en ${key}...`;
+        exportProgressText.value = `Processing chart ${index + 1} of ${totalCharts} in ${key}...`;
 
         if (currentY > 220) {
           pdf.addPage();
@@ -295,7 +296,7 @@ const exportToPdf = async () => {
           pdf.addImage(imgData, 'PNG', 20, currentY, pdfWidth, pdfHeight);
           currentY += pdfHeight + 20;
         } catch (err) {
-          console.error(`Error al convertir gráfico ${index} de ${key}:`, err);
+          console.error(`Error converting chart ${index} of ${key}:`, err);
         }
 
         processedCharts++;
@@ -309,15 +310,15 @@ const exportToPdf = async () => {
     }
 
     exportProgress.value = 85;
-    exportProgressText.value = 'Generando resumen y conclusiones...';
+    exportProgressText.value = 'Generating summary and conclusions...';
     addSummaryPage(pdf);
 
     exportProgress.value = 95;
-    exportProgressText.value = 'Guardando documento...';
-    pdf.save('informe-analisis-datos.pdf');
+    exportProgressText.value = 'Saving document...';
+    pdf.save('data-analysis-report.pdf');
 
     exportProgress.value = 100;
-    exportProgressText.value = '¡PDF generado con éxito!';
+    exportProgressText.value = 'PDF successfully generated!';
 
     setTimeout(() => {
       if (isExportingPdf.value) {
@@ -327,9 +328,9 @@ const exportToPdf = async () => {
       }
     }, 2000);
   } catch (err: any) {
-    console.error('Error al generar el PDF:', err);
-    error.value = `Error al generar el PDF: ${err.message || 'Error desconocido'}`;
-    exportProgressText.value = 'Error al generar el PDF';
+    console.error('Error generating PDF:', err);
+    error.value = `Error generating PDF: ${err.message || 'Unknown error'}`;
+    exportProgressText.value = 'Error generating PDF';
   } finally {
     if (exportProgress.value < 100) {
       isExportingPdf.value = false;
@@ -345,26 +346,26 @@ const createCoverPage = (pdf: any) => {
 
   pdf.setFillColor(123, 7, 121);
   pdf.rect(0, 0, width, height, 'F');
+
   pdf.setFillColor(46, 204, 113);
   pdf.rect(0, height * 0.75, width, height * 0.25, 'F');
 
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(30);
   pdf.setFont('helvetica', 'bold');
-  const title = 'INFORME DE ANÁLISIS DE DATOS';
+  const title = 'DATA ANALYSIS REPORT';
   const titleWidth = pdf.getStringUnitWidth(title) * 30 / pdf.internal.scaleFactor;
   pdf.text(title, (width - titleWidth) / 2, height * 0.4);
 
   pdf.setFontSize(16);
   pdf.setFont('helvetica', 'normal');
-  const subtitle = 'Visualización e Insights de Datos';
+  const subtitle = 'Data Visualization and Insights';
   const subtitleWidth = pdf.getStringUnitWidth(subtitle) * 16 / pdf.internal.scaleFactor;
   pdf.text(subtitle, (width - subtitleWidth) / 2, height * 0.47);
 
   const date = new Date().toLocaleDateString();
   pdf.setFontSize(12);
-  pdf.text(`Generado el: ${date}`, width - 60, height - 20);
-
+  pdf.text(`Generated on: ${date}`, width - 60, height - 20);
 };
 
 const addInsightsToPdf = (pdf: any, key: string, startY: number): number => {
@@ -373,7 +374,7 @@ const addInsightsToPdf = (pdf: any, key: string, startY: number): number => {
   if (chartInsights.value[key] && chartInsights.value[key].length > 0) {
     pdf.setFontSize(16);
     pdf.setTextColor(51, 51, 51);
-    pdf.text('Insights Clave:', 20, currentY);
+    pdf.text('Key Insights:', 20, currentY);
     currentY += 10;
 
     pdf.setFontSize(11);
@@ -407,7 +408,7 @@ const addSummaryPage = (pdf: any) => {
   pdf.setFontSize(20);
   pdf.setTextColor(123, 7, 121);
   pdf.setFont('helvetica', 'bold');
-  pdf.text('Resumen y Conclusiones', width / 2, 30, { align: 'center' });
+  pdf.text('Summary and Conclusions', width / 2, 30, { align: 'center' });
 
   pdf.setDrawColor(46, 204, 113);
   pdf.setLineWidth(1);
@@ -428,21 +429,21 @@ const addSummaryPage = (pdf: any) => {
 
   let y = 50;
 
-  pdf.text(`• Total de secciones analizadas: ${Object.keys(generatedCharts.value).length}`, 30, y);
+  pdf.text(`• Total sections analyzed: ${Object.keys(generatedCharts.value).length}`, 30, y);
   y += 10;
 
-  pdf.text(`• Total de visualizaciones generadas: ${totalCharts}`, 30, y);
+  pdf.text(`• Total visualizations generated: ${totalCharts}`, 30, y);
   y += 10;
 
-  pdf.text(`• Total de insights identificados: ${totalInsights}`, 30, y);
+  pdf.text(`• Total insights identified: ${totalInsights}`, 30, y);
   y += 20;
 
   pdf.setFontSize(11);
-  pdf.text('Este informe fue generado automáticamente mediante el análisis de los datos seleccionados.', 30, y);
+  pdf.text('This report was automatically generated by analyzing the selected data.', 30, y);
   y += 7;
-  pdf.text('Las visualizaciones y los insights proporcionados tienen como objetivo ayudar en la toma de', 30, y);
+  pdf.text('The visualizations and insights provided are intended to help with data-driven', 30, y);
   y += 7;
-  pdf.text('decisiones basadas en datos para mejorar los procesos de negocio.', 30, y);
+  pdf.text('decision-making to improve business processes.', 30, y);
 
   pdf.setFontSize(10);
   pdf.setTextColor(150, 150, 150);
@@ -526,7 +527,7 @@ const addSummaryPage = (pdf: any) => {
               :class="{ 'btn-enabled': hasSelectedItems }"
             >
               <span v-if="isLoading" class="btn-loader"></span>
-              <span v-else>Generate Charts</span>
+              <span v-else class="btn-text">Generate Charts</span>
             </button>
 
             <button
@@ -535,7 +536,7 @@ const addSummaryPage = (pdf: any) => {
               :disabled="isLoadingStructure"
             >
               <span v-if="isLoadingStructure" class="btn-loader"></span>
-              <span v-else>Refresh Schema</span>
+              <span v-else class="btn-text">Refresh Schema</span>
             </button>
 
             <button
@@ -545,15 +546,15 @@ const addSummaryPage = (pdf: any) => {
               :disabled="isExportingPdf"
             >
               <span v-if="isExportingPdf" class="btn-loader"></span>
-              <span v-else>
+              <span v-else class="btn-text">
                 <i class="download-icon"></i>
-                Exportar PDF
+                Export PDF
               </span>
             </button>
           </div>
 
           <div v-if="!hasSelectedItems" class="selection-hint">
-            Seleccione al menos una tabla y una columna para generar gráficos
+            Select at least one table and column to generate charts
           </div>
         </template>
 
@@ -626,7 +627,7 @@ const addSummaryPage = (pdf: any) => {
     <div v-if="isExportingPdf" class="pdf-export-overlay">
       <div class="pdf-export-modal">
         <div class="export-spinner"></div>
-        <h3>Generando PDF</h3>
+        <h3>Generating PDF</h3>
         <div class="progress-bar-container">
           <div class="progress-bar" :style="{ width: `${exportProgress}%` }"></div>
         </div>
@@ -832,9 +833,17 @@ const addSummaryPage = (pdf: any) => {
   border: none;
 }
 
+.btn-text {
+  color: inherit;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #7b0779, #5a055e);
-  color: white;
+  color: white !important;
+}
+
+.btn-primary .btn-text {
+  color: white !important;
 }
 
 .btn-primary:hover {
@@ -862,6 +871,21 @@ const addSummaryPage = (pdf: any) => {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  color: white !important;
+}
+
+.btn-outline:disabled {
+  color: #7b0779 !important;
+  background-color: rgba(123, 7, 121, 0.05);
+}
+
+.btn-loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 .loading-state {
@@ -892,15 +916,6 @@ const addSummaryPage = (pdf: any) => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-.btn-loader {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
 }
 
 .error-message {
@@ -1054,6 +1069,7 @@ const addSummaryPage = (pdf: any) => {
 .btn-enabled {
   animation: pulse 2s infinite;
   box-shadow: 0 0 10px rgba(123, 7, 121, 0.3);
+  color: white !important;
 }
 
 @keyframes pulse {
@@ -1088,17 +1104,17 @@ const addSummaryPage = (pdf: any) => {
 }
 
 .btn-export {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
-  color: white;
+  background: linear-gradient(135deg, #7b0779, #5a055e);
+  color: white !important;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-export:hover {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  background: linear-gradient(135deg, #9b0999, #7b0779);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+  box-shadow: 0 4px 12px rgba(123, 7, 121, 0.2);
 }
 
 .btn-export:active {
@@ -1191,5 +1207,64 @@ const addSummaryPage = (pdf: any) => {
   border-top-color: #7b0779;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+/* Make sure all button states have proper text color */
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:focus,
+.btn-export:hover,
+.btn-export:active,
+.btn-export:focus {
+  color: white !important;
+}
+
+.btn-primary:hover .btn-text,
+.btn-primary:active .btn-text,
+.btn-primary:focus .btn-text,
+.btn-export:hover .btn-text,
+.btn-export:active .btn-text,
+.btn-export:focus .btn-text {
+  color: white !important;
+}
+
+/* Ensure even disabled buttons have white text */
+.btn-primary:disabled,
+.btn-export:disabled {
+  color: white !important;
+  opacity: 0.7;
+}
+
+.btn-primary:disabled .btn-text,
+.btn-export:disabled .btn-text {
+  color: white !important;
+}
+
+/* Override any browser default button styles */
+button.btn-primary,
+button.btn-export {
+  color: white !important;
+}
+
+button.btn-primary span,
+button.btn-export span {
+  color: white !important;
+}
+
+.btn-export .btn-text {
+  color: white !important;
+}
+
+.btn-primary *,
+.btn-export * {
+  color: white !important;
+}
+
+.btn-outline * {
+  color: #7b0779 !important;
+}
+
+.btn-outline:hover * {
+  color: #7b0779 !important;
 }
 </style>
