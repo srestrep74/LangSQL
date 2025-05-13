@@ -11,6 +11,7 @@ import ShowAlertsView from '@/views/ShowAlertsView.vue'
 import ShowAlertView from '@/views/ShowAlertView.vue'
 import EditAlertView from '@/views/EditAlertView.vue'
 import ConfigurationDatabaseView from '@/views/ConfigurationDatabaseView.vue'
+import ReportView from '@/views/ReportView.vue'
 
 
 
@@ -80,6 +81,12 @@ const router = createRouter({
       path: '/databases',
       name: 'databases',
       component: ConfigurationDatabaseView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/report',
+      name: 'report',
+      component: ReportView,
       meta: { requiresAuth: true }
     }
   ],
