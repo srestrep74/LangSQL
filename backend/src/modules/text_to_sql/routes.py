@@ -160,7 +160,7 @@ async def generate_synthetic_data(
         ```
     """
     try:
-        results = synthetic_data_model_service.generate_synthetic_data(iterations, connection)
+        results = await synthetic_data_model_service.generate_synthetic_data(iterations, connection)
 
         return ResponseManager.success_response(
             data={"results": results},
