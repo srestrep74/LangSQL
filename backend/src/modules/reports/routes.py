@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Header
 from typing import List
 
 
@@ -17,7 +17,8 @@ router = APIRouter()
 async def generate_charts(
     graph_requests: List[GraphRequest],
     connection: DatabaseConnection,
-    service: ReportService = Depends(get_report_service)
+    service: ReportService = Depends(get_report_service),
+    accept_language: str = Header(default="en")
 ):
-    result = await service.create_graph(connection, graph_requests)
+    result = await service.create_graph(connection, graph_requests, accept_language)
     return result

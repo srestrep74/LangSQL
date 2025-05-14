@@ -47,12 +47,18 @@ class ReportService:
         df = pd.DataFrame(info)
         return df
 
+    async def extract_language(self, accept_language: str) -> str:
+        return accept_language.split(',')[0].split(';')[0].strip()
+
     async def create_graph(
-        self, connection: DatabaseConnection, graph_requests: List[GraphRequest]
+        self, connection: DatabaseConnection, graph_requests: List[GraphRequest], accept_language: str
     ) -> Dict[str, dict]:
         graphs_output = {}
         schema = connection.schema_name 
 
+        language = await self.extract_language(accept_language)
+
+        print(language)
         for request in graph_requests:
             table_name = request.table
             columns = request.columns
