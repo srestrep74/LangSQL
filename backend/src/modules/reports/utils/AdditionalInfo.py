@@ -4,7 +4,7 @@ from typing import Dict
 
 from src.config.constants import Settings
 from src.modules.reports.prompts.additional_info import (
-    ADDITIONAL_INFO_PROMPT
+    ADDITIONAL_INFO_PROMPT, TRANSLATE_PROMPT
 )
 
 
@@ -27,7 +27,17 @@ class AdditionalInfoClient:
 
     def get_additional_info(self, graph: Dict[str, dict]) -> str:
         message = ADDITIONAL_INFO_PROMPT.format(
-            graph = graph
+            graph=graph
+        )
+        try:
+            llm_response = self.llm.invoke([HumanMessage(content=message)])
+            return llm_response.content
+        except Exception as e:
+            return e
+
+    def translate(self, text: str) -> str:
+        message = TRANSLATE_PROMPT.format(
+            text=text
         )
         try:
             llm_response = self.llm.invoke([HumanMessage(content=message)])

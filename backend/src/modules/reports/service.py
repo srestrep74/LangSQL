@@ -1,4 +1,3 @@
-import json
 from typing import List, Dict
 
 import pandas as pd
@@ -54,11 +53,10 @@ class ReportService:
         self, connection: DatabaseConnection, graph_requests: List[GraphRequest], accept_language: str
     ) -> Dict[str, dict]:
         graphs_output = {}
-        schema = connection.schema_name 
+        schema = connection.schema_name
 
         language = await self.extract_language(accept_language)
 
-        print(language)
         for request in graph_requests:
             table_name = request.table
             columns = request.columns
@@ -76,9 +74,13 @@ class ReportService:
                     for graph_cls in graph_classes:
                         graph_instance = graph_cls()
                         chart_config = graph_instance.generate(col, df)
-                        
+
                         info_client = AdditionalInfoClient()
                         additional_info = info_client.get_additional_info(chart_config)
+
+                        if language == 'es':
+                            additional_info = info_client.translate(additional_info)
+
                         chart_config["additional_info"] = additional_info
                         column_graphs.append(chart_config)
 

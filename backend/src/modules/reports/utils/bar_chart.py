@@ -1,6 +1,7 @@
 from .base_graph import BaseGraph
 import pandas as pd
 
+
 class BarChart(BaseGraph):
     def generate(self, column: str, df: pd.DataFrame) -> dict:
         data = df[column].value_counts()

@@ -1,6 +1,7 @@
 from .base_graph import BaseGraph
 import pandas as pd
 
+
 class Table(BaseGraph):
     def generate(self, column: str, df: pd.DataFrame) -> dict:
         if column == "*":
@@ -8,7 +9,7 @@ class Table(BaseGraph):
         else:
             cols = [col.strip() for col in column.split(",")]
             data_subset = df[cols]
-        
+
         return {
             "type": "table",
             "data": {
