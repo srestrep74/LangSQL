@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import AlertService from '../services/AlertService';
 
 const route = useRoute();
 const router = useRouter();
 
+const { t, locale } = useI18n();
 const alertId = route.params.id as string;
 const alert = ref<any | null>(null);
 const isLoading = ref(true);
@@ -17,7 +19,7 @@ const fetchAlert = async () => {
     const response = await AlertService.getAlert(alertId);
     alert.value = response?.data;
   } catch (error: any) {
-    errorMessage.value = error.message || 'Failed to load alert';
+    errorMessage.value = error.message || t('message.alerts.errorMessage');
   } finally {
     isLoading.value = false;
   }
@@ -46,10 +48,10 @@ onMounted(() => {
 
 <template>
   <div class="container my-5">
-    <button class="btn btn-secondary mb-3" @click="router.back()">← Back</button>
+    <button class="btn btn-secondary mb-3" @click="router.back()">{{ t('message.alerts.backButton') }}</button>
 
     <div v-if="isLoading" class="alert alert-info text-center" role="alert">
-      Loading alert details...
+      {{ t('message.alerts.loadingMessage') }}
     </div>
 
     <div v-else-if="errorMessage" class="alert alert-danger text-center" role="alert">
@@ -58,13 +60,13 @@ onMounted(() => {
 
     <div v-else-if="alert" class="card shadow">
       <div class="card-body">
-        <h2 class="card-title fw-bold text-custom-purple">Alert Details</h2>
+        <h2 class="card-title fw-bold text-custom-purple">{{ t('message.alerts.alertDetails') }}</h2>
         <hr />
         <dl class="row">
-          <dt class="col-sm-4">Prompt</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertPrompt') }}</dt>
           <dd class="col-sm-8">{{ alert.prompt }}</dd>
 
-          <dt class="col-sm-4">Sent</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertStatus') }}</dt>
           <dd class="col-sm-8">
             <i
               v-if="alert.sent"
@@ -78,19 +80,19 @@ onMounted(() => {
             ></i>
           </dd>
 
-          <dt class="col-sm-4">Created At</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertCreation') }}</dt>
           <dd class="col-sm-8">{{ formatDate(alert.creation_date) }}</dd>
 
-          <dt class="col-sm-4">Expires At</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertExpiration') }}</dt>
           <dd class="col-sm-8">{{ formatDate(alert.expiration_date) }}</dd>
 
-          <dt class="col-sm-4">SQL Query</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertQuery') }}</dt>
           <dd class="col-sm-8">
             <pre class="bg-light p-2 rounded" v-if="alert.sql_query">{{ alert.sql_query }}</pre>
-            <span v-else class="text-muted">No query provided.</span>
+            <span v-else class="text-muted">{{ t('message.alerts.alertNoQuery') }}</span>
           </dd>
 
-          <dt class="col-sm-4">Notification Emails</dt>
+          <dt class="col-sm-4">{{ t('message.alerts.alertEmails') }}</dt>
           <dd class="col-sm-8">
             <ul class="mb-0">
               <li v-for="(email, idx) in alert.notification_emails" :key="idx">
