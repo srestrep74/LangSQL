@@ -45,6 +45,63 @@ type MessageSchema = {
       chatPrefix: string
       noMessages: string
     }
+    alerts: {
+      errorMessage: string
+      loadingMessage: string
+      backButton: string
+      alertDetails: string
+      alertPrompt: string
+      alertStatus: string
+      alertCreation: string
+      alertExpiration: string
+      alertQuery: string
+      alertEmails: string
+      alertNoQuery: string
+      noAlertsFound: string
+      loadingAlerts: string
+      deleteConfirmation: string
+      deleteSuccess: string
+      deleteError: string
+      deletePrompt: string
+      alertSent: string
+      alertNotSent: string
+      condition: string
+      options: string
+      showAlert: string
+      createAlert: string
+      title: string
+      createTitle: string
+      generating: string
+      createSuccess: string
+      createError: string
+      notificationEmails: string
+      notificationEmailsTooltip: string
+      conditionTooltip: string
+      expirationDate: string
+      expirationDateTooltip: string
+      submit: string
+      editAlert: string
+      loadingAlert: string
+      updateSuccess: string
+      updateError: string
+      emailLabel: string
+      updating: string
+      updateAlertButton: string
+    }
+    syntheticData: {
+      errorMessage1: string
+      errorMessage2: string
+      waitingMessage: string
+      successMessage: string
+      errorMessage3: string
+      errorMessage4: string
+      title: string
+      description: string
+      databaseSchema: string
+      loadingSchema: string
+      numberOfRecords: string
+      generateData: string
+    }
   }
 }
 
