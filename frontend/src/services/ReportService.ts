@@ -1,11 +1,7 @@
 import api, { isAxiosError } from '@/services/ApiBase';
-import { useI18n } from 'vue-i18n'
 import type { GraphRequest, ReportResponse, DBStructure } from '@/interfaces/ReportInterfaces';
 import type { ApiErrorResponse } from '@/interfaces/ApiErrorResponse';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
-const { t, locale } = useI18n()
-
-locale.value
 
 class ReportService {
   async generateCharts(graphRequests: GraphRequest[]): Promise<ReportResponse> {
@@ -15,6 +11,8 @@ class ReportService {
         throw new Error('No database credentials found');
       }
       
+      const language = navigator.language.split('-')[0] || 'en'
+            
       const response = await api.post<ReportResponse>('/reports/generate-charts', {
         graph_requests: graphRequests,
         connection: {
@@ -29,7 +27,7 @@ class ReportService {
       },
       {
         headers: {
-          'Accept-Language': locale.value
+          'Accept-Language': navigator.language.split('-')[0] || 'en'
         }
       }
       );
