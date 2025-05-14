@@ -10,6 +10,19 @@ type MessageSchema = {
       processing: string
       error: string
       results: string
+    },
+    report:{
+      title: string
+      subtitle: string
+      panel_title: string
+      loading_structure: string
+      table_selection: string
+      generate_charts: string
+      refresh_schema: string
+      export_pdf: string
+      selection_info: string
+      key_insights: string
+      generating_pdf: string
     }
     ui: {
       placeholder: string

@@ -8,6 +8,31 @@
         "error": "Error al procesar tu consulta. Por favor intenta nuevamente.",
         "results": "Resultados SQL:"
       },
+      "report": {
+          "title": "Análisis e Informes",
+          "subtitle": "Visualiza y analiza tus datos con gráficos interactivos",
+          "panel_title": "Seleccionar Datos para Visualizar",
+          "loading_structure": "Cargando estructura de la base de datos...",
+          "table_selection": "Seleccionar Tablas y Columnas",
+          "generate_charts": "Generar Gráficos",
+          "refresh_schema": "Actualizar Esquema",
+          "export_pdf": "Exportar PDF",
+          "selection_info": "Selecciona al menos una tabla y una columna para generar gráficos",
+          "key_insights": "Principales Conclusiones",
+          "generating_pdf": "Generando PDF",
+          "total_sections": "• Total de secciones analizadas",
+          "total_visualizations": "• Total de visualizaciones generadas",
+          "total_insights": "• Total de perspecitivas analizadas",
+          "report_info": "Este informe se generó automáticamente al analizar los datos seleccionados.",
+          "visualization_info": "Las visualizaciones y los conocimientos proporcionados tienen como objetivo ayudar con la toma ",
+          "decision_info": "de decisiones basada en datos. Toma de decisiones para mejorar los procesos de negocio.",
+          "selected_items": "Items seleccionados:",
+          "report_title": "INFORME DE ANÁLISIS DE DATOS",
+          "report_subtitle": "Visualización y análisis de datos",
+          "generated_text": "Generado el:",
+          "summary_text": "Resumen y conclusiones"
+
+      },
       "ui": {
         "placeholder": "Escribe tu mensaje...",
         "send": "Enviar",

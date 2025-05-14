@@ -6,6 +6,8 @@ from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
+from src.modules.reports.repositories.repository import ReportRepository
+from src.modules.reports.service import ReportService
 from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
@@ -47,3 +49,12 @@ def get_synthetic_data_model_service(query_adapter: QueryAdapter = Depends(get_q
 
 def get_text_to_sql_adapter(lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)):
     return TextToSQLAdapter(lang_to_sql_service)
+
+
+def get_report_repository() -> ReportRepository:
+    return ReportRepository()
+
+
+def get_report_service(query_adapter: QueryAdapter = Depends(get_query_adapter)) -> ReportService:
+    report_repository = get_report_repository()
+    return ReportService(report_repository, query_adapter)
