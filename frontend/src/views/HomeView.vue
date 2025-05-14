@@ -7,7 +7,6 @@
     <section class="hero text-center text-white d-flex flex-column justify-content-center align-items-center">
       <h1 class="display-3 fw-bold animate-zoom-in text-white">Unleash the Power of Natural Language Queries</h1>
       <p class="lead animate-slide-up text-white">Forget SQL. Ask, and LangSQL delivers.</p>
-      <button class="btn btn-lg mt-3 hero-btn animate-pulse">Get Started</button>
     </section>
 
     <section class="container my-5">

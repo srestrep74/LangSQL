@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import Optional
 
 import httpx
 from fastapi import Depends
+from pydantic import BaseModel
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.adapters.text_to_sql.adapter import TextToSQLAdapter
@@ -10,7 +12,6 @@ from src.config.dependencies import get_query_adapter, get_text_to_sql_adapter
 from src.modules.alerts.models.models import Alert, AlertCreate, AlertPatch
 from src.modules.alerts.repositories.repository import AlertRepository
 from src.modules.alerts.utils.email_sender import EmailSender
-from src.modules.auth.repositories.repository import UserRepository
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 
 api_url = Settings().API_URL
@@ -28,8 +29,9 @@ class AlertService:
 
     async def create_alert(self, alert_data: AlertCreate, connection: DatabaseConnection) -> Alert:
         sql_query = await self.get_sql_query(alert_data.prompt, connection)
-        alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
-        alert_create = AlertCreate(**alert_data_dict, sql_query=sql_query)
+        alert_data_dict = alert_data.model_dump(exclude={"sql_query", "credentials"})
+        credentials = [connection.model_dump()] if isinstance(connection, BaseModel) else connection
+        alert_create = AlertCreate(**alert_data_dict, sql_query=sql_query, credentials=credentials)
 
         saved_alert = await self.alert_repository.create_alert(alert_create)
 
@@ -47,7 +49,7 @@ class AlertService:
     async def update_alert(self, alert_id: str, alert_data: AlertPatch, connection: DatabaseConnection) -> Optional[Alert]:
         existing_alert = await self.alert_repository.get_by_id(alert_id)
 
-        if alert_data.prompt != existing_alert.prompt:
+        if alert_data.prompt is not None and alert_data.prompt != existing_alert.prompt:
             sql_query = await self.get_sql_query(alert_data.prompt, connection)
             alert_data_dict = alert_data.model_dump(exclude={"sql_query"})
             alert_data = AlertPatch(**alert_data_dict, sql_query=sql_query)
@@ -75,19 +77,17 @@ class AlertService:
             for alert in alerts:
                 if alert.sent:
                     continue
+                if alert.expiration_date and datetime.now() > alert.expiration_date:
+                    continue
                 try:
-                    user_id = alert.user
-                    user_repository = UserRepository()
-                    user = await user_repository.get_by_id(user_id)
-
                     db_connection = DatabaseConnection(
-                        db_type=user.credentials[0]["dbType"],
-                        host=user.credentials[0]["host"],
-                        port=user.credentials[0]["port"],
-                        username=user.credentials[0]["user"],
-                        password=user.credentials[0]["password"],
-                        database_name=user.credentials[0]["db_name"],
-                        schema_name=user.credentials[0]["db_name"],
+                        db_type=alert.credentials[0]["db_type"],
+                        host=alert.credentials[0]["host"],
+                        port=alert.credentials[0]["port"],
+                        username=alert.credentials[0]["username"],
+                        password=alert.credentials[0]["password"],
+                        database_name=alert.credentials[0]["database_name"],
+                        schema_name=alert.credentials[0]["schema_name"],
                     )
 
                     query_result = self.query_adapter.execute_query(alert.sql_query, db_connection)
