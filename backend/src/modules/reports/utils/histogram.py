@@ -1,5 +1,6 @@
-from .base_graph import BaseGraph
 import pandas as pd
+
+from .base_graph import BaseGraph
 
 
 class Histogram(BaseGraph):

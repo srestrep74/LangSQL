@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, Header
 from typing import List
 
+from fastapi import APIRouter, Depends, Header
 
-from src.config.dependencies import (
-    get_report_service
-)
-
+from src.config.dependencies import get_report_service
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
-from src.modules.reports.service import ReportService
 from src.modules.reports.schemas.GraphRequest import GraphRequest
+from src.modules.reports.service import ReportService
 
 router = APIRouter()
 

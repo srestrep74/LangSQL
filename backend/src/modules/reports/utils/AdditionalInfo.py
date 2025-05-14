@@ -1,10 +1,12 @@
+from typing import Dict
+
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from typing import Dict
 
 from src.config.constants import Settings
 from src.modules.reports.prompts.additional_info import (
-    ADDITIONAL_INFO_PROMPT, TRANSLATE_PROMPT
+    ADDITIONAL_INFO_PROMPT,
+    TRANSLATE_PROMPT,
 )
 
 

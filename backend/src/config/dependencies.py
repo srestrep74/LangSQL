@@ -6,13 +6,13 @@ from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.queries.service import QueryService
 from src.modules.queries.utils.DatabaseManagerFactory import DatabaseManagerFactory
 from src.modules.queries.utils.IDatabaseManager import IDatabaseManager
+from src.modules.reports.repositories.repository import ReportRepository
+from src.modules.reports.service import ReportService
 from src.modules.text_to_sql.repositories.repository import TextToSqlRepository
 from src.modules.text_to_sql.service import LangToSqlService, SyntheticDataModelService
 from src.modules.text_to_sql.utils.APIClientLLMClient import APIClientLLMClient
 from src.modules.text_to_sql.utils.ILLMCLient import ILLMClient
 from src.modules.text_to_sql.utils.LangChainLLMClient import LangChainLLMClient
-from src.modules.reports.service import ReportService
-from src.modules.reports.repositories.repository import ReportRepository
 
 
 def get_db_manager(connection: DatabaseConnection) -> IDatabaseManager:

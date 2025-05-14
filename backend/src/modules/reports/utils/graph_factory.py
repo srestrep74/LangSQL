@@ -1,7 +1,7 @@
 from .bar_chart import BarChart
+from .histogram import Histogram
 from .pie_chart import PieChart
 from .table import Table
-from .histogram import Histogram
 
 GRAPH_SUGGESTIONS = {
     "categorical": [BarChart, PieChart, Table],

@@ -1,14 +1,13 @@
-from typing import List, Dict
+from typing import Dict, List
 
 import pandas as pd
 
 from src.adapters.queries.QueryAdapter import QueryAdapter
 from src.modules.queries.schemas.DatabaseConnection import DatabaseConnection
 from src.modules.reports.repositories.repository import ReportRepository
-from src.modules.reports.utils.graph_factory import GraphFactory
 from src.modules.reports.schemas.GraphRequest import GraphRequest
-from src.modules.reports.utils.graph_factory import GRAPH_SUGGESTIONS
 from src.modules.reports.utils.AdditionalInfo import AdditionalInfoClient
+from src.modules.reports.utils.graph_factory import GRAPH_SUGGESTIONS, GraphFactory
 
 
 class ReportService:
