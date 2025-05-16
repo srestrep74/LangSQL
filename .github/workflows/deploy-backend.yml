@@ -1,0 +1,54 @@
+name: Deploy Backend to Azure
+
+on:
+  push:
+    branches:
+      - main
+      - ci-cd/gitflows
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create backend .env
+        run: |
+          echo "TEXTTOSQL_API_KEY=${{ secrets.TEXTTOSQL_API_KEY }}" >> backend/.env
+          echo "TEXTTOSQL_BASE_URL=${{ secrets.TEXTTOSQL_BASE_URL }}" >> backend/.env
+          echo "TEXTTOSQL_MODEL_NAME=${{ secrets.TEXTTOSQL_MODEL_NAME }}" >> backend/.env
+          echo "TEXTTOSQL_TEMPERATURE=${{ secrets.TEXTTOSQL_TEMPERATURE }}" >> backend/.env
+          echo "SYNTHETIC_DATA_MODEL_API_KEY=${{ secrets.SYNTHETIC_DATA_MODEL_API_KEY }}" >> backend/.env
+          echo "SYNTHETIC_DATA_BASE_URL=${{ secrets.SYNTHETIC_DATA_BASE_URL }}" >> backend/.env
+          echo "SYNTHETIC_DATA_MODEL=${{ secrets.SYNTHETIC_DATA_MODEL }}" >> backend/.env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> backend/.env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> backend/.env
+          echo "DB_URL=${{ secrets.DB_URL }}" >> backend/.env
+          echo "API_URL=${{ secrets.API_URL_DEPLOY }}" >> backend/.env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> backend/.env
+          echo "ALGORITHM=${{ secrets.ALGORITHM }}" >> backend/.env
+          echo "REFRESH_TOKEN_EXPIRE_DAYS=${{ secrets.REFRESH_TOKEN_EXPIRE_DAYS }}" >> backend/.env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}" >> backend/.env
+          echo "GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}" >> backend/.env
+          echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> backend/.env
+          echo "TEST_USER=${{ secrets.TEST_USER }}" >> backend/.env
+          echo "TEST_ALERT=${{ secrets.TEST_ALERT }}" >> backend/.env
+
+      - name: Login to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push backend image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/backend:latest ./backend
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/backend:latest
+
+      - name: Deploy backend to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_BACKEND_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
+          images: ${{ secrets.ACR_LOGIN_SERVER }}/backend:latest
