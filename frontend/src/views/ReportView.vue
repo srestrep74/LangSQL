@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n';
 import ReportService from '@/services/ReportService';
 import type { GraphRequest, ChartData, ReportResponse, DBStructure } from '@/interfaces/ReportInterfaces';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
@@ -8,7 +8,7 @@ import { ChartUtils } from '@/utils/chartUtils';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const { t, locale } = useI18n()
+const { t, locale } = useI18n<{ message: MessageSchema }>();
 
 const isLoading = ref(false);
 const error = ref('');
@@ -52,9 +52,9 @@ const toggleDetails = (key: string): void => {
   showDetails.value[key] = !showDetails.value[key];
 };
 
-const loadDatabaseStructure = async () => {
+const loadDatabaseStructure = async (): Promise<void> => {
   if (!dbCredentialsStore.credentials) {
-    error.value = 'Database credentials are missing. Please configure the database connection first.';
+    error.value = t('message.database.credentialsMissing');
     return;
   }
 
@@ -65,13 +65,16 @@ const loadDatabaseStructure = async () => {
     const dbStructure = await ReportService.getDatabaseStructure() as DBStructure;
     availableTables.value = Object.keys(dbStructure);
     const columns: Record<string, string[]> = {};
+    
     for (const [tableName, tableData] of Object.entries(dbStructure)) {
       columns[tableName] = tableData.columns
         .map(col => col.name)
         .filter(colName => !colName.toLowerCase().includes('id'));
     }
+    
     tableColumns.value = columns;
 
+    // Limpiar columnas ID de la selección actual
     for (const table in selectedTableColumns.value) {
       if (selectedTableColumns.value[table]) {
         selectedTableColumns.value[table] = selectedTableColumns.value[table].filter(
@@ -87,8 +90,8 @@ const loadDatabaseStructure = async () => {
 
     selectedTableColumns.value = { ...selectedTableColumns.value };
 
-  } catch (err: any) {
-    error.value = err.message || 'Error loading database structure';
+  } catch (err: unknown) {
+    error.value = err instanceof Error ? err.message : t('message.query.error');
     console.error('Error loading database structure:', err);
   } finally {
     isLoadingStructure.value = false;
@@ -99,7 +102,7 @@ onMounted(() => {
   loadDatabaseStructure();
 });
 
-const handleTableSelect = (table: string) => {
+const handleTableSelect = (table: string): void => {
   if (selectedTables.value.includes(table)) {
     selectedTables.value = selectedTables.value.filter(t => t !== table);
     delete selectedTableColumns.value[table];
@@ -109,7 +112,7 @@ const handleTableSelect = (table: string) => {
   }
 };
 
-const handleColumnSelect = (table: string, column: string) => {
+const handleColumnSelect = (table: string, column: string): void => {
   if (column.toLowerCase().includes('id')) {
     return;
   }
@@ -133,8 +136,6 @@ const handleColumnSelect = (table: string, column: string) => {
   }
 
   selectedTableColumns.value = { ...selectedTableColumns.value };
-
-  console.log('Current selection:', selectedTableColumns.value, 'button enabled:', hasSelectedItems.value);
 };
 
 const isColumnSelected = (table: string, column: string): boolean => {
@@ -146,14 +147,14 @@ const hasSelectedItems = computed(() => {
     Object.values(selectedTableColumns.value).some(columns => columns.length > 0);
 });
 
-const generateCharts = async () => {
+const generateCharts = async (): Promise<void> => {
   if (!hasSelectedItems.value) {
-    error.value = 'Please select at least one table and column';
+    error.value = t('message.report.selection_info');
     return;
   }
 
   if (!dbCredentialsStore.credentials) {
-    error.value = 'Database credentials are missing. Please configure the database connection first.';
+    error.value = t('message.database.credentialsMissing');
     return;
   }
 
@@ -186,14 +187,14 @@ const generateCharts = async () => {
     });
 
     setTimeout(renderCharts, 100);
-  } catch (err: any) {
-    error.value = err.message || 'Error generating charts';
+  } catch (err: unknown) {
+    error.value = err instanceof Error ? err.message : t('message.query.error');
   } finally {
     isLoading.value = false;
   }
 };
 
-const renderCharts = () => {
+const renderCharts = (): void => {
   const processCharts = () => {
     Object.entries(generatedCharts.value).forEach(([key, charts]) => {
       if (typeof charts === 'string') return;
@@ -216,7 +217,6 @@ const renderCharts = () => {
 
 watch(selectedTableColumns, (newVal) => {
   console.log('selectedTableColumns changed:', newVal);
-  console.log('hasSelectedItems:', hasSelectedItems.value);
 }, { deep: true });
 
 watch(chartRefs, () => {
@@ -225,20 +225,20 @@ watch(chartRefs, () => {
   }
 }, { deep: true });
 
-const exportToPdf = async () => {
+const exportToPdf = async (): Promise<void> => {
   if (Object.keys(generatedCharts.value).length === 0) {
-    error.value = 'No charts to export. Please generate some charts first.';
+    error.value = t('message.report.no_charts_to_export');
     return;
   }
 
   if (!reportContainerRef.value) {
-    error.value = 'Error generating PDF: Report container not found.';
+    error.value = t('message.report.pdf_error');
     return;
   }
 
   isExportingPdf.value = true;
   exportProgress.value = 0;
-  exportProgressText.value = 'Preparing document...';
+  exportProgressText.value = t('message.report.preparing_pdf');
   error.value = '';
 
   try {
@@ -247,12 +247,12 @@ const exportToPdf = async () => {
     });
 
     exportProgress.value = 5;
-    exportProgressText.value = 'Rendering elements...';
+    exportProgressText.value = t('message.report.rendering_elements');
 
     await new Promise(resolve => setTimeout(resolve, 300));
 
     exportProgress.value = 10;
-    exportProgressText.value = 'Creating PDF document...';
+    exportProgressText.value = t('message.report.creating_pdf');
 
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -261,7 +261,7 @@ const exportToPdf = async () => {
     });
 
     exportProgress.value = 20;
-    exportProgressText.value = 'Generating cover page...';
+    exportProgressText.value = t('message.report.generating_cover');
     createCoverPage(pdf);
 
     let currentY = 20;
@@ -275,7 +275,7 @@ const exportToPdf = async () => {
         continue;
       }
 
-      exportProgressText.value = `Processing section: ${key}...`;
+      exportProgressText.value = t('message.report.processing_section', { section: key });
       exportProgress.value = 20 + Math.round((processedSections / totalSections) * 60);
 
       pdf.addPage();
@@ -292,7 +292,11 @@ const exportToPdf = async () => {
       let processedCharts = 0;
 
       for (const [index, chart] of charts.entries()) {
-        exportProgressText.value = `Processing chart ${index + 1} of ${totalCharts} in ${key}...`;
+        exportProgressText.value = t('message.report.processing_chart', { 
+          current: index + 1, 
+          total: totalCharts, 
+          section: key 
+        });
 
         if (currentY > 220) {
           pdf.addPage();
@@ -334,15 +338,15 @@ const exportToPdf = async () => {
     }
 
     exportProgress.value = 85;
-    exportProgressText.value = 'Generating summary and conclusions...';
+    exportProgressText.value = t('message.report.generating_summary');
     addSummaryPage(pdf);
 
     exportProgress.value = 95;
-    exportProgressText.value = 'Saving document...';
+    exportProgressText.value = t('message.report.saving_pdf');
     pdf.save('data-analysis-report.pdf');
 
     exportProgress.value = 100;
-    exportProgressText.value = 'PDF successfully generated!';
+    exportProgressText.value = t('message.report.pdf_success');
 
     setTimeout(() => {
       if (isExportingPdf.value) {
@@ -351,10 +355,12 @@ const exportToPdf = async () => {
         exportProgressText.value = '';
       }
     }, 2000);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error generating PDF:', err);
-    error.value = `Error generating PDF: ${err.message || 'Unknown error'}`;
-    exportProgressText.value = 'Error generating PDF';
+    error.value = t('message.report.pdf_error', { 
+      error: err instanceof Error ? err.message : 'Unknown error' 
+    });
+    exportProgressText.value = t('message.report.pdf_error_generic');
   } finally {
     if (exportProgress.value < 100) {
       isExportingPdf.value = false;
@@ -364,7 +370,7 @@ const exportToPdf = async () => {
   }
 };
 
-const createCoverPage = (pdf: any) => {
+const createCoverPage = (pdf: jsPDF): void => {
   const width = pdf.internal.pageSize.getWidth();
   const height = pdf.internal.pageSize.getHeight();
 
@@ -392,7 +398,7 @@ const createCoverPage = (pdf: any) => {
   pdf.text(`${t("message.report.generated_text")} ${date}`, width - 60, height - 20);
 };
 
-const addInsightsToPdf = (pdf: any, key: string, startY: number): number => {
+const addInsightsToPdf = (pdf: jsPDF, key: string, startY: number): number => {
   let currentY = startY;
 
   if (chartInsights.value[key] && chartInsights.value[key].length > 0) {
@@ -424,7 +430,7 @@ const addInsightsToPdf = (pdf: any, key: string, startY: number): number => {
   return currentY;
 };
 
-const addSummaryPage = (pdf: any) => {
+const addSummaryPage = (pdf: jsPDF): void => {
   pdf.addPage();
 
   const width = pdf.internal.pageSize.getWidth();
@@ -453,17 +459,13 @@ const addSummaryPage = (pdf: any) => {
 
   let y = 50;
 
-  const translatedText = t("message.report.total_sections")
-  const totalSections = Object.keys(generatedCharts.value).length;
-
-  pdf.text(`${translatedText}: ${totalSections}`, 30, y);
-
+  pdf.text(`${t("message.report.total_sections")}: ${Object.keys(generatedCharts.value).length}`, 30, y);
   y += 10;
 
   pdf.text(`${t("message.report.total_visualizations")}: ${totalCharts}`, 30, y);
   y += 10;
 
-  pdf.text(`${t("message.report.total_visualizations")}: ${totalInsights}`, 30, y);
+  pdf.text(`${t("message.report.total_insights")}: ${totalInsights}`, 30, y);
   y += 20;
 
   pdf.setFontSize(11);
@@ -478,10 +480,10 @@ const addSummaryPage = (pdf: any) => {
   pdf.text('© LangSQL Analytics Tool', width / 2, pdf.internal.pageSize.getHeight() - 20, { align: 'center' });
 };
 
-const changeLanguage = (lang: 'en' | 'es') => {
-  locale.value = lang
-  localStorage.setItem('userLanguage', lang)
-}
+const changeLanguage = (lang: 'en' | 'es'): void => {
+  locale.value = lang;
+  localStorage.setItem('userLanguage', lang);
+};
 </script>
 
 <template>

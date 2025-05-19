@@ -30,7 +30,18 @@
           "report_title": "INFORME DE ANÁLISIS DE DATOS",
           "report_subtitle": "Visualización y análisis de datos",
           "generated_text": "Generado el:",
-          "summary_text": "Resumen y conclusiones"
+          "summary_text": "Resumen y conclusiones",
+          "pdf_error": "Error al generar PDF: Contenedor del informe no encontrado.",
+          "preparing_pdf": "Preparando documento...",
+          "rendering_elements": "Renderizando elementos...",
+          "creating_pdf": "Creando documento PDF...",
+          "generating_cover": "Generando portada...",
+          "processing_section": "Procesando sección: {section}...",
+          "processing_chart": "Procesando gráfico {current} de {total} en {section}...",
+          "generating_summary": "Generando resumen y conclusiones...",
+          "saving_pdf": "Guardando documento...",
+          "pdf_success": "¡PDF generado con éxito!",
+          "pdf_error_generic": "Error al generar PDF"
 
       },
       "ui": {
