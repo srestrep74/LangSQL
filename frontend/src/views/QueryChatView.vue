@@ -28,7 +28,23 @@ onMounted(async () => {
     currentChatId.value = route.params.chatId as string;
     await loadChatHistory(currentChatId.value);
   } else {
-    await loadChats();
+    const shouldCreateNewChat = localStorage.getItem('createNewChat') === 'true';
+
+    if (shouldCreateNewChat) {
+      // Clear the flag
+      localStorage.removeItem('createNewChat');
+      // Leave currentChatId as null to create a new chat when user sends a query
+    } else {
+      // Load existing chats and select the most recent one
+      await loadChats();
+      if (userChats.value.length > 0) {
+        const mostRecentChat = userChats.value[0];
+        const chatId = mostRecentChat.chat_id || mostRecentChat.id;
+        currentChatId.value = chatId;
+        router.push(`/chat/${chatId}`);
+        await loadChatHistory(chatId);
+      }
+    }
   }
 });
 
@@ -48,7 +64,7 @@ async function loadChats() {
       messages: []
     };
 
-    const response = await TextToSqlService.processQuery('', chatData);
+    const response = await TextToSqlService.processQuery('', chatData, 'list_only');
 
     if (response && response.chats) {
       userChats.value = response.chats;
@@ -173,6 +189,9 @@ function createNewChat() {
   currentChatId.value = null;
   chatMessages.value = [];
   router.push('/chat');
+
+  // Set a flag to indicate we want to create a new chat
+  localStorage.setItem('createNewChat', 'true');
 }
 
 async function deleteChat(chatId: string, event: Event) {
@@ -273,6 +292,9 @@ const sendQuery = async () => {
     return
   }
 
+  // If we don't have a chat ID and this is the first message, we should create a new chat
+  const isFirstMessageInNewChat = !currentChatId.value && chatMessages.value.length === 0;
+
   chatMessages.value.push({ type: 'user', content: userQuery.value })
 
   const loadingMessage = {
@@ -292,10 +314,13 @@ const sendQuery = async () => {
       }))
     };
 
+    // If this is the first message in a new chat, let's create a chat
+    const chatToUse = isFirstMessageInNewChat ? null : currentChatId.value;
+
     const response: QueryResults = await TextToSqlService.processQuery(
       userQuery.value,
       chatData,
-      currentChatId.value
+      chatToUse
     );
 
     if (!currentChatId.value && response.chat_id) {

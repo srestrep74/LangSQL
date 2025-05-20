@@ -282,3 +282,58 @@ async def generate_synthetic_data(
             status_code=status.HTTP_400_BAD_REQUEST,
             details={"error": str(e)},
         )
+
+
+@router.post("/get_chats")
+async def get_chats(
+    user_id: str = Body(..., embed=True),
+    connection: DatabaseConnection = Body(..., embed=True),
+    lang_to_sql_service: LangToSqlService = Depends(get_lang_to_sql_service)
+):
+    """
+    Endpoint to retrieve all chats for a user without creating a new chat.
+
+    Args:
+        user_id (str): The user ID for which to retrieve chats.
+        connection (DatabaseConnection): The database connection details.
+        lang_to_sql_service (LangToSqlService): Service for chat operations.
+
+    Returns:
+        Successful Response (`200 OK`)
+        ```json
+        {
+            "status": "success",
+            "message": "Success",
+            "data": {
+                "results": {
+                    "chats": [{"chat_id": "...", "title": "..."}]
+                }
+            }
+        }
+        ```
+
+        Error Response (`400 Bad Request`)
+        ```json
+        {
+            "status": "error",
+            "message": "Error retrieving chats",
+            "details": {
+                "error": "Error description"
+            }
+        }
+        ```
+    """
+    try:
+        chats = await lang_to_sql_service.get_chats(user_id)
+        
+        return ResponseManager.success_response(
+            data={"results": {"chats": chats}},
+            message="Success",
+            status_code=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return ResponseManager.error_response(
+            message="Error retrieving chats",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details={"error": str(e)},
+        )
