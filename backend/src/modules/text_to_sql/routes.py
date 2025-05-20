@@ -325,7 +325,7 @@ async def get_chats(
     """
     try:
         chats = await lang_to_sql_service.get_chats(user_id)
-        
+
         return ResponseManager.success_response(
             data={"results": {"chats": chats}},
             message="Success",
