@@ -173,6 +173,43 @@ type MessageSchema = {
         error: string
       registerPrompt: string
     }
+    register: {
+      title: string
+      subtitle: string
+      form: {
+        fullName: string
+        fullNamePlaceholder: string
+        email: string
+        emailPlaceholder: string
+        password: string
+        passwordPlaceholder: string
+        nextButton: string
+        backButton: string
+        registerButton: string
+        registering: string
+        alreadyHaveAccount: string
+        loginLink: string
+      }
+      database: {
+        dbType: string
+        host: string
+        hostPlaceholder: string
+        port: string
+        portPlaceholder: string
+        dbUser: string
+        dbUserPlaceholder: string
+        dbPassword: string
+        dbPasswordPlaceholder: string
+        dbName: string
+        dbNamePlaceholder: string
+        schemaName: string
+        schemaNamePlaceholder: string
+      }
+      errors: {
+        requiredFields: string
+        unknownError: string
+      }
+    }
   }
 }
 
