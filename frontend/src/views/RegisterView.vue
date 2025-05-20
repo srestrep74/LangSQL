@@ -4,7 +4,9 @@ import { useRouter } from 'vue-router';
 import UserService from '@/services/UserService';
 import type { UserCreate } from '@/interfaces/User';
 import type { DBCredentials, DatabaseType } from '@/interfaces/DBCredentials';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const router = useRouter();
 const currentStep = ref(1);
 
@@ -34,7 +36,7 @@ const dbTypes: DatabaseType[] = ['mysql', 'postgresql'];
 
 const nextStep = () => {
   if (!userData.value.name || !userData.value.email || !userData.value.password) {
-    errorMessage.value = 'Please fill all required fields';
+    errorMessage.value = t('message.register.errors.requiredFields');
     return;
   }
   currentStep.value = 2;
@@ -56,7 +58,7 @@ const register = async () => {
 
     await router.push('/login');
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : 'An error occurred';
+    errorMessage.value = error instanceof Error ? error.message : t('message.register.errors.unknownError');
     console.error('Registration error:', error);
   } finally {
     loading.value = false;
@@ -68,8 +70,8 @@ const register = async () => {
   <main class="container-fluid">
     <section class="hero text-center text-white d-flex flex-column justify-content-center align-items-center py-5">
       <div class="login-container animate-fade-in my-5">
-        <h1 class="display-4 fw-bold mb-4 text-white">Create Your LangSQL Account</h1>
-        <p class="lead mb-5 animate-slide-up text-white">Start querying your database with natural language</p>
+        <h1 class="display-4 fw-bold mb-4 text-white">{{ t('message.register.title') }}</h1>
+        <p class="lead mb-5 animate-slide-up text-white">{{ t('message.register.subtitle') }}</p>
 
         <div class="login-card p-5 rounded my-4">
           <div v-if="errorMessage" class="alert alert-danger mb-4 animate-shake">
@@ -81,37 +83,43 @@ const register = async () => {
             <div v-if="currentStep === 1" class="step-content">
               <div class="row g-4">
                 <div class="col-12">
-                  <label for="name" class="form-label text-white d-block text-start mb-2">Full Name</label>
+                  <label for="name" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.form.fullName') }}
+                  </label>
                   <input
                     v-model="userData.name"
                     type="text"
                     class="form-control-lg"
                     id="name"
-                    placeholder="e.g., John Doe"
+                    :placeholder="t('message.register.form.fullNamePlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-md-6">
-                  <label for="email" class="form-label text-white d-block text-start mb-2">Email</label>
+                  <label for="email" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.form.email') }}
+                  </label>
                   <input
                     v-model="userData.email"
                     type="email"
                     class="form-control-lg"
                     id="email"
-                    placeholder="e.g., user@example.com"
+                    :placeholder="t('message.register.form.emailPlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-md-6">
-                  <label for="password" class="form-label text-white d-block text-start mb-2">Password</label>
+                  <label for="password" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.form.password') }}
+                  </label>
                   <input
                     v-model="userData.password"
                     type="password"
                     class="form-control-lg"
                     id="password"
-                    placeholder="Minimum 8 characters"
+                    :placeholder="t('message.register.form.passwordPlaceholder')"
                     required
                     minlength="8"
                   >
@@ -124,12 +132,15 @@ const register = async () => {
                   class="btn btn-lg hero-btn animate-pulse"
                   @click="nextStep"
                 >
-                  Next
+                  {{ t('message.register.form.nextButton') }}
                 </button>
               </div>
 
               <div class="text-center mt-4">
-                <router-link to="/login" class="text-link">Already have an account? <span class="fw-bold">Login here</span></router-link>
+                <router-link to="/login" class="text-link">
+                  {{ t('message.register.form.alreadyHaveAccount') }} 
+                  <span class="fw-bold">{{ t('message.register.form.loginLink') }}</span>
+                </router-link>
               </div>
             </div>
 
@@ -137,7 +148,9 @@ const register = async () => {
             <div v-if="currentStep === 2" class="step-content">
               <div class="row g-4">
                 <div class="col-md-6">
-                  <label for="dbType" class="form-label text-white d-block text-start mb-2">Database Type</label>
+                  <label for="dbType" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.dbType') }}
+                  </label>
                   <select
                     v-model="userData.main_credentials.dbType"
                     class="form-control-lg"
@@ -155,74 +168,86 @@ const register = async () => {
                 </div>
 
                 <div class="col-md-6">
-                  <label for="host" class="form-label text-white d-block text-start mb-2">Host</label>
+                  <label for="host" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.host') }}
+                  </label>
                   <input
                     v-model="userData.main_credentials.host"
                     type="text"
                     class="form-control-lg"
                     id="host"
-                    placeholder="e.g., localhost or 127.0.0.1"
+                    :placeholder="t('message.register.database.hostPlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-md-3">
-                  <label for="port" class="form-label text-white d-block text-start mb-2">Port</label>
+                  <label for="port" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.port') }}
+                  </label>
                   <input
                     v-model.number="userData.main_credentials.port"
                     type="number"
                     class="form-control-lg"
                     id="port"
-                    placeholder="e.g., 3306 for MySQL"
+                    :placeholder="t('message.register.database.portPlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-md-4">
-                  <label for="dbUser" class="form-label text-white d-block text-start mb-2">DB User</label>
+                  <label for="dbUser" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.dbUser') }}
+                  </label>
                   <input
                     v-model="userData.main_credentials.user"
                     type="text"
                     class="form-control-lg"
                     id="dbUser"
-                    placeholder="Database user"
+                    :placeholder="t('message.register.database.dbUserPlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-md-5">
-                  <label for="dbPassword" class="form-label text-white d-block text-start mb-2">DB Password</label>
+                  <label for="dbPassword" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.dbPassword') }}
+                  </label>
                   <input
                     v-model="userData.main_credentials.password"
                     type="password"
                     class="form-control-lg"
                     id="dbPassword"
-                    placeholder="Database password"
+                    :placeholder="t('message.register.database.dbPasswordPlaceholder')"
                     required
                   >
                 </div>
 
                 <div class="col-12">
-                  <label for="dbName" class="form-label text-white d-block text-start mb-2">Database Name</label>
+                  <label for="dbName" class="form-label text-white d-block text-start mb-2">
+                    {{ t('message.register.database.dbName') }}
+                  </label>
                   <input
                     v-model="userData.main_credentials.db_name"
                     type="text"
                     class="form-control-lg"
                     id="dbName"
-                    placeholder="Name of the database to connect"
+                    :placeholder="t('message.register.database.dbNamePlaceholder')"
                     required
                   >
                 </div>
               </div>
 
               <div class="col-12" v-if="userData.main_credentials.dbType === 'postgresql'">
-                <label for="schemaName" class="form-label text-white d-block text-start mb-2">Schema Name</label>
+                <label for="schemaName" class="form-label text-white d-block text-start mb-2">
+                  {{ t('message.register.database.schemaName') }}
+                </label>
                 <input
                   v-model="userData.main_credentials.schema_name"
                   type="text"
                   class="form-control-lg"
                   id="schemaName"
-                  placeholder="Schema name (optional)"
+                  :placeholder="t('message.register.database.schemaNamePlaceholder')"
                 >
               </div>
 
@@ -232,7 +257,7 @@ const register = async () => {
                   class="btn btn-outline-light"
                   @click="prevStep"
                 >
-                  Back
+                  {{ t('message.register.form.backButton') }}
                 </button>
                 <button
                   type="submit"
@@ -240,7 +265,7 @@ const register = async () => {
                   :disabled="loading"
                 >
                   <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ loading ? 'Registering...' : 'Complete Registration' }}
+                  {{ loading ? t('message.register.form.registering') : t('message.register.form.registerButton') }}
                 </button>
               </div>
             </div>

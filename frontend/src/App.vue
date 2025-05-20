@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const logout = () => {
   userStore.logout()
@@ -41,31 +41,31 @@ const languageOptions = [
           <ul class="navbar-nav ms-auto align-items-center">
             <!-- Always show Home -->
             <li class="nav-item">
-              <router-link to="/" class="nav-link text-custom-purple">Home</router-link>
+              <router-link to="/" class="nav-link text-custom-purple">{{ t('message.ui.home') }}</router-link>
             </li>
-            
+
             <!-- Show these only when authenticated -->
             <template v-if="userStore.isAuthenticated">
               <li class="nav-item">
-                <router-link to="/query" class="nav-link text-custom-purple">Query</router-link>
+                <router-link to="/query" class="nav-link text-custom-purple">{{ t('message.ui.query') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/alerts" class="nav-link text-custom-purple">Alerts</router-link>
+                <router-link to="/alerts" class="nav-link text-custom-purple">{{ t('message.ui.alerts') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/reports" class="nav-link text-custom-purple">Reports</router-link>
+                <router-link to="/reports" class="nav-link text-custom-purple">{{ t('message.ui.reports') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/synthetic_data" class="nav-link text-custom-purple">Synthetic Data</router-link>
+                <router-link to="/synthetic_data" class="nav-link text-custom-purple">{{ t('message.ui.syntheticData') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/databases" class="nav-link text-custom-purple">Databases</router-link>
+                <router-link to="/databases" class="nav-link text-custom-purple">{{ t('message.ui.databases') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/configuration" class="nav-link text-custom-purple">Configuration</router-link>
+                <router-link to="/configuration" class="nav-link text-custom-purple">{{ t('message.ui.configuration') }}</router-link>
               </li>
             </template>
-            
+
             <!-- Language Selector Dropdown -->
             <li class="nav-item dropdown mx-2">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="languageDropdown" role="button" 
@@ -82,7 +82,7 @@ const languageOptions = [
                 </li>
               </ul>
             </li>
-            
+
             <!-- User Dropdown (only when authenticated) -->
             <template v-if="userStore.isAuthenticated">
               <li class="nav-item dropdown">
@@ -93,20 +93,20 @@ const languageOptions = [
                   </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                  <li><router-link to="/profile" class="dropdown-item">Profile</router-link></li>
+                  <li><router-link to="/profile" class="dropdown-item">{{ t('message.ui.profile') }}</router-link></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><button class="dropdown-item" @click="logout">Logout</button></li>
+                  <li><button class="dropdown-item" @click="logout">{{ t('message.ui.logout') }}</button></li>
                 </ul>
               </li>
             </template>
-            
+
             <!-- Show these only when NOT authenticated -->
             <template v-else>
               <li class="nav-item">
-                <router-link to="/login" class="nav-link text-custom-purple">Login</router-link>
+                <router-link to="/login" class="nav-link text-custom-purple">{{ t('message.ui.login') }}</router-link>
               </li>
               <li class="nav-item">
-                <router-link to="/register" class="nav-link text-custom-purple">Register</router-link>
+                <router-link to="/register" class="nav-link text-custom-purple">{{ t('message.ui.register') }}</router-link>
               </li>
             </template>
           </ul>
@@ -125,8 +125,8 @@ const languageOptions = [
     <footer class="bg-light-gray text-custom-purple text-center p-4 mt-auto shadow-lg">
       <div class="container">
         <div class="footer-content">
-          <p class="fw-bold fs-5">LangSQL - Powering Your Queries</p>
-          <span>© 2025 LangSQL. All rights reserved.</span>
+          <p class="fw-bold fs-5">LangSQL - {{ t('message.report.subtitle') }}</p>
+          <span>© 2025 LangSQL. {{ t('message.ui.rightsReserved') }}</span>
         </div>
       </div>
     </footer>
