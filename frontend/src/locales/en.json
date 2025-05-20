@@ -1,7 +1,42 @@
 {
     "message": {
       "database": {
-        "credentialsMissing": "Database credentials are missing. Please configure the database connection first."
+        "credentialsMissing": "Database credentials are missing. Please configure the database connection first.",
+        "configuration": {
+          "title": "Database Configuration",
+          "selectMain": "Select the main database to use:",
+          "noCredentials": "No database credentials configured.",
+          "host": "Host",
+          "user": "User",
+          "schema": "Schema",
+          "setAsMain": "Set as main",
+          "mainDatabase": "Main database",
+          "successMessage": "Main database updated successfully"
+        },
+        "addConfiguration": {
+          "title": "Database Configuration",
+          "subtitle": "Connect to your databases and start querying with natural language",
+          "sectionTitle": "Add New Database Connection",
+          "dbType": "Database Type",
+          "dbTypeHelp": "Default ports: MySQL (3306), PostgreSQL (5432)",
+          "host": "Host",
+          "hostPlaceholder": "e.g., localhost or 127.0.0.1",
+          "port": "Port",
+          "portPlaceholder": "Port number",
+          "username": "Username",
+          "usernamePlaceholder": "Database username",
+          "password": "Password",
+          "passwordPlaceholder": "Database password",
+          "dbName": "Database Name",
+          "dbNamePlaceholder": "Name of the database",
+          "schemaName": "Schema Name",
+          "schemaNamePlaceholder": "Schema name (e.g., public)",
+          "saveButton": "Save Configuration",
+          "savingButton": "Saving...",
+          "successMessage": "Database configuration saved successfully!",
+          "errorNotFound": "User ID not found. Please log in again.",
+          "errorGeneric": "An error occurred while saving configuration"
+        }
       },
       "query": {
         "processing": "Processing Query",
