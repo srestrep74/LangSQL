@@ -1,7 +1,42 @@
 {
     "message": {
       "database": {
-        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero."
+        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero.",
+        "configuration": {
+          "title": "Configuración de Base de Datos",
+          "selectMain": "Selecciona la base de datos principal:",
+          "noCredentials": "No hay credenciales de base de datos configuradas.",
+          "host": "Host",
+          "user": "Usuario",
+          "schema": "Esquema",
+          "setAsMain": "Establecer como principal",
+          "mainDatabase": "Base de datos principal",
+          "successMessage": "Base de datos principal actualizada con éxito"
+        },
+        "addConfiguration": {
+          "title": "Configuración de Base de Datos",
+          "subtitle": "Conecta a tus bases de datos y comienza a consultar con lenguaje natural",
+          "sectionTitle": "Agregar Nueva Conexión de Base de Datos",
+          "dbType": "Tipo de Base de Datos",
+          "dbTypeHelp": "Puertos predeterminados: MySQL (3306), PostgreSQL (5432)",
+          "host": "Host",
+          "hostPlaceholder": "ej., localhost o 127.0.0.1",
+          "port": "Puerto",
+          "portPlaceholder": "Número de puerto",
+          "username": "Usuario",
+          "usernamePlaceholder": "Usuario de la base de datos",
+          "password": "Contraseña",
+          "passwordPlaceholder": "Contraseña de la base de datos",
+          "dbName": "Nombre de la Base de Datos",
+          "dbNamePlaceholder": "Nombre de la base de datos",
+          "schemaName": "Nombre del Esquema",
+          "schemaNamePlaceholder": "Nombre del esquema (ej., public)",
+          "saveButton": "Guardar Configuración",
+          "savingButton": "Guardando...",
+          "successMessage": "¡Configuración de base de datos guardada con éxito!",
+          "errorNotFound": "ID de usuario no encontrado. Por favor inicia sesión nuevamente.",
+          "errorGeneric": "Ocurrió un error al guardar la configuración"
+        }
       },
       "query": {
         "processing": "Procesando Consulta",

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { userStore } from '@/store/userStore';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 import type { UserResponse } from '@/interfaces/User';
 import type { DBCredentials } from '@/interfaces/DBCredentials';
 import { createUserService } from '@/services/DatabaseService';
 
+const { t } = useI18n();
 const userService = createUserService();
 const user = ref<UserResponse | null>(null);
 const isLoading = ref(true);
@@ -47,7 +49,7 @@ const setMainCredential = async (index: number) => {
       dbCredentialsStore.setCredentials(user.value.main_credentials);
     }
 
-    successMessage.value = 'Main database updated successfully';
+    successMessage.value = t('message.database.configuration.successMessage');
     setTimeout(() => {
       successMessage.value = '';
     }, 3000);
@@ -82,7 +84,7 @@ onMounted(() => {
 <template>
   <div class="container mt-5 mb-5">
     <div class="card shadow-lg p-4">
-      <h2 class="fw-bold fs-3 text-custom-purple brand-text text-center mb-4">Database Configuration</h2>
+      <h2 class="fw-bold fs-3 text-custom-purple brand-text text-center mb-4">{{ t('message.database.configuration.title') }}</h2>
 
       <div v-if="isLoading" class="text-center">
         <div class="spinner-border text-custom-purple" role="status">
@@ -99,11 +101,11 @@ onMounted(() => {
       </div>
 
       <div v-else-if="!user?.credentials?.length" class="alert alert-info" role="alert">
-        No database credentials configured.
+        {{ t('message.database.configuration.noCredentials') }}
       </div>
 
       <div v-else>
-        <p class="mb-4">Select the main database to use:</p>
+        <p class="mb-4">{{ t('message.database.configuration.selectMain') }}</p>
 
         <div class="list-group">
           <div
@@ -115,9 +117,9 @@ onMounted(() => {
             <div class="d-flex w-100 justify-content-between align-items-center">
               <div>
                 <h5 class="mb-1">{{ credential.dbType }} - {{ credential.db_name }}</h5>
-                <p class="mb-1">Host: {{ credential.host }}:{{ credential.port }}</p>
-                <p class="mb-1">User: {{ credential.user }}</p>
-                <p class="mb-1" v-if="credential.schema_name">Schema: {{ credential.schema_name }}</p>
+                <p class="mb-1">{{ t('message.database.configuration.host') }}: {{ credential.host }}:{{ credential.port }}</p>
+                <p class="mb-1">{{ t('message.database.configuration.user') }}: {{ credential.user }}</p>
+                <p class="mb-1" v-if="credential.schema_name">{{ t('message.database.configuration.schema') }}: {{ credential.schema_name }}</p>
               </div>
               <div>
                 <button
@@ -125,9 +127,9 @@ onMounted(() => {
                   @click="setMainCredential(index)"
                   class="btn btn-primary custom-btn"
                 >
-                  Set as main
+                  {{ t('message.database.configuration.setAsMain') }}
                 </button>
-                <span v-else class="badge bg-custom-purple">Main database</span>
+                <span v-else class="badge bg-custom-purple">{{ t('message.database.configuration.mainDatabase') }}</span>
               </div>
             </div>
           </div>

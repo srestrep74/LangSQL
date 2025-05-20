@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { createUserService } from '@/services/DatabaseService';
 import type { DBCredentials } from '@/interfaces/DBCredentials';
 import { userStore } from '@/store/userStore';
 import { dbCredentialsStore } from '@/store/dbCredentialsStore';
 
+const { t } = useI18n();
 const databaseService = createUserService();
 
 const credentials = ref<DBCredentials>({
@@ -35,7 +37,7 @@ const saveConfiguration = async () => {
     const userId = userStore.user?.id;
 
     if (!userId) {
-      throw new Error('User ID not found. Please log in again.');
+      throw new Error(t('message.database.addConfiguration.errorNotFound'));
     }
 
     const newCredential: DBCredentials = {
@@ -49,7 +51,7 @@ const saveConfiguration = async () => {
       dbCredentialsStore.setCredentials(updatedUser.credentials[0]);
     }
 
-    successMessage.value = 'Database configuration saved successfully!';
+    successMessage.value = t('message.database.addConfiguration.successMessage');
 
     credentials.value = {
       dbType: 'mysql',
@@ -65,7 +67,7 @@ const saveConfiguration = async () => {
       successMessage.value = '';
     }, 3000);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'An error occurred while saving configuration';
+    errorMessage.value = error instanceof Error ? error.message : t('message.database.addConfiguration.errorGeneric');
     console.error('Error saving configuration:', error);
 
     setTimeout(() => {
@@ -86,8 +88,8 @@ onMounted(() => {
     <section class="config-section p-5">
       <div class="config-container">
         <div class="config-header text-center mb-5">
-          <h1 class="display-5 fw-bold animate-slide-up">Database Configuration</h1>
-          <p class="lead animate-fade-in">Connect to your databases and start querying with natural language</p>
+          <h1 class="display-5 fw-bold animate-slide-up">{{ t('message.database.addConfiguration.title') }}</h1>
+          <p class="lead animate-fade-in">{{ t('message.database.addConfiguration.subtitle') }}</p>
         </div>
 
         <div class="row">
@@ -95,7 +97,7 @@ onMounted(() => {
             <div class="config-card p-4 rounded-lg shadow-lg animate-fade-in">
               <div class="card-header d-flex align-items-center mb-4">
                 <i class="bi bi-database-fill me-3 header-icon"></i>
-                <h2 class="m-0">Add New Database Connection</h2>
+                <h2 class="m-0">{{ t('message.database.addConfiguration.sectionTitle') }}</h2>
               </div>
 
               <div v-if="errorMessage" class="alert alert-danger animate-shake mb-4">
@@ -112,7 +114,7 @@ onMounted(() => {
                 <div class="row g-4">
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="dbType" class="form-label">Database Type</label>
+                      <label for="dbType" class="form-label">{{ t('message.database.addConfiguration.dbType') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-hdd-network-fill"></i></span>
                         <select
@@ -127,14 +129,14 @@ onMounted(() => {
                         </select>
                       </div>
                       <small class="form-text text-muted">
-                        Default ports: MySQL (3306), PostgreSQL (5432)
+                        {{ t('message.database.addConfiguration.dbTypeHelp') }}
                       </small>
                     </div>
                   </div>
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="host" class="form-label">Host</label>
+                      <label for="host" class="form-label">{{ t('message.database.addConfiguration.host') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-globe"></i></span>
                         <input
@@ -142,7 +144,7 @@ onMounted(() => {
                           type="text"
                           class="form-control"
                           id="host"
-                          placeholder="e.g., localhost or 127.0.0.1"
+                          :placeholder="t('message.database.addConfiguration.hostPlaceholder')"
                           required
                         >
                       </div>
@@ -151,7 +153,7 @@ onMounted(() => {
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="port" class="form-label">Port</label>
+                      <label for="port" class="form-label">{{ t('message.database.addConfiguration.port') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-ethernet"></i></span>
                         <input
@@ -159,7 +161,7 @@ onMounted(() => {
                           type="number"
                           class="form-control"
                           id="port"
-                          placeholder="Port number"
+                          :placeholder="t('message.database.addConfiguration.portPlaceholder')"
                           required
                         >
                       </div>
@@ -168,7 +170,7 @@ onMounted(() => {
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="username" class="form-label">Username</label>
+                      <label for="username" class="form-label">{{ t('message.database.addConfiguration.username') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
                         <input
@@ -176,7 +178,7 @@ onMounted(() => {
                           type="text"
                           class="form-control"
                           id="username"
-                          placeholder="Database username"
+                          :placeholder="t('message.database.addConfiguration.usernamePlaceholder')"
                           required
                         >
                       </div>
@@ -185,7 +187,7 @@ onMounted(() => {
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="password" class="form-label">Password</label>
+                      <label for="password" class="form-label">{{ t('message.database.addConfiguration.password') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
                         <input
@@ -193,7 +195,7 @@ onMounted(() => {
                           type="password"
                           class="form-control"
                           id="password"
-                          placeholder="Database password"
+                          :placeholder="t('message.database.addConfiguration.passwordPlaceholder')"
                           required
                         >
                       </div>
@@ -202,7 +204,7 @@ onMounted(() => {
 
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label for="database" class="form-label">Database Name</label>
+                      <label for="database" class="form-label">{{ t('message.database.addConfiguration.dbName') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-folder-fill"></i></span>
                         <input
@@ -210,7 +212,7 @@ onMounted(() => {
                           type="text"
                           class="form-control"
                           id="database"
-                          placeholder="Name of the database"
+                          :placeholder="t('message.database.addConfiguration.dbNamePlaceholder')"
                           required
                         >
                       </div>
@@ -219,7 +221,7 @@ onMounted(() => {
 
                   <div v-if="showSchemaField" class="col-md-6">
                     <div class="form-group">
-                      <label for="schema" class="form-label">Schema Name</label>
+                      <label for="schema" class="form-label">{{ t('message.database.addConfiguration.schemaName') }}</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-diagram-3-fill"></i></span>
                         <input
@@ -227,7 +229,7 @@ onMounted(() => {
                           type="text"
                           class="form-control"
                           id="schema"
-                          placeholder="Schema name (e.g., public)"
+                          :placeholder="t('message.database.addConfiguration.schemaNamePlaceholder')"
                         >
                       </div>
                     </div>
@@ -238,7 +240,7 @@ onMounted(() => {
                       <button type="submit" class="btn btn-primary w-100" :disabled="loading">
                         <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
                         <i v-else class="bi bi-save-fill me-2"></i>
-                        {{ loading ? 'Saving...' : 'Save Configuration' }}
+                        {{ loading ? t('message.database.addConfiguration.savingButton') : t('message.database.addConfiguration.saveButton') }}
                       </button>
                     </div>
                   </div>
