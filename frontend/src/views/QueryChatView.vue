@@ -548,9 +548,9 @@ const changeLanguage = (lang: 'en' | 'es') => {
                 {{ chat.title || t('message.ui.chatPrefix') + ' ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
               </div>
               <div class="chat-preview">
-                {{ chat.messages && chat.messages.length > 0 ?
-                  chat.messages[chat.messages.length - 1].message.substring(0, 30) + '...' :
-                  t('message.ui.noMessages') }}
+                {{ chat.title ?
+                  t('message.ui.clickToView') :
+                  t('message.ui.untitledChat') }}
               </div>
             </div>
           </div>
