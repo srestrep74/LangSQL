@@ -15,7 +15,8 @@ async def generate_charts(
     graph_requests: List[GraphRequest],
     connection: DatabaseConnection,
     service: ReportService = Depends(get_report_service),
-    accept_language: str = Header(default="en")
+    lang: str = Header(None)
 ):
-    result = await service.create_graph(connection, graph_requests, accept_language)
+
+    result = await service.create_graph(connection, graph_requests, lang)
     return result
