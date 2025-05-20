@@ -31,11 +31,8 @@ onMounted(async () => {
     const shouldCreateNewChat = localStorage.getItem('createNewChat') === 'true';
 
     if (shouldCreateNewChat) {
-      // Clear the flag
       localStorage.removeItem('createNewChat');
-      // Leave currentChatId as null to create a new chat when user sends a query
     } else {
-      // Load existing chats and select the most recent one
       await loadChats();
       if (userChats.value.length > 0) {
         const mostRecentChat = userChats.value[0];
@@ -190,7 +187,6 @@ function createNewChat() {
   chatMessages.value = [];
   router.push('/chat');
 
-  // Set a flag to indicate we want to create a new chat
   localStorage.setItem('createNewChat', 'true');
 }
 
@@ -257,7 +253,6 @@ async function saveChatTitle(chatId: string, event: Event) {
     isLoading.value = true;
     await TextToSqlService.renameChat(chatId, editedTitle.value.trim());
 
-    // Update chat title in the list
     const chatIndex = userChats.value.findIndex(chat =>
       (chat.chat_id || chat.id) === chatId
     );
@@ -292,7 +287,6 @@ const sendQuery = async () => {
     return
   }
 
-  // If we don't have a chat ID and this is the first message, we should create a new chat
   const isFirstMessageInNewChat = !currentChatId.value && chatMessages.value.length === 0;
 
   chatMessages.value.push({ type: 'user', content: userQuery.value })
@@ -314,7 +308,6 @@ const sendQuery = async () => {
       }))
     };
 
-    // If this is the first message in a new chat, let's create a chat
     const chatToUse = isFirstMessageInNewChat ? null : currentChatId.value;
 
     const response: QueryResults = await TextToSqlService.processQuery(
@@ -498,7 +491,6 @@ function addSqlResultsTable(data: any[], title: string = t('message.query.result
   chatMessages.value.push({ type: 'bot', content: tableHTML });
 }
 
-// Language switcher function
 const changeLanguage = (lang: 'en' | 'es') => {
   locale.value = lang
   localStorage.setItem('userLanguage', lang)
@@ -594,7 +586,6 @@ const changeLanguage = (lang: 'en' | 'es') => {
       </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="delete-modal-overlay">
       <div class="delete-modal">
         <div class="delete-modal-header">
@@ -1035,7 +1026,6 @@ const changeLanguage = (lang: 'en' | 'es') => {
   font-style: italic;
 }
 
-/* Delete Modal Styles */
 .delete-modal-overlay {
   position: fixed;
   top: 0;
