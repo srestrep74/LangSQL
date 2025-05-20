@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import UserService from '@/services/UserService';
 import { userStore } from '@/store/userStore';
 
+const { t, locale } = useI18n();
 const router = useRouter();
 
 const credentials = ref({
@@ -20,11 +22,11 @@ const login = async () => {
     errorMessage.value = '';
 
     const response = await UserService.login(credentials.value);
-    
+
     userStore.handleAuthResponse(response);
     await router.push('/');
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : 'An error occurred';
+    errorMessage.value = error instanceof Error ? error.message : t('message.login.error');
     console.error('Login error:', error);
   } finally {
     loading.value = false;
@@ -36,17 +38,17 @@ const login = async () => {
   <main class="container-fluid">
     <section class="hero text-center text-white d-flex flex-column justify-content-center align-items-center py-5">
       <div class="login-container animate-fade-in my-5">
-        <h1 class="display-4 fw-bold mb-4 text-white">Welcome Back to LangSQL</h1>
-        <p class="lead mb-5 animate-slide-up text-white">Unlock your database with natural language queries</p>
-        
+        <h1 class="display-4 fw-bold mb-4 text-white">{{ t('message.login.title') }}</h1>
+        <p class="lead mb-5 animate-slide-up text-white">{{ t('message.login.subtitle') }}</p>
+
         <div class="login-card p-5 rounded my-4">
           <div v-if="errorMessage" class="alert alert-danger mb-4 animate-shake">
-            {{ errorMessage }}
+            {{ t('message.login.error') }}: {{ errorMessage }}
           </div>
-          
+
           <form @submit.prevent="login" class="login-form">
             <div class="mb-4">
-              <label for="loginEmail" class="form-label text-white d-block text-start mb-2">Email</label>
+              <label for="loginEmail" class="form-label text-white d-block text-start mb-2">{{ t('message.login.email') }}</label>
               <input
                 v-model="credentials.email"
                 type="email"
@@ -56,19 +58,19 @@ const login = async () => {
                 required
               >
             </div>
-            
+
             <div class="mb-4">
-              <label for="loginPassword" class="form-label text-white d-block text-start mb-2">Password</label>
+              <label for="loginPassword" class="form-label text-white d-block text-start mb-2">{{ t('message.login.password') }}</label>
               <input
                 v-model="credentials.password"
                 type="password"
                 class="form-control-lg"
                 id="loginPassword"
-                placeholder="Enter your password"
+                placeholder="••••••••"
                 required
               >
             </div>
-            
+
             <div class="text-center mt-5">
               <button 
                 type="submit" 
@@ -76,12 +78,14 @@ const login = async () => {
                 :disabled="loading"
               >
                 <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-                {{ loading ? 'Logging in...' : 'Login' }}
+                {{ loading ? t('message.login.loading') : t('message.login.button') }}
               </button>
             </div>
-            
+
             <div class="text-center mt-4">
-              <router-link to="/register" class="text-link">Don't have an account? <span class="fw-bold">Register now</span></router-link>
+              <router-link to="/register" class="text-link">
+                {{ t('message.login.registerPrompt') }}
+              </router-link>
             </div>
           </form>
         </div>
@@ -182,7 +186,7 @@ body {
   text-decoration: underline;
 }
 
-/* Animations */
+/* Animaciones */
 .animate-fade-in {
   animation: fadeIn 1s ease-in-out;
 }
@@ -222,20 +226,20 @@ body {
   .hero {
     padding: 3rem 1.5rem;
   }
-  
+
   .login-container {
     padding: 0 1.5rem;
   }
-  
+
   .login-card {
     padding: 2rem 1.5rem;
     margin: 1.5rem 0;
   }
-  
+
   h1 {
     font-size: 2.2rem;
   }
-  
+
   .hero-btn {
     max-width: 100%;
   }

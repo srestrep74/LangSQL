@@ -45,6 +45,18 @@
         "pdf_error_generic": "Error generating PDF"
       },
       "ui": {
+        "home": "Home",
+        "query": "Query",
+        "alerts": "Alerts",
+        "reports": "Reports",
+        "syntheticData": "Synthetic Data",
+        "databases": "Databases",
+        "configuration": "Configuration",
+        "login": "Login",
+        "register": "Register",
+        "profile": "Profile",
+        "logout": "Logout",
+        "footerMessage": "LangSQL - Powering Your Queries",
         "placeholder": "Type your message...",
         "send": "Send",
         "yourChats": "Your Chats",
@@ -135,6 +147,89 @@
         "loadingSchema": "Loading database schema...",
         "numberOfRecords": "Number of records to generate:",
         "generateData":  "Generate Data"
+      },
+      "landing": {
+        "hero": {
+          "title": "Unleash the Power of Natural Language Queries",
+          "subtitle": "Forget SQL. Ask, and LangSQL delivers."
+        },
+        "features": {
+          "fast": {
+            "title": "Lightning Fast",
+            "description": "Get insights in seconds, no SQL required."
+          },
+          "effortless": {
+            "title": "Effortless",
+            "description": "Just ask questions naturally, and we handle the rest."
+          },
+          "versatile": {
+            "title": "Versatile",
+            "description": "Works seamlessly across multiple databases."
+          }
+        },
+        "howItWorks": {
+          "title": "How LangSQL Works",
+          "subtitle": "A simple 3-step process to unlock your database potential.",
+          "step1": {
+            "title": "Step 1: Connect",
+            "description": "Link your database with a few clicks."
+          },
+          "step2": {
+            "title": "Step 2: Ask",
+            "description": "Type a question in natural language."
+          },
+          "step3": {
+            "title": "Step 3: Get Results",
+            "description": "Receive instant, clear answers."
+          }
+        }
+      },
+      "login": {
+        "title": "Welcome Back to LangSQL",
+        "subtitle": "Unlock your database with natural language queries",
+        "email": "Email",
+        "password": "Password",
+        "button": "Login",
+        "loading": "Logging in...",
+        "error": "An error occurred",
+        "registerPrompt": "Don't have an account? Register now"
+      },
+      "register": {
+        "title": "Create Your LangSQL Account",
+        "subtitle": "Start querying your database with natural language",
+        "form": {
+          "fullName": "Full Name",
+          "fullNamePlaceholder": "e.g., John Doe",
+          "email": "Email",
+          "emailPlaceholder": "e.g., user@example.com",
+          "password": "Password",
+          "passwordPlaceholder": "Minimum 8 characters",
+          "nextButton": "Next",
+          "backButton": "Back",
+          "registerButton": "Complete Registration",
+          "registering": "Registering...",
+          "alreadyHaveAccount": "Already have an account?",
+          "loginLink": "Login here"
+        },
+        "database": {
+          "dbType": "Database Type",
+          "host": "Host",
+          "hostPlaceholder": "e.g., localhost or 127.0.0.1",
+          "port": "Port",
+          "portPlaceholder": "e.g., 3306 for MySQL",
+          "dbUser": "DB User",
+          "dbUserPlaceholder": "Database user",
+          "dbPassword": "DB Password",
+          "dbPasswordPlaceholder": "Database password",
+          "dbName": "Database Name",
+          "dbNamePlaceholder": "Name of the database to connect",
+          "schemaName": "Schema Name",
+          "schemaNamePlaceholder": "Schema name (optional)"
+        },
+        "errors": {
+          "requiredFields": "Please fill all required fields",
+          "unknownError": "An error occurred"
+        }
       }
     }
   }

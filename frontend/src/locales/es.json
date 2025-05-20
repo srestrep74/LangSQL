@@ -45,6 +45,18 @@
 
       },
       "ui": {
+        "home": "Inicio",
+        "query": "Consulta",
+        "alerts": "Alertas",
+        "reports": "Reportes",
+        "syntheticData": "Datos Sintéticos",
+        "databases": "Bases de Datos",
+        "configuration": "Configuración",
+        "login": "Iniciar sesión",
+        "register": "Registrarse",
+        "profile": "Perfil",
+        "logout": "Cerrar sesión",
+        "footerMessage": "LangSQL - Potenciando tus consultas",
         "placeholder": "Escribe tu mensaje...",
         "send": "Enviar",
         "yourChats": "Tus Conversaciones",
@@ -134,6 +146,89 @@
         "loadingSchema": "Cargando esquema...",
         "numberOfRecords": "Cantidad de registros a generar:",
         "generateData": "Generar Datos"
+      },
+      "landing": {
+        "hero": {
+          "title": "Libera el poder de las consultas en lenguaje natural",
+          "subtitle": "Olvida el SQL. Pregunta, y LangSQL responde."
+        },
+        "features": {
+          "fast": {
+            "title": "Rápido como un rayo",
+            "description": "Obtén información en segundos, sin necesidad de SQL."
+          },
+          "effortless": {
+            "title": "Sin esfuerzo",
+            "description": "Solo haz preguntas naturalmente, nosotros nos encargamos del resto."
+          },
+          "versatile": {
+            "title": "Versátil",
+            "description": "Funciona perfectamente con múltiples bases de datos."
+          }
+        },
+        "howItWorks": {
+          "title": "Cómo funciona LangSQL",
+          "subtitle": "Un simple proceso de 3 pasos para desbloquear el potencial de tu base de datos.",
+          "step1": {
+            "title": "Paso 1: Conecta",
+            "description": "Vincula tu base de datos en unos pocos clics."
+          },
+          "step2": {
+            "title": "Paso 2: Pregunta",
+            "description": "Escribe una pregunta en lenguaje natural."
+          },
+          "step3": {
+            "title": "Paso 3: Obtén resultados",
+            "description": "Recibe respuestas claras al instante."
+          }
+        }
+      },
+      "login": {
+        "title": "Bienvenido de nuevo a LangSQL",
+        "subtitle": "Consulta tu base de datos con lenguaje natural",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "button": "Iniciar sesión",
+        "loading": "Iniciando sesión...",
+        "error": "Ocurrió un error",
+        "registerPrompt": "¿No tienes una cuenta? Regístrate ahora"
+      },
+      "register": {
+        "title": "Crea tu cuenta de LangSQL",
+        "subtitle": "Comienza a consultar tu base de datos con lenguaje natural",
+        "form": {
+          "fullName": "Nombre completo",
+          "fullNamePlaceholder": "ej. Juan Pérez",
+          "email": "Correo electrónico",
+          "emailPlaceholder": "ej. usuario@ejemplo.com",
+          "password": "Contraseña",
+          "passwordPlaceholder": "Mínimo 8 caracteres",
+          "nextButton": "Siguiente",
+          "backButton": "Atrás",
+          "registerButton": "Completar registro",
+          "registering": "Registrando...",
+          "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+          "loginLink": "Inicia sesión aquí"
+        },
+        "database": {
+          "dbType": "Tipo de base de datos",
+          "host": "Servidor",
+          "hostPlaceholder": "ej. localhost o 127.0.0.1",
+          "port": "Puerto",
+          "portPlaceholder": "ej. 3306 para MySQL",
+          "dbUser": "Usuario DB",
+          "dbUserPlaceholder": "Usuario de la base de datos",
+          "dbPassword": "Contraseña DB",
+          "dbPasswordPlaceholder": "Contraseña de la base de datos",
+          "dbName": "Nombre de la base de datos",
+          "dbNamePlaceholder": "Nombre de la base de datos a conectar",
+          "schemaName": "Nombre del esquema",
+          "schemaNamePlaceholder": "Nombre del esquema (opcional)"
+        },
+        "errors": {
+          "requiredFields": "Por favor completa todos los campos requeridos",
+          "unknownError": "Ocurrió un error"
+        }
       }
     }
   }
