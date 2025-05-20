@@ -30,7 +30,19 @@
         "report_title": "DATA ANALYSIS REPORT",
         "report_subtitle": "Data Visualization and Insights",
         "generated_text": "Generated on:",
-        "summary_text": "Summary and Conclusions"
+        "summary_text": "Summary and Conclusions",
+        "no_charts_to_export": "No charts to export. Please generate some charts first.",
+        "pdf_error": "Error generating PDF: Report container not found.",
+        "preparing_pdf": "Preparing document...",
+        "rendering_elements": "Rendering elements...",
+        "creating_pdf": "Creating PDF document...",
+        "generating_cover": "Generating cover page...",
+        "processing_section": "Processing section: {section}...",
+        "processing_chart": "Processing chart {current} of {total} in {section}...",
+        "generating_summary": "Generating summary and conclusions...",
+        "saving_pdf": "Saving document...",
+        "pdf_success": "PDF successfully generated!",
+        "pdf_error_generic": "Error generating PDF"
       },
       "ui": {
         "placeholder": "Type your message...",
