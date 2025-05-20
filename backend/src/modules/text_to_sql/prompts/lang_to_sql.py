@@ -52,4 +52,3 @@ HUMAN_RESPONSE_PROMPT = (
     The header should be written in natural language, like a short sentence or phrase that could appear at the top of a written answer or report. Avoid labels or keyword-only formats. Return only the header.
     """
 )
-
