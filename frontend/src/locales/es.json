@@ -88,7 +88,9 @@
         },
         "enterTitle": "Ingresa un título...",
         "chatPrefix": "Chat",
-        "noMessages": "Sin mensajes"
+        "noMessages": "Sin mensajes",
+        "clickToView": "Clic para ver conversación",
+        "untitledChat": "Chat sin título"
       },
       "alerts": {
         "errorMessage": "Error al cargar la alerta",

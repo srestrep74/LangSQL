@@ -88,7 +88,9 @@
         },
         "enterTitle": "Enter chat title...",
         "chatPrefix": "Chat",
-        "noMessages": "No messages"
+        "noMessages": "No messages",
+        "clickToView": "Click to view conversation",
+        "untitledChat": "Untitled chat"
       },
       "alerts": {
         "errorMessage": "Failed to load alert",

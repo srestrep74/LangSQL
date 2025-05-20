@@ -17,6 +17,47 @@ class TextToSqlService {
         messages: []
       };
 
+      // Special case for list_only - just fetch user's chats without creating a new chat
+      if (chatId === 'list_only') {
+        try {
+          const response = await api.post<ApiResponse>('/text-to-sql/get_chats', {
+            user_id: userStore.user?.id || '',
+            connection: {
+              db_type: credentials.dbType,
+              username: credentials.user,
+              password: credentials.password,
+              host: credentials.host,
+              port: credentials.port,
+              database_name: credentials.db_name,
+              schema_name: credentials.schema_name
+            }
+          });
+
+          if (response.data.status === 'error') {
+            throw new Error(response.data.details?.error || response.data.message || 'Unknown API error');
+          }
+
+          return {
+            chat_id: '',
+            header: '',
+            sql_query: '',
+            sql_results: '[]',
+            chats: response.data?.data?.results?.chats || [],
+            messages: []
+          };
+        } catch (error) {
+          console.error('Error fetching chats list:', error);
+          return {
+            chat_id: '',
+            header: '',
+            sql_query: '',
+            sql_results: '[]',
+            chats: [],
+            messages: []
+          };
+        }
+      }
+
       const response = await api.post<ApiResponse>('/text-to-sql/chat', {
         user_input: query,
         connection: {
