@@ -457,4 +457,15 @@ select.form-control-lg {
     max-width: 100%;
   }
 }
+
+select.form-control-lg option {
+  background-color: white;
+  color: black;
+}
+
+select.form-control-lg option:checked,
+select.form-control-lg option:hover {
+  background-color: #f0f0f0;
+  color: black;
+}
 </style>
