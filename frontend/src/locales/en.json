@@ -1,7 +1,42 @@
 {
     "message": {
       "database": {
-        "credentialsMissing": "Database credentials are missing. Please configure the database connection first."
+        "credentialsMissing": "Database credentials are missing. Please configure the database connection first.",
+        "configuration": {
+          "title": "Database Configuration",
+          "selectMain": "Select the main database to use:",
+          "noCredentials": "No database credentials configured.",
+          "host": "Host",
+          "user": "User",
+          "schema": "Schema",
+          "setAsMain": "Set as main",
+          "mainDatabase": "Main database",
+          "successMessage": "Main database updated successfully"
+        },
+        "addConfiguration": {
+          "title": "Database Configuration",
+          "subtitle": "Connect to your databases and start querying with natural language",
+          "sectionTitle": "Add New Database Connection",
+          "dbType": "Database Type",
+          "dbTypeHelp": "Default ports: MySQL (3306), PostgreSQL (5432)",
+          "host": "Host",
+          "hostPlaceholder": "e.g., localhost or 127.0.0.1",
+          "port": "Port",
+          "portPlaceholder": "Port number",
+          "username": "Username",
+          "usernamePlaceholder": "Database username",
+          "password": "Password",
+          "passwordPlaceholder": "Database password",
+          "dbName": "Database Name",
+          "dbNamePlaceholder": "Name of the database",
+          "schemaName": "Schema Name",
+          "schemaNamePlaceholder": "Schema name (e.g., public)",
+          "saveButton": "Save Configuration",
+          "savingButton": "Saving...",
+          "successMessage": "Database configuration saved successfully!",
+          "errorNotFound": "User ID not found. Please log in again.",
+          "errorGeneric": "An error occurred while saving configuration"
+        }
       },
       "query": {
         "processing": "Processing Query",
@@ -30,9 +65,33 @@
         "report_title": "DATA ANALYSIS REPORT",
         "report_subtitle": "Data Visualization and Insights",
         "generated_text": "Generated on:",
-        "summary_text": "Summary and Conclusions"
+        "summary_text": "Summary and Conclusions",
+        "no_charts_to_export": "No charts to export. Please generate some charts first.",
+        "pdf_error": "Error generating PDF: Report container not found.",
+        "preparing_pdf": "Preparing document...",
+        "rendering_elements": "Rendering elements...",
+        "creating_pdf": "Creating PDF document...",
+        "generating_cover": "Generating cover page...",
+        "processing_section": "Processing section: {section}...",
+        "processing_chart": "Processing chart {current} of {total} in {section}...",
+        "generating_summary": "Generating summary and conclusions...",
+        "saving_pdf": "Saving document...",
+        "pdf_success": "PDF successfully generated!",
+        "pdf_error_generic": "Error generating PDF"
       },
       "ui": {
+        "home": "Home",
+        "query": "Query",
+        "alerts": "Alerts",
+        "reports": "Reports",
+        "syntheticData": "Synthetic Data",
+        "databases": "Databases",
+        "configuration": "Configuration",
+        "login": "Login",
+        "register": "Register",
+        "profile": "Profile",
+        "logout": "Logout",
+        "footerMessage": "LangSQL - Powering Your Queries",
         "placeholder": "Type your message...",
         "send": "Send",
         "yourChats": "Your Chats",
@@ -64,7 +123,9 @@
         },
         "enterTitle": "Enter chat title...",
         "chatPrefix": "Chat",
-        "noMessages": "No messages"
+        "noMessages": "No messages",
+        "clickToView": "Click to view conversation",
+        "untitledChat": "Untitled chat"
       },
       "alerts": {
         "errorMessage": "Failed to load alert",
@@ -123,6 +184,89 @@
         "loadingSchema": "Loading database schema...",
         "numberOfRecords": "Number of records to generate:",
         "generateData":  "Generate Data"
+      },
+      "landing": {
+        "hero": {
+          "title": "Unleash the Power of Natural Language Queries",
+          "subtitle": "Forget SQL. Ask, and LangSQL delivers."
+        },
+        "features": {
+          "fast": {
+            "title": "Lightning Fast",
+            "description": "Get insights in seconds, no SQL required."
+          },
+          "effortless": {
+            "title": "Effortless",
+            "description": "Just ask questions naturally, and we handle the rest."
+          },
+          "versatile": {
+            "title": "Versatile",
+            "description": "Works seamlessly across multiple databases."
+          }
+        },
+        "howItWorks": {
+          "title": "How LangSQL Works",
+          "subtitle": "A simple 3-step process to unlock your database potential.",
+          "step1": {
+            "title": "Step 1: Connect",
+            "description": "Link your database with a few clicks."
+          },
+          "step2": {
+            "title": "Step 2: Ask",
+            "description": "Type a question in natural language."
+          },
+          "step3": {
+            "title": "Step 3: Get Results",
+            "description": "Receive instant, clear answers."
+          }
+        }
+      },
+      "login": {
+        "title": "Welcome Back to LangSQL",
+        "subtitle": "Unlock your database with natural language queries",
+        "email": "Email",
+        "password": "Password",
+        "button": "Login",
+        "loading": "Logging in...",
+        "error": "An error occurred",
+        "registerPrompt": "Don't have an account? Register now"
+      },
+      "register": {
+        "title": "Create Your LangSQL Account",
+        "subtitle": "Start querying your database with natural language",
+        "form": {
+          "fullName": "Full Name",
+          "fullNamePlaceholder": "e.g., John Doe",
+          "email": "Email",
+          "emailPlaceholder": "e.g., user@example.com",
+          "password": "Password",
+          "passwordPlaceholder": "Minimum 8 characters",
+          "nextButton": "Next",
+          "backButton": "Back",
+          "registerButton": "Complete Registration",
+          "registering": "Registering...",
+          "alreadyHaveAccount": "Already have an account?",
+          "loginLink": "Login here"
+        },
+        "database": {
+          "dbType": "Database Type",
+          "host": "Host",
+          "hostPlaceholder": "e.g., localhost or 127.0.0.1",
+          "port": "Port",
+          "portPlaceholder": "e.g., 3306 for MySQL",
+          "dbUser": "DB User",
+          "dbUserPlaceholder": "Database user",
+          "dbPassword": "DB Password",
+          "dbPasswordPlaceholder": "Database password",
+          "dbName": "Database Name",
+          "dbNamePlaceholder": "Name of the database to connect",
+          "schemaName": "Schema Name",
+          "schemaNamePlaceholder": "Schema name (optional)"
+        },
+        "errors": {
+          "requiredFields": "Please fill all required fields",
+          "unknownError": "An error occurred"
+        }
       }
     }
   }

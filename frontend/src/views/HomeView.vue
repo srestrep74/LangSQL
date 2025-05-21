@@ -1,53 +1,54 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+const { locale, t } = useI18n()
 </script>
 
 <template>
   <main class="container-fluid">
-
     <section class="hero text-center text-white d-flex flex-column justify-content-center align-items-center">
-      <h1 class="display-3 fw-bold animate-zoom-in text-white">Unleash the Power of Natural Language Queries</h1>
-      <p class="lead animate-slide-up text-white">Forget SQL. Ask, and LangSQL delivers.</p>
+      <h1 class="display-3 fw-bold animate-zoom-in text-white">{{ t('message.landing.hero.title') }}</h1>
+      <p class="lead animate-slide-up text-white">{{ t('message.landing.hero.subtitle') }}</p>
     </section>
 
     <section class="container my-5">
       <div class="row text-center">
         <div class="col-md-4 animate-fade-in">
           <i class="bi bi-lightning-fill feature-icon"></i>
-          <h3 class="mt-3 feature-text">Lightning Fast</h3>
-          <p class="feature-text">Get insights in seconds, no SQL required.</p>
+          <h3 class="mt-3 feature-text">{{ t('message.landing.features.fast.title') }}</h3>
+          <p class="feature-text">{{ t('message.landing.features.fast.description') }}</p>
         </div>
         <div class="col-md-4 animate-fade-in" style="animation-delay: 0.2s;">
           <i class="bi bi-chat-left-text-fill feature-icon"></i>
-          <h3 class="mt-3 feature-text">Effortless</h3>
-          <p class="feature-text">Just ask questions naturally, and we handle the rest.</p>
+          <h3 class="mt-3 feature-text">{{ t('message.landing.features.effortless.title') }}</h3>
+          <p class="feature-text">{{ t('message.landing.features.effortless.description') }}</p>
         </div>
         <div class="col-md-4 animate-fade-in" style="animation-delay: 0.4s;">
           <i class="bi bi-database-fill-check feature-icon"></i>
-          <h3 class="mt-3 feature-text">Versatile</h3>
-          <p class="feature-text">Works seamlessly across multiple databases.</p>
+          <h3 class="mt-3 feature-text">{{ t('message.landing.features.versatile.title') }}</h3>
+          <p class="feature-text">{{ t('message.landing.features.versatile.description') }}</p>
         </div>
       </div>
     </section>
 
     <section class="how-it-works text-white text-center py-5">
-      <h2 class="display-4 animate-slide-up text-white">How LangSQL Works</h2>
-      <p class="lead animate-fade-in text-white">A simple 3-step process to unlock your database potential.</p>
+      <h2 class="display-4 animate-slide-up text-white">{{ t('message.landing.howItWorks.title') }}</h2>
+      <p class="lead animate-fade-in text-white">{{ t('message.landing.howItWorks.subtitle') }}</p>
       <div class="container mt-4">
         <div class="row">
           <div class="col-md-4 animate-scale-up">
             <i class="bi bi-pencil-square feature-icon"></i>
-            <h4 class="text-white">Step 1: Connect</h4>
-            <p class="text-white">Link your database with a few clicks.</p>
+            <h4 class="text-white">{{ t('message.landing.howItWorks.step1.title') }}</h4>
+            <p class="text-white">{{ t('message.landing.howItWorks.step1.description') }}</p>
           </div>
           <div class="col-md-4 animate-scale-up" style="animation-delay: 0.2s;">
             <i class="bi bi-chat-dots feature-icon"></i>
-            <h4 class="text-white">Step 2: Ask</h4>
-            <p class="text-white">Type a question in natural language.</p>
+            <h4 class="text-white">{{ t('message.landing.howItWorks.step2.title') }}</h4>
+            <p class="text-white">{{ t('message.landing.howItWorks.step2.description') }}</p>
           </div>
           <div class="col-md-4 animate-scale-up" style="animation-delay: 0.4s;">
             <i class="bi bi-bar-chart-line feature-icon"></i>
-            <h4 class="text-white">Step 3: Get Results</h4>
-            <p class="text-white">Receive instant, clear answers.</p>
+            <h4 class="text-white">{{ t('message.landing.howItWorks.step3.title') }}</h4>
+            <p class="text-white">{{ t('message.landing.howItWorks.step3.description') }}</p>
           </div>
         </div>
       </div>

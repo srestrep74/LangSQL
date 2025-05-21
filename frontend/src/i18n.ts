@@ -25,6 +25,18 @@ type MessageSchema = {
       generating_pdf: string
     }
     ui: {
+      home: string
+      query: string
+      alerts: string
+      reports: string
+      syntheticData: string
+      databases: string
+      configuration: string
+      login: string
+      register: string
+      profile: string
+      logout: string
+      footerMessage: string
       placeholder: string
       send: string
       yourChats: string
@@ -114,6 +126,89 @@ type MessageSchema = {
       loadingSchema: string
       numberOfRecords: string
       generateData: string
+    }
+    landing: {
+      hero: {
+        title: string
+        subtitle: string
+      }
+      features: {
+        fast: {
+          title: string
+          description: string
+        }
+        effortless: {
+          title: string
+          description: string
+        }
+        versatile: {
+          title: string
+          description: string
+        }
+      }
+      howItWorks: {
+        title: string
+        subtitle: string
+        step1: {
+          title: string
+          description: string
+        }
+        step2: {
+          title: string
+          description: string
+        }
+        step3: {
+          title: string
+          description: string
+        }
+      }
+    }
+    login: {
+      title: string
+      subtitle: string
+      email: string
+      password: string
+      button: string
+      loading: string
+        error: string
+      registerPrompt: string
+    }
+    register: {
+      title: string
+      subtitle: string
+      form: {
+        fullName: string
+        fullNamePlaceholder: string
+        email: string
+        emailPlaceholder: string
+        password: string
+        passwordPlaceholder: string
+        nextButton: string
+        backButton: string
+        registerButton: string
+        registering: string
+        alreadyHaveAccount: string
+        loginLink: string
+      }
+      database: {
+        dbType: string
+        host: string
+        hostPlaceholder: string
+        port: string
+        portPlaceholder: string
+        dbUser: string
+        dbUserPlaceholder: string
+        dbPassword: string
+        dbPasswordPlaceholder: string
+        dbName: string
+        dbNamePlaceholder: string
+        schemaName: string
+        schemaNamePlaceholder: string
+      }
+      errors: {
+        requiredFields: string
+        unknownError: string
+      }
     }
   }
 }

@@ -1,7 +1,42 @@
 {
     "message": {
       "database": {
-        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero."
+        "credentialsMissing": "Faltan credenciales de la base de datos. Por favor configure la conexión primero.",
+        "configuration": {
+          "title": "Configuración de Base de Datos",
+          "selectMain": "Selecciona la base de datos principal:",
+          "noCredentials": "No hay credenciales de base de datos configuradas.",
+          "host": "Host",
+          "user": "Usuario",
+          "schema": "Esquema",
+          "setAsMain": "Establecer como principal",
+          "mainDatabase": "Base de datos principal",
+          "successMessage": "Base de datos principal actualizada con éxito"
+        },
+        "addConfiguration": {
+          "title": "Configuración de Base de Datos",
+          "subtitle": "Conecta a tus bases de datos y comienza a consultar con lenguaje natural",
+          "sectionTitle": "Agregar Nueva Conexión de Base de Datos",
+          "dbType": "Tipo de Base de Datos",
+          "dbTypeHelp": "Puertos predeterminados: MySQL (3306), PostgreSQL (5432)",
+          "host": "Host",
+          "hostPlaceholder": "ej., localhost o 127.0.0.1",
+          "port": "Puerto",
+          "portPlaceholder": "Número de puerto",
+          "username": "Usuario",
+          "usernamePlaceholder": "Usuario de la base de datos",
+          "password": "Contraseña",
+          "passwordPlaceholder": "Contraseña de la base de datos",
+          "dbName": "Nombre de la Base de Datos",
+          "dbNamePlaceholder": "Nombre de la base de datos",
+          "schemaName": "Nombre del Esquema",
+          "schemaNamePlaceholder": "Nombre del esquema (ej., public)",
+          "saveButton": "Guardar Configuración",
+          "savingButton": "Guardando...",
+          "successMessage": "¡Configuración de base de datos guardada con éxito!",
+          "errorNotFound": "ID de usuario no encontrado. Por favor inicia sesión nuevamente.",
+          "errorGeneric": "Ocurrió un error al guardar la configuración"
+        }
       },
       "query": {
         "processing": "Procesando Consulta",
@@ -30,10 +65,33 @@
           "report_title": "INFORME DE ANÁLISIS DE DATOS",
           "report_subtitle": "Visualización y análisis de datos",
           "generated_text": "Generado el:",
-          "summary_text": "Resumen y conclusiones"
+          "summary_text": "Resumen y conclusiones",
+          "pdf_error": "Error al generar PDF: Contenedor del informe no encontrado.",
+          "preparing_pdf": "Preparando documento...",
+          "rendering_elements": "Renderizando elementos...",
+          "creating_pdf": "Creando documento PDF...",
+          "generating_cover": "Generando portada...",
+          "processing_section": "Procesando sección: {section}...",
+          "processing_chart": "Procesando gráfico {current} de {total} en {section}...",
+          "generating_summary": "Generando resumen y conclusiones...",
+          "saving_pdf": "Guardando documento...",
+          "pdf_success": "¡PDF generado con éxito!",
+          "pdf_error_generic": "Error al generar PDF"
 
       },
       "ui": {
+        "home": "Inicio",
+        "query": "Consulta",
+        "alerts": "Alertas",
+        "reports": "Reportes",
+        "syntheticData": "Datos Sintéticos",
+        "databases": "Bases de Datos",
+        "configuration": "Configuración",
+        "login": "Iniciar sesión",
+        "register": "Registrarse",
+        "profile": "Perfil",
+        "logout": "Cerrar sesión",
+        "footerMessage": "LangSQL - Potenciando tus consultas",
         "placeholder": "Escribe tu mensaje...",
         "send": "Enviar",
         "yourChats": "Tus Conversaciones",
@@ -65,7 +123,9 @@
         },
         "enterTitle": "Ingresa un título...",
         "chatPrefix": "Chat",
-        "noMessages": "Sin mensajes"
+        "noMessages": "Sin mensajes",
+        "clickToView": "Clic para ver conversación",
+        "untitledChat": "Chat sin título"
       },
       "alerts": {
         "errorMessage": "Error al cargar la alerta",
@@ -123,6 +183,89 @@
         "loadingSchema": "Cargando esquema...",
         "numberOfRecords": "Cantidad de registros a generar:",
         "generateData": "Generar Datos"
+      },
+      "landing": {
+        "hero": {
+          "title": "Libera el poder de las consultas en lenguaje natural",
+          "subtitle": "Olvida el SQL. Pregunta, y LangSQL responde."
+        },
+        "features": {
+          "fast": {
+            "title": "Rápido como un rayo",
+            "description": "Obtén información en segundos, sin necesidad de SQL."
+          },
+          "effortless": {
+            "title": "Sin esfuerzo",
+            "description": "Solo haz preguntas naturalmente, nosotros nos encargamos del resto."
+          },
+          "versatile": {
+            "title": "Versátil",
+            "description": "Funciona perfectamente con múltiples bases de datos."
+          }
+        },
+        "howItWorks": {
+          "title": "Cómo funciona LangSQL",
+          "subtitle": "Un simple proceso de 3 pasos para desbloquear el potencial de tu base de datos.",
+          "step1": {
+            "title": "Paso 1: Conecta",
+            "description": "Vincula tu base de datos en unos pocos clics."
+          },
+          "step2": {
+            "title": "Paso 2: Pregunta",
+            "description": "Escribe una pregunta en lenguaje natural."
+          },
+          "step3": {
+            "title": "Paso 3: Obtén resultados",
+            "description": "Recibe respuestas claras al instante."
+          }
+        }
+      },
+      "login": {
+        "title": "Bienvenido de nuevo a LangSQL",
+        "subtitle": "Consulta tu base de datos con lenguaje natural",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "button": "Iniciar sesión",
+        "loading": "Iniciando sesión...",
+        "error": "Ocurrió un error",
+        "registerPrompt": "¿No tienes una cuenta? Regístrate ahora"
+      },
+      "register": {
+        "title": "Crea tu cuenta de LangSQL",
+        "subtitle": "Comienza a consultar tu base de datos con lenguaje natural",
+        "form": {
+          "fullName": "Nombre completo",
+          "fullNamePlaceholder": "ej. Juan Pérez",
+          "email": "Correo electrónico",
+          "emailPlaceholder": "ej. usuario@ejemplo.com",
+          "password": "Contraseña",
+          "passwordPlaceholder": "Mínimo 8 caracteres",
+          "nextButton": "Siguiente",
+          "backButton": "Atrás",
+          "registerButton": "Completar registro",
+          "registering": "Registrando...",
+          "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+          "loginLink": "Inicia sesión aquí"
+        },
+        "database": {
+          "dbType": "Tipo de base de datos",
+          "host": "Servidor",
+          "hostPlaceholder": "ej. localhost o 127.0.0.1",
+          "port": "Puerto",
+          "portPlaceholder": "ej. 3306 para MySQL",
+          "dbUser": "Usuario DB",
+          "dbUserPlaceholder": "Usuario de la base de datos",
+          "dbPassword": "Contraseña DB",
+          "dbPasswordPlaceholder": "Contraseña de la base de datos",
+          "dbName": "Nombre de la base de datos",
+          "dbNamePlaceholder": "Nombre de la base de datos a conectar",
+          "schemaName": "Nombre del esquema",
+          "schemaNamePlaceholder": "Nombre del esquema (opcional)"
+        },
+        "errors": {
+          "requiredFields": "Por favor completa todos los campos requeridos",
+          "unknownError": "Ocurrió un error"
+        }
       }
     }
   }

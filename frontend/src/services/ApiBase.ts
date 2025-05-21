@@ -1,10 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { userStore } from '@/store/userStore';
+import i18n from '@/i18n'; 
 
 declare module 'axios' {
-    interface AxiosInstance {
-        isAxiosError(payload: any): payload is AxiosError;
-    }
+  interface AxiosInstance {
+    isAxiosError(payload: any): payload is AxiosError;
+  }
 }
 
 const api = axios.create({
@@ -15,7 +16,7 @@ const api = axios.create({
 });
 
 api.isAxiosError = (payload: any): payload is AxiosError => {
-    return (payload as AxiosError).isAxiosError !== undefined;
+  return (payload as AxiosError).isAxiosError !== undefined;
 };
 
 api.interceptors.request.use(
@@ -24,6 +25,9 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    config.headers['lang'] = i18n.global.locale.value;
+
     return config;
   },
   (error) => {
@@ -35,17 +39,20 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && 
-        !originalRequest._retry && 
-        !originalRequest.url.includes('/auth/refresh') &&
-        !originalRequest.url.includes('/auth/login')) {
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/auth/refresh') &&
+      !originalRequest.url.includes('/auth/login')
+    ) {
       originalRequest._retry = true;
-      
+
       try {
         const refreshed = await userStore.refreshToken();
         if (refreshed) {
           originalRequest.headers.Authorization = `Bearer ${userStore.access_token}`;
+          originalRequest.headers['lang'] = i18n.global.locale.value; 
           return api(originalRequest);
         }
       } catch (refreshError) {
@@ -55,7 +62,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

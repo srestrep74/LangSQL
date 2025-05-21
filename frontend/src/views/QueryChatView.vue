@@ -28,7 +28,20 @@ onMounted(async () => {
     currentChatId.value = route.params.chatId as string;
     await loadChatHistory(currentChatId.value);
   } else {
-    await loadChats();
+    const shouldCreateNewChat = localStorage.getItem('createNewChat') === 'true';
+
+    if (shouldCreateNewChat) {
+      localStorage.removeItem('createNewChat');
+    } else {
+      await loadChats();
+      if (userChats.value.length > 0) {
+        const mostRecentChat = userChats.value[0];
+        const chatId = mostRecentChat.chat_id || mostRecentChat.id;
+        currentChatId.value = chatId;
+        router.push(`/chat/${chatId}`);
+        await loadChatHistory(chatId);
+      }
+    }
   }
 });
 
@@ -48,7 +61,7 @@ async function loadChats() {
       messages: []
     };
 
-    const response = await TextToSqlService.processQuery('', chatData);
+    const response = await TextToSqlService.processQuery('', chatData, 'list_only');
 
     if (response && response.chats) {
       userChats.value = response.chats;
@@ -173,6 +186,8 @@ function createNewChat() {
   currentChatId.value = null;
   chatMessages.value = [];
   router.push('/chat');
+
+  localStorage.setItem('createNewChat', 'true');
 }
 
 async function deleteChat(chatId: string, event: Event) {
@@ -238,7 +253,6 @@ async function saveChatTitle(chatId: string, event: Event) {
     isLoading.value = true;
     await TextToSqlService.renameChat(chatId, editedTitle.value.trim());
 
-    // Update chat title in the list
     const chatIndex = userChats.value.findIndex(chat =>
       (chat.chat_id || chat.id) === chatId
     );
@@ -273,6 +287,8 @@ const sendQuery = async () => {
     return
   }
 
+  const isFirstMessageInNewChat = !currentChatId.value && chatMessages.value.length === 0;
+
   chatMessages.value.push({ type: 'user', content: userQuery.value })
 
   const loadingMessage = {
@@ -292,10 +308,12 @@ const sendQuery = async () => {
       }))
     };
 
+    const chatToUse = isFirstMessageInNewChat ? null : currentChatId.value;
+
     const response: QueryResults = await TextToSqlService.processQuery(
       userQuery.value,
       chatData,
-      currentChatId.value
+      chatToUse
     );
 
     if (!currentChatId.value && response.chat_id) {
@@ -473,7 +491,6 @@ function addSqlResultsTable(data: any[], title: string = t('message.query.result
   chatMessages.value.push({ type: 'bot', content: tableHTML });
 }
 
-// Language switcher function
 const changeLanguage = (lang: 'en' | 'es') => {
   locale.value = lang
   localStorage.setItem('userLanguage', lang)
@@ -523,9 +540,9 @@ const changeLanguage = (lang: 'en' | 'es') => {
                 {{ chat.title || t('message.ui.chatPrefix') + ' ' + (chat.chat_id || chat.id)?.substring(0, 8) }}
               </div>
               <div class="chat-preview">
-                {{ chat.messages && chat.messages.length > 0 ?
-                  chat.messages[chat.messages.length - 1].message.substring(0, 30) + '...' :
-                  t('message.ui.noMessages') }}
+                {{ chat.title ?
+                  t('message.ui.clickToView') :
+                  t('message.ui.untitledChat') }}
               </div>
             </div>
           </div>
@@ -569,7 +586,6 @@ const changeLanguage = (lang: 'en' | 'es') => {
       </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="delete-modal-overlay">
       <div class="delete-modal">
         <div class="delete-modal-header">
@@ -1010,7 +1026,6 @@ const changeLanguage = (lang: 'en' | 'es') => {
   font-style: italic;
 }
 
-/* Delete Modal Styles */
 .delete-modal-overlay {
   position: fixed;
   top: 0;
