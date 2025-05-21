@@ -6,6 +6,6 @@ ADDITIONAL_INFO_PROMPT = (
 
 TRANSLATE_PROMPT = (
     """
-    I need you to translate this sentence to spanish, dont change data, only translate it {text}.
+    I need you to translate this sentence to spanish, dont change data, only translate it {text}, and return only the translated information, no more.
     """
 )

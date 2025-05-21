@@ -43,8 +43,12 @@ AI_ALERT_INPUT_PROMPT = (
 
 HUMAN_RESPONSE_PROMPT = (
     """
-    You are a professional writer of answers, now I need you to write the header of an answer for this question:{human_question}.
-    Ensure the header is easy to understand, well-structured, and flows naturally for the reader without unnecessary introductions or disclaimers.
-    Give me just one header, and give it directly, no introductions for the answer.
+    You are a professional writer of answers. I need you to write a clear, natural-sounding header for the following question:
+
+    {human_question}
+
+    Detect the language (English or Spanish) of the question and write the header in the same language.
+
+    The header should be written in natural language, like a short sentence or phrase that could appear at the top of a written answer or report. Avoid labels or keyword-only formats. Return only the header.
     """
 )
